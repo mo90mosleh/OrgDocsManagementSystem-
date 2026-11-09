@@ -1,0 +1,5 @@
+import type{KeyboardEvent,ReactNode}from'react';
+export function SegmentedControl<T extends string>({label,value,options,onChange,className=''}:{label:string;value:T;options:{value:T;label:string;icon:ReactNode}[];onChange:(value:T)=>void;className?:string}){
+ function keys(e:KeyboardEvent<HTMLButtonElement>,index:number){let next=index;if(e.key==='ArrowLeft'||e.key==='ArrowDown')next=(index+1)%options.length;else if(e.key==='ArrowRight'||e.key==='ArrowUp')next=(index-1+options.length)%options.length;else if(e.key==='Home')next=0;else if(e.key==='End')next=options.length-1;else return;e.preventDefault();onChange(options[next].value);e.currentTarget.parentElement?.querySelectorAll<HTMLButtonElement>('[role=radio]')[next]?.focus();}
+ return <div className={'segmented-control '+className} role="radiogroup" aria-label={label}>{options.map((option,index)=><button key={option.value} type="button" role="radio" aria-checked={value===option.value} tabIndex={value===option.value?0:-1} onKeyDown={e=>keys(e,index)} onClick={()=>onChange(option.value)}>{option.icon}<span>{option.label}</span></button>)}</div>;
+}
