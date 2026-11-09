@@ -1,3 +1,4 @@
+import{usePageSelection,useRequestedSelection}from'./namayar/PageContextProvider';
 import{SegmentedControl}from'./SegmentedControl';
 import{useEffect,useRef,useState}from'react';import{Layers3,ClipboardList,Search,X,ChevronLeft,ArrowUpRight,ArrowLeft,Home,Building2,ChartNoAxesCombined,GitBranch,ListTree,PanelsTopLeft,Info,ChevronDown,ChevronsUpDown,ChevronsDownUp}from'lucide-react';import type{Data,Process}from'./types';import{Heading,Empty,Link,number,currentPath}from'./ui';import{architectureTrail,searchArchitecture,descendantProcessCount}from'./architecture-navigation';
 type View={mode:'staged'|'tree';closed:string[];branchId:string|null;selectedId:string|null;query:string;scrollY:number};
@@ -6,6 +7,8 @@ const classifications:Record<string,string>={CORE:'اصلی',MANAGEMENT:'مدی�
 export function Architecture({data}:{data:Data}){
  const key='nama-architecture-view-v1:'+data.organization.id+':'+data.user.role,[saved]=useState(()=>readView(key)),[mode,setMode]=useState<'staged'|'tree'>(saved.mode),[closed,setClosed]=useState(new Set(saved.closed)),[branchId,setBranchId]=useState(saved.branchId),[selectedId,setSelectedId]=useState(saved.selectedId),[query,setQuery]=useState(saved.query),[searchOpen,setSearchOpen]=useState(false),panel=useRef<HTMLElement>(null),stage=useRef<HTMLDivElement>(null);
  const branch=data.nodes.find(n=>n.id===branchId),trail=architectureTrail(data.nodes,branch?.id??null),selected=data.nodes.find(n=>n.id===selectedId&&n.kind==='PROCESS'),byId=new Map(data.nodes.map(n=>[n.id,n])),children=data.nodes.filter(n=>branch?n.parent_id===branch.id:!n.parent_id||!byId.has(n.parent_id)),results=searchArchitecture(data.nodes,query),linked=selected?data.kpis.filter(k=>data.links.some(l=>l.process_id===selected.id&&l.kpi_id===k.id)):[],relatedIds=new Set(selected?(data.relations??[]).flatMap(r=>r.source_process_id===selected.id?[r.target_process_id]:r.target_process_id===selected.id?[r.source_process_id]:[]):[]),related=data.nodes.filter(n=>n.kind==='PROCESS'&&n.id!==selected?.id&&relatedIds.has(n.id));
+ usePageSelection('/architecture',selected?{kind:'process',id:selected.id}:branch?{kind:'group',id:branch.id}:null);
+ useRequestedSelection('/architecture',entity=>{const node=data.nodes.find(n=>n.id===entity.id);if(node&&(entity.kind==='group'||entity.kind==='process'))reveal(node);});
  const view=useRef({mode,closed:[...closed],branchId,selectedId,query});view.current={mode,closed:[...closed],branchId,selectedId,query};const leaving=useRef(false);
  function remember(){try{sessionStorage.setItem(key,JSON.stringify({...view.current,scrollY:window.scrollY}));}catch{}}
  useEffect(()=>{remember();},[mode,closed,branchId,selectedId,query,key]);
