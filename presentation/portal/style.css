@@ -46,3 +46,6 @@
 .topbar-actions{display:flex;align-items:center;gap:18px;flex-shrink:0}.topbar-actions .global-back{margin:0}.chart-header .chart-back{margin-right:auto}.chart-header .global-back{margin-right:0}.global-back{min-height:34px}
 @media(max-width:760px){.topbar-actions{gap:10px}.global-back{padding:7px 9px;min-width:34px}.global-back>span{display:none}}
 @media(max-width:480px){.topbar-actions .profile-menu summary>span:nth-child(2){display:none}.topbar-actions .profile-menu summary{gap:6px}}
+
+/* Read-only diagram cards remain interactive: the canvas pans, cards open details. */
+.interactive-chart .organization-flow-node,.flow-org-node,.flow-org-node .node-select,.flow-org-node .node-toggle{cursor:pointer}.flow-org-node:hover{border-color:#7e9c89;box-shadow:0 5px 16px #25432e20}.flow-org-node.selected:hover{border-color:var(--brand)}

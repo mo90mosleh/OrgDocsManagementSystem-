@@ -17,3 +17,9 @@ The header uses matching, keyboard-accessible segmented radio controls for «س�
 Validation adds geometry checks for both chart contents in both directions, keyboard radio navigation, rendered parent-child direction/handle checks, toolbar placement/icons, mobile bounds and vertical-state/camera restoration after navigation and refresh. Desktop/mobile screenshots were inspected.
 
 The owner's follow-up places Back at the upper-left of every page: the leftmost top-bar action on normal pages and the leftmost chart-header action. On small screens it uses the same labelled arrow icon without visible text to avoid crowding; its accessible label and behavior are unchanged. Browser assertions verify its upper-left bounds across all public routes.
+
+## Direct-card interaction fix
+
+React Flow disables pointer events on a read-only node wrapper unless selection, dragging or a node pointer callback is registered. Custom child buttons alone therefore did not receive physical clicks even though search could open the details panel. A diagram-level `onNodeClick` now explicitly enables read-only card interaction. Child selection/collapse buttons stop propagation to avoid duplicate actions; cards use a pointer cursor and subtle hover border/shadow, while background drag still pans. No diagram editing is enabled.
+
+Validation: typecheck/build and 10 browser scenarios passed, including actual hover and card-button clicks (not search-only selection) on both content types in both directions, process/KPI navigation and Back, single-action collapse, background pan/wheel zoom, state restoration and admin/viewer boundaries.
