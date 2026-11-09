@@ -22,26 +22,63 @@ const style=document.createElement("style");style.textContent=`
 #orgchart-pages-v2 .orgc-node strong{font-size:13px;line-height:1.7}
 #orgchart-pages-v2 .orgc-node small{font-size:11px;color:#647083;line-height:1.6}
 #orgchart-pages-v2 .orgc-node button{padding:2px 8px;font-size:11px;margin:3px auto 0}
-#orgchart-pages-v2 .orgc-empty{padding:32px;text-align:center;color:#657081}
+#orgchart-pages-v2 .orgc-empty{padding:32px;text-align:center;color:#657081}\n#orgchart-pages-v2 .orgc-seat-count{font-weight:700;color:#b72a3e;background:#fff0f2;border-radius:6px;padding:2px 6px;align-self:center}\n#orgchart-pages-v2 .orgc-mixed-reporting{color:#785e26}
 @media(max-width:700px){#orgchart-pages-v2 .orgc-scroll{padding:14px 8px}#orgchart-pages-v2 .orgc-toolbar{gap:8px}#orgchart-pages-v2 button{font-size:12px}}
 `;document.head.append(style);
+
+/* A job title is a reusable role; individual position records represent seats.
+   Group repeated seats by normalized title and organizational unit.
+   Keep underlying reporting relationships unchanged, and indicate mixed reporting lines. */
+function roleKey(p){return p.org_unit_id+"|"+String(p.title||"").normalize("NFKC").replace(/ي/g,"ی").replace(/ك/g,"ک").replace(/\s+/g," ").trim();}
+function groupRoles(positions){
+ const byPosition=new Map(positions.map(p=>[p.id,p]));
+ const groups=new Map();
+ for(const p of positions){
+  const key=roleKey(p);
+  if(!groups.has(key))groups.set(key,{id:"role:"+key,title:String(p.title||"").trim(),org_unit_id:p.org_unit_id,members:[],parent_id:null,reporting_variants:0});
+  groups.get(key).members.push(p);
+ }
+ for(const [key,g] of groups){
+  const parents=new Map();
+  for(const p of g.members){
+   const sourceParent=byPosition.get(p.reports_to_position_id);
+   const parentKey=sourceParent?roleKey(sourceParent):null;
+   if(parentKey!==key && (parentKey===null || groups.has(parentKey)))
+     parents.set(parentKey,(parents.get(parentKey)||0)+1);
+  }
+  g.reporting_variants=parents.size;
+  const ranked=[...parents].filter(([k])=>k!==null).sort((a,b)=>b[1]-a[1]);
+  g.parent_id=ranked.length?"role:"+ranked[0][0]:null;
+ }
+ const byId=new Map([...groups.values()].map(g=>[g.id,g]));
+ for(const g of groups.values()){
+  const visited=new Set([g.id]);let parent=g.parent_id;
+  while(parent){if(visited.has(parent)){g.parent_id=null;break;}visited.add(parent);parent=byId.get(parent)?.parent_id||null;}
+ }
+ return [...groups.values()];
+}
 function render(){
  const root=document.getElementById("orgchart-pages-v2");if(!root||!data)return;
  root.replaceChildren();
  const toolbar=el("div","orgc-toolbar"),left=el("div"),right=el("div");
  const btn=(txt,fn,isActive=false)=>{const b=el("button",isActive?"active":"",txt);b.type="button";b.addEventListener("click",fn);return b;};
  left.append(btn("چارت سمت‌ها",()=>{mode="positions";collapsed.clear();render();},mode==="positions"),btn("ساختار واحدها",()=>{mode="units";collapsed.clear();render();},mode==="units"));
- right.append(btn("باز کردن همه",()=>{collapsed.clear();render();}),btn("جمع کردن همه",()=>{collapsed=new Set((mode==="positions"?data.positions:data.units).map(x=>x.id));render();}));
+ right.append(btn("باز کردن همه",()=>{collapsed.clear();render();}),btn("جمع کردن همه",()=>{collapsed=new Set((mode==="positions"?groupRoles(data.positions):data.units).map(x=>x.id));render();}));
  toolbar.append(left,right);root.append(toolbar);
- root.append(el("p","orgc-info",mode==="positions"?`${data.positions.length} جایگاه سازمانی | اطلاعات افراد در نسخه عمومی نمایش داده نمی‌شود.`:`${data.units.length} واحد سازمانی`));
+ const roles=groupRoles(data.positions);
+ root.append(el("p","orgc-info",mode==="positions"?`${roles.length} سمت متمایز در ${data.positions.length} جایگاه سازمانی · نام افراد در نسخه عمومی نمایش داده نمی‌شود.`:`${data.units.length} واحد سازمانی`));
  const scroll=el("div","orgc-scroll");root.append(scroll);
- const records=mode==="positions"?data.positions:data.units;
+ const records=mode==="positions"?roles:data.units;
  const children=new Map(),byId=new Map(records.map(x=>[x.id,x])),units=new Map(data.units.map(x=>[x.id,x.name]));
- for(const x of records){const parent=mode==="positions"?x.reports_to_position_id:x.parent_id;const k=parent&&byId.has(parent)?parent:"__root__";const arr=children.get(k)||[];arr.push(x);children.set(k,arr);}
+ for(const x of records){const parent=mode==="positions"?x.parent_id:x.parent_id;const k=parent&&byId.has(parent)?parent:"__root__";const arr=children.get(k)||[];arr.push(x);children.set(k,arr);}
  function node(item,visited){
   const li=el("li"),card=el("div","orgc-node"),title=mode==="positions"?item.title:item.name;
   card.append(el("strong","",title));
-  if(mode==="positions")card.append(el("small","",units.get(item.org_unit_id)||""));
+  if(mode==="positions"){
+   card.append(el("small","",units.get(item.org_unit_id)||""));
+   if(item.members.length>1)card.append(el("small","orgc-seat-count",String(item.members.length)+" جایگاه"));
+   if(item.reporting_variants>1)card.append(el("small","orgc-mixed-reporting","چند مسیر گزارش‌دهی"));
+  }
   const kids=(children.get(item.id)||[]).filter(x=>!visited.has(x.id));
   if(kids.length)card.append(btn(collapsed.has(item.id)?"نمایش زیرمجموعه ("+kids.length+")":"جمع کردن ("+kids.length+")",()=>{collapsed.has(item.id)?collapsed.delete(item.id):collapsed.add(item.id);render();}));
   li.append(card);
