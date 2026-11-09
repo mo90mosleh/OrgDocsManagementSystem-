@@ -1,0 +1,12 @@
+export type Role='ADMIN'|'EDITOR'|'VIEWER';
+export type Org={id:string;name:string;display_name:string;primary_color:string;logo_data_url:string|null};
+export type Unit={id:string;name:string;parent_id:string|null;code:string|null;sort_order:number};
+export type Position={id:string;org_unit_id:string;reports_to_position_id:string|null;title:string};
+export type Person={id:string;display_name:string;email:string|null;phone:string|null};
+export type Assignment={id:string;person_id:string;position_id:string};
+export type Process={content_status?:string;content_revision?:string;source_data?:{owner:string;description:string;initiators:string[];sheet:string;row:number};id:string;parent_id:string|null;kind:'GROUP'|'PROCESS';classification:string|null;code:string|null;name:string;summary:string|null;owner_org_unit_id:string|null};
+export type Profile={id?:string;process_id:string;objective:string|null;start_event:string|null;end_event:string|null;inputs:string|null;outputs:string|null;roles:string|null;expected_outcome:string|null;notes:string|null};
+export type KPI={id:string;code:string;name:string;description:string|null;formula_text:string|null;unit:string|null;frequency:string|null;readiness_status:string;target_value:number|null;data_source:string|null};
+export type Data={organization:Org;units:Unit[];positions:Position[];persons:Person[];assignments:Assignment[];nodes:Process[];profiles:Profile[];kpis:KPI[];links:{process_id:string;kpi_id:string}[];documents:{id:string;title:string;process_id?:string;doc_type?:string;external_url?:string;content_status?:string}[];references?:{process_id:string;system_name:string;workflow_name:string;main_steps:string;control_question:string}[];relations?:{source_process_id:string;target_process_id:string;relation_type:string}[];requirements?:{kpi_id:string;required_for:string;field_or_event_name:string;availability_note:string}[];user:{name:string;email:string;role:Role};};
+export type Config={mode:'public'|'private';adminUrl:string;url?:string;publishableKey?:string};
+declare global{interface Window{__PORTAL_CONFIG__:Config;__ORGDEMO_HASH_ROUTING__?:boolean}}

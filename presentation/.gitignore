@@ -1,0 +1,8 @@
+.env*
+node_modules/
+dist/
+*.tar.gz
+pages/
+node_modules/
+playwright-report/
+test-results/
