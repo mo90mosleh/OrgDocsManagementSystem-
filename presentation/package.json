@@ -7,7 +7,8 @@
     "test": "node --test --test-isolation=none tests/*.test.mjs",
     "typecheck": "tsc -p portal/tsconfig.json",
     "test:e2e": "playwright test",
-    "publish:pages": "npm run build && node scripts/publish-pages.mjs"
+    "publish:pages": "npm run build && node scripts/publish-pages.mjs",
+    "build:pages": "PAGES_SNAPSHOT=1 npm run build"
   },
   "dependencies": {
     "lucide-react": "0.575.0",

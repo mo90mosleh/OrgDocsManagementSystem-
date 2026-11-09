@@ -2,6 +2,7 @@ import type{Data,Config}from './types';
 export const ORG='a0000000-0000-4000-8000-000000000001';
 export const config=window.__PORTAL_CONFIG__;
 export async function loadData():Promise<Data>{
+ if(config.snapshotPath){const r=await fetch(config.snapshotPath,{cache:'no-store',signal:AbortSignal.timeout(20000)});if(!r.ok)throw Error('دریافت فایل اطلاعات انجام نشد. دوباره تلاش کنید.');return normalize(await r.json());}
  if(config.mode==='private'){const r=await fetch('/api/data',{cache:'no-store',signal:AbortSignal.timeout(25000)});const v=await r.json();if(!r.ok)throw Error(v.error||'دریافت اطلاعات انجام نشد.');return normalize(v);}
  const cfg=config as Required<Config>;
  const get=async(table:string,query:string)=>{const r=await fetch(cfg.url+'/rest/v1/'+table+'?'+query,{headers:{apikey:cfg.publishableKey},signal:AbortSignal.timeout(20000)});if(!r.ok)throw Error('دریافت اطلاعات انجام نشد؛ اتصال را بررسی کنید.');return r.json();};

@@ -23,3 +23,7 @@ A self-hostable, organization-independent platform for organization charts, proc
 - Use proven open-source components for chart visualization and BPMN editing; **do not develop a workflow execution engine**.
 
 > Nothing in this repository is a deployed application or an existing set of business records. It is the implementation blueprint.
+
+## ارائهٔ عمومی راسان
+
+[باز کردن ارائه در GitHub Pages](https://mo90mosleh.github.io/OrgDocsManagementSystem-/) — ۴۴ فرآیند، شناسنامه‌ها، شاخص‌ها، ارجاع اسناد و ابزار بازخورد. کد ارائه در `presentation/` و [راهنمای انتشار](presentation/docs/github-pages.md) است. ارائهٔ عمومی از دادهٔ نسخه‌بندی‌شدهٔ بستهٔ مالک استفاده می‌کند و برای نمایش به Render/Supabase وابسته نیست. این انتشار جایگزین مخزن دموی جدا می‌شود.
