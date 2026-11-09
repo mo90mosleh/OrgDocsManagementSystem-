@@ -146,7 +146,7 @@ export function Feedback() {
       setDraft({
         id: crypto.randomUUID(),
         page: route(),
-        url: location.origin + location.pathname + location.hash,
+        url: location.origin + location.pathname + (location.hash.startsWith("#/") ? location.hash.split("?")[0] : ""),
         title: document.title,
         selector: elementSelector(el),
         tag: el.tagName.toLowerCase(),

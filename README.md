@@ -27,3 +27,5 @@ A self-hostable, organization-independent platform for organization charts, proc
 ## ارائهٔ عمومی راسان
 
 [باز کردن ارائه در GitHub Pages](https://mo90mosleh.github.io/OrgDocsManagementSystem-/) — ۴۴ فرآیند، شناسنامه‌ها، شاخص‌ها، ارجاع اسناد و ابزار بازخورد. کد ارائه در `presentation/` و [راهنمای انتشار](presentation/docs/github-pages.md) است. ارائهٔ عمومی از دادهٔ نسخه‌بندی‌شدهٔ بستهٔ مالک استفاده می‌کند و برای نمایش به Render/Supabase وابسته نیست. این انتشار جایگزین مخزن دموی جدا می‌شود.
+
+ورود مدیریتی Pages: [صفحهٔ ورود](https://mo90mosleh.github.io/OrgDocsManagementSystem-/#/login). [راهنمای حساب مالک و دسترسی](presentation/docs/pages-auth.md) و [تغییرات شناسنامهٔ فرآیند](presentation/docs/feedback-2026-11-09.md).

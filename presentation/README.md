@@ -1,3 +1,12 @@
-# Private presentation
+# نما — ارائهٔ راسان
 
-See [setup, import and access documentation](docs/rassan-private-presentation.md). This optional deployment does not change the original application or automatically import any business data.
+[باز کردن پرتال](https://mo90mosleh.github.io/OrgDocsManagementSystem-/) · [ورود مدیریتی](https://mo90mosleh.github.io/OrgDocsManagementSystem-/#/login)
+
+بازدید عمومی بدون ورود است. مدیر تأییدشده با ایمیل/رمز وارد می‌شود و ساختار سازمان، شناسنامه‌های فرآیند، تنظیمات برند و ارجاع ویدئو را در Supabase ذخیره می‌کند. بازخوردها در مرورگر ذخیره و به JSON صادر می‌شوند.
+
+- [ورود، ساخت حساب مالک و کنترل دسترسی](docs/pages-auth.md)
+- [انتشار روی GitHub Pages](docs/github-pages.md)
+- [تغییرات صفحهٔ شناسنامه بر اساس بازخوردها](docs/feedback-2026-11-09.md)
+- [سوابق بستهٔ واردشده و محیط ارائه](docs/rassan-private-presentation.md)
+
+اجرای اختیاری این ارائه، قرارداد نصب خالی برنامهٔ اصلی را تغییر نمی‌دهد. ساخت و اجرای برنامه به‌طور خودکار حساب، رمز یا رکورد کسب‌وکار ایجاد نمی‌کند.
