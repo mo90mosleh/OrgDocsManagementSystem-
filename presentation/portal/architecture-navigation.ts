@@ -1,0 +1,5 @@
+import type{Process}from'./types';
+export function architectureTrail(nodes:Process[],id:string|null){const byId=new Map(nodes.map(n=>[n.id,n])),path:Process[]=[],seen=new Set<string>();let node=id?byId.get(id):undefined;while(node&&!seen.has(node.id)){seen.add(node.id);path.unshift(node);node=node.parent_id?byId.get(node.parent_id):undefined;}return path;}
+export function normalizeSearch(text:string){return text.normalize('NFKC').replace(/ي/g,'ی').replace(/ك/g,'ک').replace(/[\u064B-\u065F\u0670]/g,'').replace(/[\s\u200c]+/g,' ').trim().toLocaleLowerCase('fa');}
+export function searchArchitecture(nodes:Process[],query:string){const words=normalizeSearch(query).split(' ').filter(Boolean);return words.length?nodes.filter(n=>{const text=normalizeSearch(n.name+' '+(n.code??''));return words.every(w=>text.includes(w));}):[];}
+export function descendantProcessCount(nodes:Process[],id:string){const visited=new Set([id]),queue=[id];let count=0;while(queue.length){const parent=queue.shift();for(const n of nodes)if(n.parent_id===parent&&!visited.has(n.id)){visited.add(n.id);if(n.kind==='PROCESS')count++;queue.push(n.id);}}return count;}
