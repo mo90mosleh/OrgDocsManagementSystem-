@@ -46,3 +46,13 @@ The Free Render compute plan may take about a minute to wake after 15 minutes id
 - Chromium: 44-process dashboard counts, 90 documents; source names/owners and draft markers for RAS-U013, RAS-U027, RAS-U038; original PDF URL links, owner filter, KPI requirements; existing feedback/mobile/admin regressions.
 
 Deployment is complete only after Render reports live and authenticated HTTP checks pass. Source preparation alone does not establish a live URL.
+
+## Render deployment status (2026-11-09)
+
+Workspace explicitly confirmed: Mohammad's workspace (tea-db9lcvfbtjjs73c5onu0). Created Free Node service srv-dbom8ndg1s2s73flbj0g in Frankfurt. URL: https://rassan-orgdocs-preview.onrender.com. First deploy dep-dbom8ntg1s2s73flbksg reached live.
+
+Live HTTP checks: /health200, /login200, anonymous /api/data401, root redirect303; both role-key logins succeed with secure cookies, viewer mutation403, admin invalid form400. Business-data request remains502 because upstream Supabase REST returns503. Full data preview is NOT verified/live yet.
+
+Supabase management says ACTIVE_HEALTHY while pause/log diagnostics report hibernating; SQL fails28P01 postgres password authentication; restore rejects because project is not paused; pause rejects because it is currently hibernating and asks to contact support. No database password was reset, no project was deleted/recreated, and business records were not reimported. A prepared private-scope access update, imports/authorize_render.sql, could not be applied while the provider is unavailable. After Supabase recovery apply this policy-only script (retains Sites capability and authorizes the Render capability), then run scripts/verify-render.mjs with runtime access keys via hidden stdin. It must report44 processes,44 profiles,44KPIs,90documents,44model PDF references.
+
+Private login keys are available only in this service's Render Dashboard Environment: PRESENTATION_VIEWER_KEY for review, PRESENTATION_ADMIN_KEY for management. No keys are included in this document. The verify script prints only response statuses/counts.
