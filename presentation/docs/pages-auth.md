@@ -35,3 +35,5 @@ Browser auth tests use intercepted test Auth/REST responses for invalid login, l
 Security advisor contains informational [RLS Enabled No Policy](https://supabase.com/docs/guides/database/database-linter?lint=0008_rls_enabled_no_policy) notices for intentionally inaccessible internal owner/audit tables: RLS is enabled and schema/table grants revoked, so default deny is intended. No new public administrative RPC is exposed.
 
 Training-video persistence uses portal/pages-training-videos.sql and its own public-read/admin-write RLS policy; it creates no video records automatically.
+
+The public reporting-position structure (job titles and seat hierarchy only) uses pages-public-positions.sql. Job-title groups match the existing public chart (41 groups / 74 seats in the current versioned dataset). Employee names, contact records and assignments remain excluded from the public snapshot and admin-only in live reads. No existing organizational data is replaced by this release.

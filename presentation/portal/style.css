@@ -20,3 +20,5 @@
 .position-tree-canvas .org-position-node:has(.position-person){min-height:82px}
 .position-tree-canvas .tree-canvas li{flex-shrink:0}
 @media(max-width:760px){.chart-view-switch{width:100%}.chart-view-switch button{flex:1}.position-tree-canvas{padding:16px 12px}}
+
+.position-seat-count{padding:1px 6px;border-radius:5px;background:#fff0f1;color:var(--brand)!important;font-size:10px!important}.position-mixed-reporting{font-size:9px!important;color:#a17d35!important}.position-tree-canvas .position-node-text{gap:4px}.position-tree-canvas .node-select{min-height:78px}
