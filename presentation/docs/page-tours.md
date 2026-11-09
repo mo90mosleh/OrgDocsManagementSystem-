@@ -7,3 +7,5 @@ Covered pages: dashboard, organization chart, architecture, process catalog/deta
 The overlay traps keyboard focus, makes the app and feedback controls inert while open, restores previous focus/scroll after closing, and closes on route changes. It does not read, copy or export form values, authentication tokens or business content; guide text is static. It makes no business-data writes or network requests.
 
 Tests cover all public routes, authenticated admin/settings, next/back/Escape/focus cleanup, temporary accordion state, mobile bounds and chart controls. The tour and chart are released after the separately verified admin/process-profile release, following the owner's requested priority.
+
+The second November 9 feedback release moves chart controls into its own header, retains only the dashboard return action, and guides users to process/KPI links from selected units or positions. Sidebar defaults to collapsed; its icon control is in the organization top bar.
