@@ -1,0 +1,218 @@
+{
+  "schema_version": "1.0",
+  "revision": "0.2",
+  "status": "DRAFT",
+  "scope": "Rassan sales and connected functions; proposal subject to process-owner validation",
+  "principle": "Existing 44 PayamGostar workflows are technical references, not automatically approved L2 processes. Preserve their IDs, profiles, KPI links, and documents.",
+  "root_groups": [
+    {
+      "id": "a1000000-0000-4000-8000-000000000001",
+      "code": "RAS-ARCH-L0-CORE",
+      "name": "فرآیندهای اصلی",
+      "classification": "CORE",
+      "parent_id": null,
+      "summary": "فرآیندهای ارزش‌آفرین در بازاریابی، فروش و خدمات مشتریان — طبقه‌بندی پیشنهادی و نیازمند تأیید"
+    },
+    {
+      "id": "a1000000-0000-4000-8000-000000000002",
+      "code": "RAS-ARCH-L0-MGMT",
+      "name": "فرآیندهای مدیریتی",
+      "classification": "MANAGEMENT",
+      "parent_id": null,
+      "summary": "فرآیندهای راهبری، برنامه‌ریزی، کنترل و بهبود عملکرد — در انتظار استخراج و تأیید"
+    },
+    {
+      "id": "a1000000-0000-4000-8000-000000000003",
+      "code": "RAS-ARCH-L0-SUPP",
+      "name": "فرآیندهای پشتیبان",
+      "classification": "SUPPORT",
+      "parent_id": null,
+      "summary": "فرآیندهای فراهم‌کننده منابع و خدمات مشترک موردنیاز زنجیره ارزش — طبقه‌بندی پیشنهادی"
+    }
+  ],
+  "level_1_groups": [
+    {
+      "id": "a1100000-0000-4000-8000-000000000001",
+      "code": "RAS-ARCH-L1-CORE-MARKET",
+      "name": "بازاریابی و توسعه کانال‌های فروش",
+      "classification": "CORE",
+      "parent_id": "a1000000-0000-4000-8000-000000000001",
+      "summary": "توسعه شبکه نمایندگان، ترویج بازار و پشتیبانی کانال‌ها — پیش‌نویس"
+    },
+    {
+      "id": "a1100000-0000-4000-8000-000000000002",
+      "code": "RAS-ARCH-L1-CORE-SALES",
+      "name": "فروش و تحقق سفارش",
+      "classification": "CORE",
+      "parent_id": "a1000000-0000-4000-8000-000000000001",
+      "summary": "فروش از کانال‌های مختلف و تأمین نیاز سفارش — پیش‌نویس"
+    },
+    {
+      "id": "a1100000-0000-4000-8000-000000000003",
+      "code": "RAS-ARCH-L1-CORE-SERVICE",
+      "name": "خدمات پس از فروش و ارتباط با مشتری",
+      "classification": "CORE",
+      "parent_id": "a1000000-0000-4000-8000-000000000001",
+      "summary": "خدمات، شبکه تکنسین‌ها، باشگاه مجریان و بازخورد مشتری — پیش‌نویس"
+    },
+    {
+      "id": "a1100000-0000-4000-8000-000000000004",
+      "code": "RAS-ARCH-L1-MGMT-PERF",
+      "name": "راهبری، برنامه‌ریزی و بهبود عملکرد",
+      "classification": "MANAGEMENT",
+      "parent_id": "a1000000-0000-4000-8000-000000000002",
+      "summary": "حوزه مدیریتی پیشنهادی؛ مصادیق آن هنوز از سازمان استخراج نشده است — پیش‌نویس"
+    },
+    {
+      "id": "a1100000-0000-4000-8000-000000000005",
+      "code": "RAS-ARCH-L1-SUPP-FIN",
+      "name": "امور مالی و حسابداری",
+      "classification": "SUPPORT",
+      "parent_id": "a1000000-0000-4000-8000-000000000003",
+      "summary": "پرداخت‌ها و حساب‌های مالی نمایندگان — پیش‌نویس"
+    },
+    {
+      "id": "a1100000-0000-4000-8000-000000000006",
+      "code": "RAS-ARCH-L1-SUPP-HR",
+      "name": "منابع انسانی و خدمات اداری",
+      "classification": "SUPPORT",
+      "parent_id": "a1000000-0000-4000-8000-000000000003",
+      "summary": "جذب و نگهداشت افراد و خدمات مشترک اداری — پیش‌نویس"
+    },
+    {
+      "id": "a1100000-0000-4000-8000-000000000007",
+      "code": "RAS-ARCH-L1-SUPP-IT",
+      "name": "فناوری اطلاعات و سامانه‌ها",
+      "classification": "SUPPORT",
+      "parent_id": "a1000000-0000-4000-8000-000000000003",
+      "summary": "پشتیبانی زیرساخت و سامانه‌های مورد استفاده — پیش‌نویس"
+    },
+    {
+      "id": "a1100000-0000-4000-8000-000000000008",
+      "code": "RAS-ARCH-L1-SUPP-COM",
+      "name": "تأمین و بازرگانی",
+      "classification": "SUPPORT",
+      "parent_id": "a1000000-0000-4000-8000-000000000003",
+      "summary": "عملیات بازرگانی و الزامات تجارت — پیش‌نویس"
+    }
+  ],
+  "existing_level_2_reparent": [
+    {
+      "name": "توسعه شبکه نمایندگان",
+      "new_parent_id": "a1100000-0000-4000-8000-000000000001",
+      "classification": "CORE"
+    },
+    {
+      "name": "پشتیبانی بازاریابی",
+      "new_parent_id": "a1100000-0000-4000-8000-000000000001",
+      "classification": "CORE"
+    },
+    {
+      "name": "تجهیز نمایندگی",
+      "new_parent_id": "a1100000-0000-4000-8000-000000000001",
+      "classification": "CORE"
+    },
+    {
+      "name": "فروش نمایندگی",
+      "new_parent_id": "a1100000-0000-4000-8000-000000000002",
+      "classification": "CORE"
+    },
+    {
+      "name": "فروش پروژه‌ای",
+      "new_parent_id": "a1100000-0000-4000-8000-000000000002",
+      "classification": "CORE"
+    },
+    {
+      "name": "فروش صادراتی",
+      "new_parent_id": "a1100000-0000-4000-8000-000000000002",
+      "classification": "CORE"
+    },
+    {
+      "name": "تأمین سفارش",
+      "new_parent_id": "a1100000-0000-4000-8000-000000000002",
+      "classification": "CORE"
+    },
+    {
+      "name": "خدمات مشتریان",
+      "new_parent_id": "a1100000-0000-4000-8000-000000000003",
+      "classification": "CORE"
+    },
+    {
+      "name": "شبکه تکنسین‌ها",
+      "new_parent_id": "a1100000-0000-4000-8000-000000000003",
+      "classification": "CORE"
+    },
+    {
+      "name": "باشگاه مجریان",
+      "new_parent_id": "a1100000-0000-4000-8000-000000000003",
+      "classification": "CORE"
+    },
+    {
+      "name": "صدای مشتری",
+      "new_parent_id": "a1100000-0000-4000-8000-000000000003",
+      "classification": "CORE"
+    },
+    {
+      "name": "عملیات مالی",
+      "new_parent_id": "a1100000-0000-4000-8000-000000000005",
+      "classification": "SUPPORT"
+    },
+    {
+      "name": "حساب نمایندگان",
+      "new_parent_id": "a1100000-0000-4000-8000-000000000005",
+      "classification": "SUPPORT"
+    },
+    {
+      "name": "سرمایه انسانی",
+      "new_parent_id": "a1100000-0000-4000-8000-000000000006",
+      "classification": "SUPPORT"
+    },
+    {
+      "name": "خدمات اداری",
+      "new_parent_id": "a1100000-0000-4000-8000-000000000006",
+      "classification": "SUPPORT"
+    },
+    {
+      "name": "پشتیبانی سامانه‌ها",
+      "new_parent_id": "a1100000-0000-4000-8000-000000000007",
+      "classification": "SUPPORT"
+    },
+    {
+      "name": "عملیات بازرگانی",
+      "new_parent_id": "a1100000-0000-4000-8000-000000000008",
+      "classification": "SUPPORT"
+    }
+  ],
+  "proposed_level_2_groups": [
+    {
+      "id": "a1200000-0000-4000-8000-000000000001",
+      "code": "RAS-ARCH-L2-M01",
+      "name": "برنامه‌ریزی فروش و اهداف",
+      "classification": "MANAGEMENT",
+      "parent_id": "a1100000-0000-4000-8000-000000000004",
+      "summary": "پیشنهاد فرآیند مدیریتی برای تدوین برنامه، هدف‌گذاری و تخصیص منابع فروش؛ هنوز با متولی مصاحبه نشده و فرآیند مصوب نیست"
+    },
+    {
+      "id": "a1200000-0000-4000-8000-000000000002",
+      "code": "RAS-ARCH-L2-M02",
+      "name": "پایش و بهبود عملکرد فرآیندها",
+      "classification": "MANAGEMENT",
+      "parent_id": "a1100000-0000-4000-8000-000000000004",
+      "summary": "پیشنهاد فرآیند مدیریتی برای پایش KPI و اصلاح فرآیندها؛ محدوده و مالک نیازمند بررسی است"
+    }
+  ],
+  "expected": {
+    "level0": 3,
+    "level1": 8,
+    "level2": 19,
+    "level3_workflow_references": 44,
+    "all_nodes": 74
+  },
+  "review_questions": [
+    "Are promotional-material requests part of core market development or supporting administration?",
+    "Should accounts of representatives be a supporting finance process or part of the core dealer-sales chain?",
+    "Confirm whether supply of sales orders belongs to core order fulfillment rather than sourcing support.",
+    "Management processes must be elicited from actual governance practices, not inferred solely from workflow lists.",
+    "Confirm L2 process boundaries and owners separately from the 44 BPMS workflows."
+  ]
+}
