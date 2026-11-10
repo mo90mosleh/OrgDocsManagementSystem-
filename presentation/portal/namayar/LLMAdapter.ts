@@ -6,6 +6,16 @@ import{validateReplyLinks,validInternalRoute}from'./router';
 // The provider API key remains in Supabase Edge Function Secrets.
 const KEY='namayar-groq-pilot-session-v1';
 const ENDPOINT='https://oozwypufxjkpamkdygjm.supabase.co/functions/v1/namayar-groq-test';
+// Local, approximate daily usage. Groq account-wide usage may include other clients.
+const QUOTA_KEY='namayar-groq-quota-v1';
+const DAILY_TOKEN_BUDGET=200000;
+export function readApproxQuota(){
+  try{const day=new Date().toISOString().slice(0,10);const stored=JSON.parse(localStorage.getItem(QUOTA_KEY)||'{}');const tokens=stored.day===day&&Number.isFinite(stored.tokens)?Math.max(0,stored.tokens):0;return Math.max(0,Math.round(100*(1-Math.min(tokens,DAILY_TOKEN_BUDGET)/DAILY_TOKEN_BUDGET)));}catch{return 100;}
+}
+function recordApproxUsage(tokens:number){
+  if(!Number.isFinite(tokens)||tokens<=0)return;
+  try{const day=new Date().toISOString().slice(0,10);const old=JSON.parse(localStorage.getItem(QUOTA_KEY)||'{}');const previous=old.day===day&&Number.isFinite(old.tokens)?Math.max(0,old.tokens):0;localStorage.setItem(QUOTA_KEY,JSON.stringify({day,tokens:previous+tokens}));window.dispatchEvent(new Event('namayar:quota-updated'));}catch{/* Storage may be unavailable */}
+}
 export type HistoryMessage={role:'user'|'assistant';content:string};
 export function getGroqPilotCode():string{
   try{return sessionStorage.getItem(KEY)||'';}catch{return '';}
@@ -51,6 +61,7 @@ export class GroqPilotAdapter implements LLMAdapter{
       throw Error(detail);
     }
     if(!raw||!Array.isArray(raw.paragraphs)||!raw.paragraphs.every(p=>typeof p==='string'))throw Error('فرمت پاسخ Groq معتبر نبود.');
+    const usage=raw.usage as Record<string,unknown>|undefined;recordApproxUsage(Number(usage?.total_tokens)||0);
     const checked=(value:unknown)=>validateReplyLinks(data,Array.isArray(value)?value.filter((l):l is AssistantLink=>Boolean(l&&typeof l==='object'&&typeof l.href==='string'&&typeof l.label==='string')).slice(0,10):[]);
     return{paragraphs:raw.paragraphs.slice(0,8).map(s=>String(s).slice(0,4000)),links:checked(raw.links),sources:[]};
   }
