@@ -1,0 +1,53 @@
+name: Build and publish Rassan Pages
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/publish-namayar-pages.yml'
+      - 'presentation/portal/namayar/**'
+      - 'presentation/scripts/build-demo.mjs'
+      - 'presentation/namayar-groq-test.html'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: rassan-pages-publish
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: presentation/package-lock.json
+      - name: Install and verify
+        working-directory: presentation
+        run: |
+          npm ci
+          npm run typecheck
+          npm test
+          npm run build:pages
+      - name: Publish artifacts to gh-pages
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git fetch origin gh-pages
+          git worktree add --detach /tmp/nama-publish origin/gh-pages
+          rsync -av --delete --exclude='.git' presentation/pages/ /tmp/nama-publish/
+          cd /tmp/nama-publish
+          git add --all
+          if ! git diff --cached --quiet; then
+            git commit -m "Publish Namayar Groq pilot to Rassan Pages"
+            git push origin HEAD:gh-pages
+          fi
