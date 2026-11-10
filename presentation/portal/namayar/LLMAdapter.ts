@@ -6,6 +6,8 @@ import{validateReplyLinks,validInternalRoute}from'./router';
 // The provider API key remains in Supabase Edge Function Secrets.
 const KEY='namayar-groq-pilot-session-v1';
 const ENDPOINT='https://oozwypufxjkpamkdygjm.supabase.co/functions/v1/namayar-groq-test';
+const QUOTA_ENDPOINT='https://oozwypufxjkpamkdygjm.supabase.co/functions/v1/namayar-groq-test';
+export async function fetchSharedQuota():Promise<number|null>{const code=getGroqPilotCode();if(!code)return null;try{const res=await fetch(QUOTA_ENDPOINT,{method:'GET',headers:{'x-namayar-test-token':code},cache:'no-store'});if(!res.ok)return null;const data=await res.json();return typeof data.remaining_percent==='number'?Math.max(0,Math.min(100,data.remaining_percent)):null;}catch{return null;}}
 export type HistoryMessage={role:'user'|'assistant';content:string};
 export function getGroqPilotCode():string{
   try{return sessionStorage.getItem(KEY)||'';}catch{return '';}
