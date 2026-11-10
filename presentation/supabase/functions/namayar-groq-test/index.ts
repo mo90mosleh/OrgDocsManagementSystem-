@@ -1,7 +1,11 @@
 // Namayar Groq pilot. Public site, private access code; never embed provider credentials in frontend.
 const ORIGIN = "https://mo90mosleh.github.io";
 const SNAPSHOT = "https://mo90mosleh.github.io/OrgDocsManagementSystem-/rassan-presentation.json";
-const headers = { "Access-Control-Allow-Origin": ORIGIN, "Access-Control-Allow-Methods": "POST, OPTIONS", "Access-Control-Allow-Headers": "content-type,x-namayar-test-token", "Content-Type": "application/json; charset=utf-8", "Vary": "Origin" };
+const headers = { "Access-Control-Allow-Origin": ORIGIN, "Access-Control-Allow-Methods": "GET, POST, OPTIONS", "Access-Control-Allow-Headers": "content-type,x-namayar-test-token", "Content-Type": "application/json; charset=utf-8", "Vary": "Origin" };
+const DAILY_BUDGET=200000;
+const usageDay=()=>new Date().toISOString().slice(0,10);
+async function usageStore(path:string,method:string,body?:unknown){const url=Deno.env.get('SUPABASE_URL');const key=Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');if(!url||!key)throw Error('USAGE_STORE_NOT_CONFIGURED');const res=await fetch(url+'/rest/v1/'+path,{method,headers:{apikey:key,Authorization:'Bearer '+key,'Content-Type':'application/json'},...(body?{body:JSON.stringify(body)}:{})});if(!res.ok)throw Error('USAGE_STORE_FAILED');return method==='GET'?await res.json():null;}
+async function quota(){const rows=await usageStore('namayar_daily_usage?usage_day=eq.'+usageDay()+'&select=tokens,requests','GET');const used=Number(rows?.[0]?.tokens)||0;return {remaining_percent:Math.max(0,Math.round(100*(1-Math.min(used,DAILY_BUDGET)/DAILY_BUDGET))),used_tokens:used,estimated:true};}
 const response = (status: number, value: unknown) => new Response(JSON.stringify(value), { status, headers });
 type AnyRecord = Record<string, any>;
 let cache: { until: number; value: AnyRecord } | undefined;
@@ -58,11 +62,12 @@ function findFacts(data: AnyRecord, question: string, entity: AnyRecord | null) 
 }
 Deno.serve(async (req: Request) => {
   if (req.method === "OPTIONS") return new Response(null, {status:204,headers});
-  if (req.method !== "POST") return response(405,{error:"METHOD_NOT_ALLOWED"});
+  if (req.method !== "POST" && req.method !== "GET") return response(405,{error:"METHOD_NOT_ALLOWED"});
   if (req.headers.get("origin") && req.headers.get("origin") !== ORIGIN) return response(403,{error:"ORIGIN_NOT_ALLOWED"});
   const apiKey=Deno.env.get("GROQ_API_KEY"), testCode=Deno.env.get("NAMAYAR_TEST_TOKEN");
   if (!apiKey || !testCode || testCode.length < 24) return response(503,{error:"TEST_NOT_CONFIGURED",message:"کلید Groq یا کد تست در Secrets تنظیم نشده است."});
   if (!await sameSecret(testCode,req.headers.get("x-namayar-test-token")||"")) return response(401,{error:"INVALID_TEST_TOKEN"});
+  if(req.method==="GET"){try{return response(200,await quota());}catch{return response(503,{error:"USAGE_UNAVAILABLE"});}}
   let body: AnyRecord;
   try { const text=await req.text();if(text.length>6500)return response(413,{error:"TOO_LARGE"});body=JSON.parse(text); } catch {return response(400,{error:"INVALID_JSON"});}
   const question=typeof body.question==="string"?body.question.trim().slice(0,1200):"";
@@ -88,6 +93,8 @@ Deno.serve(async (req: Request) => {
       return response(provider.status===429?429:502,{error:"GROQ_REQUEST_FAILED",provider_status:provider.status,provider_code:providerCode.slice(0,80),provider_message:providerMessage,model:selectedModel,message:provider.status===429?"سهمیه Groq فعلاً به سقف رسیده است.":provider.status===401||provider.status===403?"کلید نامعتبر است یا ارائه‌دهنده اجازه استفاده نمی‌دهد.":"درخواست Groq موفق نبود."});
     }
     const completion=await provider.json();
+    const usedTokens=Math.max(1,Math.round(Number(completion?.usage?.total_tokens)||((prompt.length+question.length+String(completion?.choices?.[0]?.message?.content||"").length)/3.5)));
+    try{await usageStore('rpc/namayar_record_usage','POST',{p_day:usageDay(),p_tokens:usedTokens});}catch(e){console.error('Shared usage tracking unavailable',e);}
     const answer=safeText(completion?.choices?.[0]?.message?.content,4000).trim();
     if (!answer) return response(502,{error:"EMPTY_GROQ_RESPONSE"});
     return response(200,{paragraphs:[answer],links:found.links,sources:[],model:"Groq",mode:"pilot"});
