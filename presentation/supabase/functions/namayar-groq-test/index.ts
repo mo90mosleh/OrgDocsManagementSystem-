@@ -90,7 +90,7 @@ Deno.serve(async (req: Request) => {
     const completion=await provider.json();
     const answer=safeText(completion?.choices?.[0]?.message?.content,4000).trim();
     if (!answer) return response(502,{error:"EMPTY_GROQ_RESPONSE"});
-    return response(200,{paragraphs:[answer],links:found.links,sources:[],model:"Groq",mode:"pilot"});
+    return response(200,{paragraphs:[answer],links:found.links,sources:[],model:"Groq",mode:"pilot",usage:{total_tokens:Number(completion?.usage?.total_tokens)||0}});
   } catch (error) {
     const msg=error instanceof Error?error.message:"";
     return response(msg==="PUBLIC_SNAPSHOT_UNAVAILABLE"?503:502,{error:"GATEWAY_ERROR",message:msg==="PUBLIC_SNAPSHOT_UNAVAILABLE"?"داده عمومی نما در دسترس نیست.":"اتصال آزمایشی انجام نشد."});
