@@ -57,3 +57,16 @@ body:has(.namayar-intro) .namayar-launcher-label{display:none}
 body:has(.feedback-root) .namayar-intro,body:has(.feedback-root) .namayar-launcher-label{display:none}
 body:has(.feedback-root) .namayar-launcher{bottom:calc(var(--navigation-height) + var(--navigation-safe) + 10px)}
 @media(max-width:760px){.feedback-root .feedback-launcher{padding-inline:9px;white-space:nowrap}.feedback-root .feedback-history{padding-inline:7px;gap:3px}}
+.desktop-assistance-controls{display:none}
+@media(min-width:761px){
+ :root{--assistance-height:0px}
+ .assistance-dock,.workspace>footer{display:none}
+ .desktop-assistance-controls{display:flex;align-items:center;gap:8px;flex-shrink:0}
+ .desktop-assistance-controls .namayar-launcher,.desktop-assistance-controls .tour-launcher{position:relative;inset:auto;width:40px;height:40px;border-radius:12px;flex-shrink:0;margin:0;box-shadow:none;display:grid;place-items:center}
+ .desktop-assistance-controls .namayar-avatar{width:36px;height:36px}
+ .desktop-assistance-controls .namayar-launcher-label{display:none}
+ .chart-header>.desktop-assistance-controls{order:10}
+ .namayar-root .namayar-intro{top:86px;bottom:auto;right:24px;width:295px;background:white;border:1px solid #e2e8ef}
+ body .tour-notice{top:86px;bottom:auto;left:24px;background:white}
+ .namayar-root .namayar-panel{top:86px;bottom:auto;right:24px}
+}
