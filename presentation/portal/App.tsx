@@ -23,15 +23,25 @@ function SettingsPage({data,refresh}:{data:Data;refresh:()=>Promise<void>}){cons
 }
 function AccessDenied(){return <><Heading title="دسترسی محدود" description="این بخش فقط برای مدیر سامانه قابل دسترسی است."/><section className="panel empty"><ShieldCheck size={40}/><h2>به حساب مدیر نیاز دارید</h2><p>با حساب مجاز وارد فضای مدیریت شوید.</p>{config.adminUrl?<a className="primary" href={config.adminUrl}>ورود به فضای مدیریت</a>:<p>این نسخه برای مشاهده و ثبت بازخورد است.</p>}</section></>;}
 export function App(){const[data,setData]=useState<Data|null>(null),[error,setError]=useState(''),[path,setPath]=useState(currentPath);async function refresh(){const v=await loadData();setData(v);setError('');}useEffect(()=>{
- let cancelled=false;
- // The public, read-only snapshot can paint immediately. Live data still refreshes
- // in parallel and replaces it after access checks finish.
+ let cancelled=false,liveStarted=false;
+ const startLive=()=>{
+  if(cancelled||liveStarted)return;
+  liveStarted=true;
+  void refresh().catch(e=>{if(!cancelled)setError(errorMessage(e));});
+ };
  if(config.mode==='public'&&config.authEnabled&&config.snapshotPath){
+  // Give the local public snapshot first chance to paint. If it is slow or
+  // unavailable, never hold the live request beyond the short grace window.
+  const fallbackTimer=window.setTimeout(startLive,2000);
   void loadInitialSnapshot().then(snapshot=>{
    if(!cancelled&&snapshot)setData(previous=>previous??snapshot);
-  }).catch(()=>{/* live load or its existing fallback remains authoritative */});
+  }).catch(()=>{/* Live data remains available. */}).finally(()=>{
+   window.clearTimeout(fallbackTimer);
+   startLive();
+  });
+  return()=>{cancelled=true;window.clearTimeout(fallbackTimer);};
  }
- void refresh().catch(e=>{if(!cancelled)setError(errorMessage(e));});
+ startLive();
  return()=>{cancelled=true;};
  },[]);useEffect(()=>{const update=()=>setPath(currentPath());window.addEventListener('popstate',update);window.addEventListener('hashchange',update);return()=>{window.removeEventListener('popstate',update);window.removeEventListener('hashchange',update);};},[]);
  useEffect(()=>{if(!authClient)return;const{data:{subscription}}=authClient.auth.onAuthStateChange(event=>{if(['SIGNED_IN','SIGNED_OUT','USER_UPDATED','PASSWORD_RECOVERY'].includes(event)){setTimeout(()=>{void refresh().catch(e=>setError(errorMessage(e)));if(event==='PASSWORD_RECOVERY')go('/login');},0);}});return()=>subscription.unsubscribe();},[]);
