@@ -1,9 +1,33 @@
 import{build}from'esbuild';import{createHash}from'node:crypto';import{readFile,writeFile,mkdir,cp}from'node:fs/promises';
 const result=await build({entryPoints:['portal/main.tsx'],bundle:true,minify:true,write:false,outfile:'portal.js',format:'iife',platform:'browser',target:'es2022',jsx:'automatic',loader:{'.woff2':'dataurl','.png':'dataurl'},define:{'process.env.NODE_ENV':'"production"'}});
 const js=result.outputFiles.find(f=>f.path.endsWith('.js')).text.replace(/<\/script/gi,'<\\/script');const css=result.outputFiles.find(f=>f.path.endsWith('.css')).text;
+
+await mkdir('pages',{recursive:true});
+// GitHub Pages: cacheable, fingerprinted ESM chunks instead of an inlined mega-HTML.
+// Keep the private Worker artifact unchanged (it still receives the IIFE above).
+const publicBuild=await build({
+ entryPoints:['portal/main.tsx'],bundle:true,minify:true,write:true,
+ outdir:'pages',entryNames:'assets/[name]-[hash]',chunkNames:'assets/chunks/[name]-[hash]',assetNames:'assets/media/[name]-[hash]',
+ format:'esm',splitting:true,platform:'browser',target:'es2022',jsx:'automatic',metafile:true,
+ loader:{'.woff2':'file','.png':'file'},
+ define:{'process.env.NODE_ENV':'"production"'}
+});
+const publicEntry=Object.entries(publicBuild.metafile.outputs).find(([,meta])=>meta.entryPoint==='portal/main.tsx');
+if(!publicEntry)throw Error('Public entry chunk not generated');
+const publicHref=(path)=>'./'+path.replace(/^pages\\//,'');
+const publicJsHref=publicHref(publicEntry[0]);
+const publicCssHref=publicEntry[1].cssBundle?publicHref(publicEntry[1].cssBundle):null;
+if(!publicCssHref)throw Error('Public CSS bundle not generated');
+console.log('Cacheable public assets:',publicJsHref,publicCssHref);
+
 const publicConfig=JSON.parse(await readFile('pages-config.json','utf8'));const adminUrl='https://orgdocs-demo.mo90mosleh.chatgpt.site/admin';
 const snapshot=process.env.PAGES_SNAPSHOT==='1';
-function html(mode){const cfg=mode==='public'?(snapshot?{...publicConfig,mode,authEnabled:true,organizationId:'8847c22d-0282-5b07-80b1-d34bc41a4efa',adminUrl:'#/login',snapshotPath:'./rassan-presentation.json'}:{...publicConfig,mode,adminUrl}):{mode,adminUrl:'/login'};return '<!doctype html><html lang="fa" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#bd2739"><title>نما | مدیریت سازمان و عملکرد</title><style>'+css+'</style></head><body><div id="app"></div><script>window.__ORGDEMO_HASH_ROUTING__='+(mode==='public')+';window.__PORTAL_CONFIG__='+JSON.stringify(cfg)+';</script><script>'+js+'</script></body></html>';}
+function html(mode){
+ const cfg=mode==='public'?(snapshot?{...publicConfig,mode,authEnabled:true,organizationId:'8847c22d-0282-5b07-80b1-d34bc41a4efa',adminUrl:'#/login',snapshotPath:'./rassan-presentation.json'}:{...publicConfig,mode,adminUrl}):{mode,adminUrl:'/login'};
+ const styles=mode==='public'?'<link rel="stylesheet" href="'+publicCssHref+'">':'<style>'+css+'</style>';
+ const scripts=mode==='public'?'<script type="module" src="'+publicJsHref+'"></script>':'<script>'+js+'</script>';
+ return '<!doctype html><html lang="fa" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#bd2739"><title>نما | مدیریت سازمان و عملکرد</title>'+styles+'</head><body><div id="app"></div><script>window.__ORGDEMO_HASH_ROUTING__='+(mode==='public')+';window.__PORTAL_CONFIG__='+JSON.stringify(cfg)+';</script>'+scripts+'</body></html>';
+}
 const ico=await readFile('portal/assets/favicon.ico'),svg=await readFile('portal/assets/favicon.svg','utf8'),apple=await readFile('portal/assets/apple-touch-icon.png');const version=createHash('sha256').update(ico).digest('hex').slice(0,8);
 function icons(mode){const base=mode==='public'?'./':'/';return '<link rel=\"icon\" type=\"image/svg+xml\" href=\"'+base+'favicon.svg?v='+version+'\"><link rel=\"icon\" type=\"image/x-icon\" href=\"'+base+'favicon.ico?v='+version+'\"><link rel=\"apple-touch-icon\" href=\"'+base+'apple-touch-icon.png?v='+version+'\">';}
 const privateHtml=html('private').replace('</head>',icons('private')+'</head>'),publicHtml=html('public').replace('</head>',icons('public')+'</head>');const source=(await readFile('worker/index.js','utf8')).replace("'__PORTAL_HTML__'",()=>JSON.stringify(privateHtml)).replace("'__FAVICON_ICO__'",()=>JSON.stringify(ico.toString('base64'))).replace("'__FAVICON_SVG__'",()=>JSON.stringify(svg)).replace("'__APPLE_ICON__'",()=>JSON.stringify(apple.toString('base64')));await mkdir('dist/server',{recursive:true});await mkdir('dist/.openai',{recursive:true});await writeFile('dist/server/index.js',source);await cp('.openai/hosting.json','dist/.openai/hosting.json');
