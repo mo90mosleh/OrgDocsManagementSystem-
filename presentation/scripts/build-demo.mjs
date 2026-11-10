@@ -14,7 +14,7 @@ const publicBuild=await build({
 });
 const publicEntry=Object.entries(publicBuild.metafile.outputs).find(([,meta])=>meta.entryPoint==='portal/main.tsx');
 if(!publicEntry)throw Error('Public entry chunk not generated');
-const publicHref=(path)=>'./'+path.replace(/^pages\\//,'');
+const publicHref=(path)=>'./'+path.replace('pages/','');
 const publicJsHref=publicHref(publicEntry[0]);
 const publicCssHref=publicEntry[1].cssBundle?publicHref(publicEntry[1].cssBundle):null;
 if(!publicCssHref)throw Error('Public CSS bundle not generated');
