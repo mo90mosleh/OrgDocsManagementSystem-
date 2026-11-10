@@ -70,3 +70,13 @@ body:has(.feedback-root) .namayar-launcher{bottom:calc(var(--navigation-height) 
  body .tour-notice{top:86px;bottom:auto;left:24px;background:white}
  .namayar-root .namayar-panel{top:86px;bottom:auto;right:24px}
 }
+.chart-header>.chart-menu-toggle{display:grid;place-items:center;width:40px;height:40px;flex-shrink:0;background:#fff;border:1px solid #dfe6ed;border-radius:11px;color:#536e61;margin:0}
+.chart-header>.global-back{margin-right:auto}
+.chart-menu-backdrop{position:fixed;inset:0;background:#182b3a66;border:0;border-radius:0;z-index:1000;cursor:default}
+.app.chart-focus-mode.chart-menu-open>.side{display:flex;flex-direction:column;position:fixed;inset:0 0 0 auto;width:260px;max-width:85vw;padding:20px 16px;background:#fff;z-index:1001;overflow:auto;box-shadow:-10px 0 40px #16283a20}
+.chart-menu-open .side .brand-copy,.chart-menu-open .side .nav-label,.chart-menu-open .side .nav-link-label{display:block}
+.chart-menu-open .side .brand{justify-content:flex-start;padding:0 0 20px}
+.chart-menu-open .side .nav{display:flex;flex-direction:column;gap:7px}
+.chart-menu-open .side .nav a{justify-content:flex-start;padding:12px;gap:10px;font-size:13px;min-height:46px}
+.chart-menu-open .side .nav svg{width:19px;height:19px}
+.chart-menu-open .chart-menu-close{align-self:flex-end;min-width:40px;min-height:40px;margin-bottom:12px}

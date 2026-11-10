@@ -13,3 +13,6 @@ for(const file of ['favicon.svg','favicon.ico','apple-touch-icon.png'])await cp(
 
 if(snapshot){await cp('data/rassan-presentation.json','pages/rassan-presentation.json');await writeFile('pages/README.md','# نما — ارائه عمومی راسان\n\n۴۴ فرآیند، ۴۴ شناسنامه، ۴۴ شاخص و ۹۰ ارجاع سند از بستهٔ بازنگری ۰٫۱ (۲۰۲۶-۱۱-۰۴). پیشنهادها پیش‌نویس هستند. انتشار داده‌ها و لینک‌ها با دستور صریح مالک انجام شده است.\n\nدادهٔ زنده از Supabase خوانده می‌شود و در قطع اتصال، نسخهٔ ذخیره‌شده برای مشاهده باقی می‌ماند. Render لازم نیست. بازدید عمومی بدون ورود است. ورود مدیریتی با ایمیل/رمز Supabase انجام می‌شود؛ مدیر تأییدشده می‌تواند ساختار سازمان، شناسنامه‌ها و برند را در دیتابیس ذخیره کند. در قطع اتصال، نسخهٔ ذخیره‌شده با پیام مشخص و بدون ویرایش نمایش داده می‌شود. بازخوردها در مرورگر ذخیره و به JSON صادر می‌شوند.\n');}
 await import('./build-licenses.mjs');
+
+// Preserve the separately maintained verification page in Pages releases.
+await cp('namayar-groq-test.html','pages/namayar-groq-test.html');
