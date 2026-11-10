@@ -1,6 +1,6 @@
 import{withinScope,refusalReply}from'./scope';
 import type{AllowedData,PageContext,Reply,AssistantLink}from'./types';
-import{validateReplyLinks}from'./router';
+import{validateReplyLinks,validInternalRoute}from'./router';
 
 // Namayar Groq pilot: the temporary access code is entered by a tester, never embedded in Pages.
 // The provider API key remains in Supabase Edge Function Secrets.
@@ -55,4 +55,26 @@ export class GroqPilotAdapter implements LLMAdapter{
     return{paragraphs:raw.paragraphs.slice(0,8).map(s=>String(s).slice(0,4000)),links:checked(raw.links),sources:[]};
   }
 }
+
+// Retained backward-compatible, same-origin adapter; not used by the public Groq pilot.
+export class BackendLLMAdapter implements LLMAdapter{
+  readonly enabled=true;
+  constructor(private endpoint:string,private fetcher:typeof fetch=fetch){
+    if(!/^\/api\/namayar(?:\/[a-z0-9-]+)?$/.test(endpoint))throw Error('Only a same-origin Namayar gateway is supported');
+  }
+  async answer(question:string,context:PageContext,data:AllowedData,signal:AbortSignal):Promise<Reply>{
+    if(!withinScope(data,context,question))return refusalReply();
+    const res=await this.fetcher(this.endpoint,{
+      method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({question:question.slice(0,1200),context:{path:context.path,pageType:context.pageType,entity:context.entity}}),signal
+    });
+    if(!res.ok)throw Error('ارتباط با دستیار سرور انجام نشد.');
+    const raw=await res.json() as Record<string,unknown>;
+    if(!Array.isArray(raw.paragraphs)||!raw.paragraphs.every(p=>typeof p==='string'))throw Error('پاسخ سرور معتبر نیست.');
+    const checked=(value:unknown)=>validateReplyLinks(data,Array.isArray(value)?value.filter((l):l is AssistantLink=>Boolean(l&&typeof l==='object'&&typeof l.href==='string'&&typeof l.label==='string')).slice(0,20):[]);
+    const navigate=/برو|ببر|باز\s*کن|بریم|go to|open /i.test(question)&&typeof raw.navigate==='string'&&validInternalRoute(data,raw.navigate)?raw.navigate:undefined;
+    return {paragraphs:raw.paragraphs.slice(0,12).map(x=>String(x).slice(0,6000)),links:checked(raw.links),sources:checked(raw.sources),navigate};
+  }
+}
+
 export const llmAdapter:LLMAdapter=new GroqPilotAdapter();
