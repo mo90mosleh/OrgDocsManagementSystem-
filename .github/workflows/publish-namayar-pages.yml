@@ -34,8 +34,8 @@ jobs:
         run: |
           npm ci
           npm run typecheck
-          npm test
           npm run build:pages
+          npm test
       - name: Publish artifacts to gh-pages
         shell: bash
         run: |
