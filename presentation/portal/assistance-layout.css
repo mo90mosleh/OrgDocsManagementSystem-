@@ -1,0 +1,59 @@
+/* The assistance controls have their own viewport row, outside the page scrollport. */
+:root{--assistance-height:72px;--navigation-height:0px;--navigation-safe:0px}
+html,body{height:100%;overflow:hidden}
+#app{position:fixed;inset:0 0 calc(var(--assistance-height) + var(--navigation-height) + var(--navigation-safe)) 0;overflow:auto;overscroll-behavior-y:contain;scroll-padding-top:80px;scroll-padding-bottom:20px}
+.app>.side{bottom:var(--assistance-height)}
+.assistance-dock{position:fixed;left:0;right:0;bottom:calc(var(--navigation-height) + var(--navigation-safe));height:var(--assistance-height);background:#f9fbfdee;border-top:1px solid #e2e8ef;z-index:110;backdrop-filter:blur(14px)}
+.namayar-root .namayar-launcher,body .tour-launcher{width:52px;height:52px;bottom:calc(var(--navigation-height) + var(--navigation-safe) + 10px);margin:0;border-radius:16px;box-shadow:0 2px 9px #23395112}
+.namayar-root .namayar-launcher{right:max(18px,env(safe-area-inset-right))}
+body .tour-launcher{left:max(18px,env(safe-area-inset-left))}
+.namayar-root .namayar-panel{bottom:calc(var(--navigation-height) + var(--navigation-safe) + var(--assistance-height) + 10px)}
+.namayar-root .namayar-intro,body .tour-notice{bottom:calc(var(--navigation-height) + var(--navigation-safe) + var(--assistance-height) + 12px)}
+.namayar-header>div{margin-left:auto}.namayar-header .namayar-readiness{margin-right:0}
+.namayar-panel .namayar-footer{justify-content:flex-end}
+/* Neutral focus, while preserving a visible keyboard focus indicator. */
+.organization-filters label:focus-within{outline:0;box-shadow:none;border-color:#b7c5d5}
+.organization-filters select:focus,.organization-filters select:focus-visible,.toolbar>select:focus,.toolbar>select:focus-visible,.namayar-input textarea:focus,.namayar-input textarea:focus-visible{outline:none;box-shadow:none;border-color:#b7c5d5}
+.organization-filters label:has(select:focus-visible),.toolbar>select:focus-visible,.namayar-input textarea:focus-visible{box-shadow:0 0 0 2px #d8e4f1}
+.toolbar{align-items:flex-start;justify-content:flex-start;gap:12px}
+.toolbar>.search{flex:1 1 250px;height:46px;margin:0;border-radius:10px;padding:10px 12px}
+.toolbar>.mobile-filter-disclosure{display:contents}
+.toolbar>.mobile-filter-disclosure>summary{display:none}
+.organization-filters{display:flex;align-items:flex-start;gap:12px;flex-wrap:wrap}
+.organization-filters label,.toolbar>select{height:46px;min-height:46px;width:220px;max-width:220px;min-width:0;flex:0 0 220px;border:1px solid #dce4eb;border-radius:10px;background:#fff;padding:0 10px;box-sizing:border-box;margin:0}
+.organization-filters label{display:flex;align-items:center}
+.organization-filters select{height:44px;min-height:44px;width:100%;max-width:none;min-width:0;flex:1;padding:0 4px;font-size:12px;box-sizing:border-box;background:transparent;color:var(--ink)}
+.organization-filters>.icon-button{min-width:46px;height:46px;border:1px solid #dce4eb;border-radius:10px;background:#fff}
+@media(max-width:760px){
+ :root{--assistance-height:64px;--navigation-height:72px;--navigation-safe:env(safe-area-inset-bottom,0px)}
+ .app>.workspace,.app.sidebar-collapsed>.workspace{padding-bottom:0}
+ .namayar-root .namayar-launcher,body .tour-launcher{width:44px;height:44px;bottom:calc(var(--navigation-height) + var(--navigation-safe) + 10px);border-radius:13px}
+ .namayar-root .namayar-launcher .namayar-avatar{width:40px;height:40px}
+ .namayar-root .namayar-panel{left:auto;right:max(12px,env(safe-area-inset-right));width:min(350px,calc(100vw - 24px));height:min(440px,calc(100dvh - 160px - var(--navigation-safe)));max-height:calc(100dvh - 160px - var(--navigation-safe));bottom:calc(var(--navigation-height) + var(--navigation-safe) + var(--assistance-height) + 8px)}
+ .namayar-input textarea{min-height:44px;max-height:70px}
+ .namayar-root .namayar-input textarea{min-height:44px}
+ .namayar-welcome{padding:8px 4px}.namayar-welcome p{font-size:11px}.namayar-welcome>.namayar-avatar{margin-bottom:6px}
+ .toolbar>.mobile-filter-disclosure{display:block;flex:1 1 100%;width:100%}
+ .toolbar>.mobile-filter-disclosure>summary{display:flex}
+ .toolbar>select,.toolbar>.search{height:48px;min-height:48px;max-width:none;width:100%;flex:1 1 100%}
+ .organization-filters{gap:10px;width:100%;align-items:stretch}
+ .organization-filters label{height:48px;min-height:48px;width:100%;max-width:none;flex:0 0 auto}
+ .organization-filters select{height:46px;min-height:46px;max-width:none;width:100%;font-size:16px}
+ .mobile-keyboard-open #app{bottom:0}
+ .mobile-keyboard-open .assistance-dock{display:none}
+ .mobile-keyboard-open .namayar-root .namayar-panel{bottom:calc(12px + var(--mobile-keyboard-height,0px));height:min(440px,calc(var(--mobile-visual-height,100dvh) - 24px));max-height:calc(var(--mobile-visual-height,100dvh) - 24px)}
+ body:has(.feedback-root) .tour-launcher{bottom:calc(var(--navigation-height) + var(--navigation-safe) + 10px)}
+ .feedback-root .feedback-launcher-group{bottom:calc(var(--navigation-height) + var(--navigation-safe) + var(--assistance-height) + 10px)}
+}
+/* Greeting and transient help text also stay inside the reserved utility row. */
+.namayar-root .namayar-intro,body .tour-notice{bottom:calc(var(--navigation-height) + var(--navigation-safe) + 14px);height:44px;width:min(380px,calc(100vw - 156px));max-width:none;padding:4px 8px;align-items:center;gap:5px;border:0;border-radius:8px;background:transparent;box-shadow:none}
+.namayar-root .namayar-intro{right:80px;left:auto}.namayar-intro>span{min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.namayar-intro .icon-button{flex-shrink:0}body .tour-notice{left:80px;right:auto;overflow:hidden;font-size:11px}
+body:has(.namayar-intro) .namayar-launcher-label{display:none}
+@media(max-width:760px){.namayar-root .namayar-intro,body .tour-notice{bottom:calc(var(--navigation-height) + var(--navigation-safe) + 10px);font-size:10px}.namayar-intro>span{font-size:10px}}
+.app,.app.sidebar-collapsed{min-height:100%}
+@media(max-width:760px){.toolbar>.mobile-filter-disclosure{border:0;background:transparent;overflow:visible}.toolbar>.mobile-filter-disclosure>summary{border:1px solid #dce4eb;border-radius:13px;background:#fff}.mobile-filter-disclosure .organization-filters{padding:10px 0 0}}
+/* Optional retained feedback shares the utility row, away from both help buttons. */
+.feedback-root .feedback-launcher-group{left:82px;bottom:calc(var(--navigation-height) + var(--navigation-safe) + 10px);max-width:calc(100vw - 164px)}
+body:has(.feedback-root) .namayar-intro,body:has(.feedback-root) .namayar-launcher-label{display:none}
+body:has(.feedback-root) .namayar-launcher{bottom:calc(var(--navigation-height) + var(--navigation-safe) + 10px)}
+@media(max-width:760px){.feedback-root .feedback-launcher{padding-inline:9px;white-space:nowrap}.feedback-root .feedback-history{padding-inline:7px;gap:3px}}

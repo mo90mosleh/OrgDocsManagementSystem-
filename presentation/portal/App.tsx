@@ -5,7 +5,7 @@ import{Shell}from'./Shell';
 import{Login}from'./Login';import{authClient,signOut}from'./auth';
 import{Documents,Requirements}from'./References';import{ProcessProfile}from'./ProcessDetail';
 import{useEffect,useState,type FormEvent}from'react';import{LayoutDashboard,Network,Layers3,ClipboardList,ChartNoAxesCombined,Settings as SettingsIcon,ChevronLeft,ChevronDown,ArrowLeft,ArrowUpLeft,Building2,Files,UserRound,ShieldCheck,Save,LogIn,Menu,X}from'lucide-react';
-import{loadData,mutate,config}from'./api';import type{Data,Process}from'./types';import{Chart}from'./Chart';import{Heading,Empty,Link,go,currentPath,number,errorMessage}from'./ui';import logo from'./assets/rassan-en.png';import'./style.css';import'./mobile.css';
+import{loadData,mutate,config}from'./api';import type{Data,Process}from'./types';import{Chart}from'./Chart';import{Heading,Empty,Link,go,currentPath,number,errorMessage}from'./ui';import logo from'./assets/rassan-en.png';import'./style.css';import'./mobile.css';import'./assistance-layout.css';
 
 const readiness:Record<string,string>={UNASSESSED:'بررسی‌نشده',DEFINED:'تعریف‌شده',GAP:'نیازمند داده',READY:'آمادهٔ پایش'};
 
