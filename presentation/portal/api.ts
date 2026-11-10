@@ -2,8 +2,19 @@ import{loadLivePages,mutatePages}from'./pages-store';
 import type{Data,Config}from './types';
 export const ORG='a0000000-0000-4000-8000-000000000001';
 export const config=window.__PORTAL_CONFIG__;
+/** Render the public read-only snapshot immediately while live data checks run separately. */
+export async function loadInitialSnapshot():Promise<Data|null>{
+ if(config.mode!=='public'||!config.authEnabled||!config.snapshotPath)return null;
+ const r=await fetch(config.snapshotPath,{cache:'default',signal:AbortSignal.timeout(12000)});
+ if(!r.ok)throw Error('نسخه ذخیره‌شده قابل دریافت نیست.');
+ const d=normalize(await r.json());
+ d.user={name:'مشاهده‌گر',email:'',role:'VIEWER'};
+ d.dataSource='snapshot';
+ d.syncWarning='نسخه ذخیره‌شده نمایش داده می‌شود؛ دریافت اطلاعات زنده در پس‌زمینه ادامه دارد.';
+ return d;
+}
 export async function loadData():Promise<Data>{
- if(config.authEnabled){try{return normalize(await loadLivePages());}catch{if(!config.snapshotPath)throw Error('اتصال به اطلاعات زنده انجام نشد.');const r=await fetch(config.snapshotPath,{cache:'no-store'});if(!r.ok)throw Error('اطلاعات در دسترس نیست.');const d=normalize(await r.json());d.user={name:'مشاهده‌گر',email:'',role:'VIEWER'};d.dataSource='snapshot';d.syncWarning='اتصال به اطلاعات زنده برقرار نیست؛ نسخهٔ ذخیره‌شده نمایش داده می‌شود و ویرایش غیرفعال است.';return d;}}
+ if(config.authEnabled){try{return normalize(await loadLivePages());}catch{if(!config.snapshotPath)throw Error('اتصال به اطلاعات زنده انجام نشد.');const r=await fetch(config.snapshotPath,{cache:'default',signal:AbortSignal.timeout(12000)});if(!r.ok)throw Error('اطلاعات در دسترس نیست.');const d=normalize(await r.json());d.user={name:'مشاهده‌گر',email:'',role:'VIEWER'};d.dataSource='snapshot';d.syncWarning='اتصال به اطلاعات زنده برقرار نیست؛ نسخهٔ ذخیره‌شده نمایش داده می‌شود و ویرایش غیرفعال است.';return d;}}
  if(config.snapshotPath){const r=await fetch(config.snapshotPath,{cache:'no-store',signal:AbortSignal.timeout(20000)});if(!r.ok)throw Error('دریافت فایل اطلاعات انجام نشد. دوباره تلاش کنید.');return normalize(await r.json());}
  if(config.mode==='private'){const r=await fetch('/api/data',{cache:'no-store',signal:AbortSignal.timeout(25000)});const v=await r.json();if(!r.ok)throw Error(v.error||'دریافت اطلاعات انجام نشد.');return normalize(v);}
  const cfg=config as Required<Config>;
