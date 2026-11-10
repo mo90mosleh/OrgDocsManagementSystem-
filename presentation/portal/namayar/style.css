@@ -13,11 +13,29 @@ body:has(.feedback-root) .namayar-launcher{bottom:calc(150px + env(safe-area-ins
 .namayar-avatar{color:#162b50}.namayar-launcher{color:#162b50;border-color:#d9e4f3}.namayar-avatar .namayar-glint{color:#45aee7}.namayar-hearts{display:none}.namayar-launcher:hover .namayar-hearts{display:block}.namayar-launcher:hover .namayar-eyes{visibility:hidden}.namayar-panel{width:378px;height:min(560px,calc(100dvh - 112px - env(safe-area-inset-bottom)));border-color:#dce4ef;box-shadow:0 14px 48px #142b5026}.namayar-header{padding:8px 11px;background:#f5f8fd;gap:7px}.namayar-header h2{color:#162b50;font-size:15px}.namayar-header small{color:#5f708a;font-size:8px}.namayar-context{padding:5px 11px;min-height:28px;color:#61718a;background:white}.namayar-context>small{display:none}.namayar-conversation{padding:12px 11px 5px}.namayar-message{font-size:12px;padding:10px;border:0!important;line-height:1.95}.namayar-message.assistant{background:#f2f5fa;color:#283b58}.namayar-message.user{background:#e7effb;color:#203e68}.namayar-links{display:inline!important;line-height:2.1}.namayar-result-link{display:inline!important;padding:0;border:0;border-radius:0;background:transparent;color:#1265c3;font-size:inherit;text-decoration:underline;text-underline-offset:3px;margin-inline:3px}.namayar-result-link:hover{background:transparent;color:#084584}.namayar-result-link svg{display:none}.namayar-input{background:white;padding:6px 10px}.namayar-input textarea{min-height:42px;font-size:12px;padding:7px 9px;border-color:#dce4ef}.namayar-send{background:#19375e}.namayar-suggestions{padding:6px 10px;border:0}.namayar-suggestions button{color:#435f82;font-size:10px;padding:3px 8px}.namayar-welcome{padding:12px 6px}.namayar-welcome p{color:#63748b}.namayar-avatar.is-listening .namayar-eyes{animation:namayar-look 2s ease-in-out infinite}.namayar-avatar.is-responding .namayar-shell,.namayar-avatar.is-success .namayar-shell{animation:namayar-nod .6s ease-out}.namayar-avatar.is-success .namayar-hearts{display:block}.namayar-avatar.is-success .namayar-eyes{visibility:hidden}@keyframes namayar-nod{50%{transform:translateY(-3px) rotate(-4deg)}}
 @media(max-width:600px){.namayar-panel{width:auto;height:min(550px,calc(100dvh - 96px - env(safe-area-inset-bottom)))}.namayar-header{padding:8px}.namayar-header small{font-size:7px}}
 
-/* Groq opt-in only; scoped to Namayar; never display provider credentials. */
-.namayar-pilot-settings{padding:12px 15px;background:#f4f7fc;border-bottom:1px solid #dfe6f2;direction:rtl;display:grid;gap:6px;font-size:12px;color:#253d61}
-.namayar-pilot-settings strong{font-size:13px}.namayar-pilot-settings p{margin:0;line-height:1.8}
-.namayar-pilot-settings form{display:flex;gap:7px;flex-wrap:wrap;align-items:center}
-.namayar-pilot-settings input{border:1px solid #cad5e5;padding:8px;border-radius:8px;min-width:140px;flex:1;direction:ltr}
-.namayar-pilot-settings button{border:0;border-radius:8px;padding:8px 10px;background:#173458;color:white;cursor:pointer;font-size:12px}
-.namayar-pilot-settings button:disabled{opacity:.6;cursor:not-allowed}
-.namayar-pilot-settings small{font-size:10px;line-height:1.6}
+
+/* Namayar intelligent-mode toggle and private access dialog */
+.namayar-ai-toggle{display:inline-flex;align-items:center;justify-content:center;gap:4px;min-width:46px;height:31px;padding:4px 8px;border:1px solid #cbd3df;border-radius:10px;background:#e9edf3;color:#65758a;font:700 12px/1.1 Vazirmatn,Tahoma,sans-serif;cursor:pointer;transition:background .2s ease,color .2s ease,box-shadow .2s ease,transform .2s ease;flex-shrink:0}
+.namayar-ai-toggle:hover{color:#233b5c;background:#dbe4f0}
+.namayar-ai-toggle.is-active{background:linear-gradient(135deg,#ffe998,#ffd24d);border-color:#e8b82d;color:#5a4008;box-shadow:0 2px 12px #edb62c45}
+.namayar-ai-toggle.is-active svg{color:#825601;animation:namayar-ai-spark 2.5s ease-in-out infinite}
+.namayar-ai-toggle:focus-visible{outline:3px solid #4a8fdd;outline-offset:2px}
+.namayar-access-overlay{position:absolute;inset:0;background:#0b18345c;display:flex;align-items:center;justify-content:center;padding:16px;z-index:8;backdrop-filter:blur(3px)}
+.namayar-access-dialog{position:relative;width:min(100%,322px);padding:24px 20px 20px;border:1px solid #e4e9f4;border-radius:20px;background:#fff;box-shadow:0 20px 55px #091c3b35;text-align:center;color:#1c3454;animation:namayar-modal-enter .2s ease-out}
+.namayar-access-dialog h3{font-size:16px;font-weight:800;color:#172e50;margin:9px 0 7px}
+.namayar-access-dialog p{font-size:12px;line-height:2;margin:0 0 17px;color:#64738a}
+.namayar-access-close{position:absolute;left:11px;top:10px;width:28px;height:28px;border:0;border-radius:8px;background:transparent;color:#8290a6;display:grid;place-items:center;cursor:pointer}
+.namayar-access-close:hover{background:#f0f3f8;color:#253e63}
+.namayar-access-symbol{margin:0 auto;width:54px;height:54px;border-radius:17px;display:flex;align-items:center;justify-content:center;gap:1px;color:#18395f;background:linear-gradient(145deg,#f1f6ff,#e8edf8);box-shadow:inset 0 0 0 1px #e3eaf5}
+.namayar-access-symbol svg:last-child{color:#e2a925}
+.namayar-access-dialog form{display:grid;text-align:right;gap:8px}
+.namayar-access-dialog label{font-size:11px;font-weight:700;color:#2e4365}
+.namayar-access-dialog input{width:100%;box-sizing:border-box;border:1px solid #d4deee;border-radius:11px;background:#fcfdff;color:#1b2f4b;min-height:40px;padding:9px 12px;font:12px Vazirmatn,Tahoma,sans-serif;direction:ltr;text-align:left}
+.namayar-access-dialog input:focus-visible{outline:2px solid #5b9bd5;outline-offset:1px}
+.namayar-access-dialog form button{border:0;border-radius:11px;min-height:42px;display:flex;align-items:center;justify-content:center;gap:8px;background:#1b3d67;color:white;font:600 12px Vazirmatn,Tahoma,sans-serif;cursor:pointer;margin-top:3px}
+.namayar-access-dialog form button:disabled{opacity:.5;cursor:not-allowed}
+.namayar-access-dialog small{display:block;margin-top:13px;font-size:10px;color:#93a0b2;line-height:1.75}
+@keyframes namayar-modal-enter{from{opacity:0;transform:translateY(8px) scale(.97)}to{opacity:1;transform:none}}
+@keyframes namayar-ai-spark{0%,100%{transform:scale(1);opacity:.88}50%{transform:scale(1.15) rotate(7deg);opacity:1}}
+@media(max-width:600px){.namayar-access-overlay{padding:12px}.namayar-access-dialog{width:min(100%,315px);padding:21px 18px}.namayar-ai-toggle{min-width:42px;height:29px}}
+@media(prefers-reduced-motion:reduce){.namayar-access-dialog,.namayar-ai-toggle.is-active svg{animation:none!important}}
