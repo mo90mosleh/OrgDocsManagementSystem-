@@ -6,21 +6,21 @@ Namayar is an original animated SVG/CSS character and a Persian RTL floating ass
 
 The active engine is deterministic local retrieval and product guidance. It uses the same already-authorized app data, not DOM scraping and not a second database. Supported responses include current process goals/ownership/roles/inputs/outputs/events, actual process relationships and KPIs, the current KPI's formula/source/unit/frequency/target, unit/position associations, architecture levels/classifications/draft status, recorded document links, product navigation and tours. Missing data stays explicitly missing. Formula definitions do not imply calculation; registered model PDFs do not imply editable BPMN XML or execution.
 
-Out-of-domain requests return exactly:
+The November 10 revision supersedes the earlier blanket off-topic refusal. Greetings and general management concepts (including efficiency/effectiveness and why processes need KPIs) are supported. Unsupported general questions explicitly disclose the missing language-model connection; they are not presented as generated expertise. Confidentiality and instruction-override protection remain independent of topic vocabulary.
 
-> متاسفم، نمیتونم به این سوال پاسخ بدم
+`conversation.ts` maintains an in-memory session focus and requested document type. Explicit names/codes override previous focus; page or selected-entity changes reset it. Followups can request an educational diagram, then BPMN, then “send it” without losing the subject. Ambiguous diagram requests ask for the type; ambiguous subjects ask for the process. Educational documents are matched only by `EDUCATIONAL_PDF`, BPMN models only by `BPMN2_PDF`. Missing requested types are stated explicitly; other recorded documents are clearly labelled as different alternatives. No semantic embeddings or generative model is active: this is an improved deterministic intent/retrieval pipeline, not a general conversational LLM.
 
-The scope gate runs before current-entity interpretation and before the optional backend adapter. Generic domain words, current page context or a real record name must not bypass rejection of unrelated requests. Unknown/unmatched requests default to refusal. Persian normalization, common synonyms, explicit-name/code priority and ambiguity handling are unit-tested. This is a scoped intent/retrieval engine, not an open-ended language model.
+The panel is 378 × at most 560 px on desktop, responsive on mobile, navy/light-blue, and displays natural inline blue links without a separate source list. Provenance and safe-link validation remain in the engine. SVG state includes idle, hover hearts, typing/listening, thinking, response and successful internal link selection; reduced-motion remains supported. Artificial response delay was removed.
 
 ## Source modules
 
-- `portal/namayar/Namayar.tsx`, `NamayarAvatar.tsx`, `style.css`: launcher, original vector identity, panel, suggestions, sources, input, clear/close and overlay lifecycle.
+- `portal/namayar/Namayar.tsx`, `NamayarAvatar.tsx`, `style.css`: launcher, original vector identity, panel, suggestions, inline links, input, clear/close and overlay lifecycle.
 - `PageContextProvider.tsx`, `context.ts`, `types.ts`: independent page/entity context and strict allowed-knowledge projection. Chart and architecture publish their actual selected IDs; route changes and data refresh resolve context again. Entity facts, approval status, actual related links and suggestions travel with context.
 - `router.ts`: actual route registry, record-ID validation and safe recorded HTTPS documents. Internal links use the portal's normal router; only explicit navigation requests move automatically. Requests for chart units/roles or architecture groups select the actual target through a consumed context request.
 - `knowledge.ts`, `retrieval.ts`, `scope.ts`, `engine.ts`: product knowledge, Persian search, scope control and sourced replies.
 - `LLMAdapter.ts`: disabled-by-default optional gateway interface and validated same-origin client contract.
 
-Personnel/contact tables, assignments, account emails, auth/session data, logos and raw source metadata are not included in assistant knowledge, even for admin. Free-form private notes are excluded. Stored business text is displayed as text, never HTML or executable instructions; URLs are only offered from recorded documents. Sources are clickable existing records or the product guidance route. Snapshot mode is visibly labelled.
+Personnel/contact tables, assignments, account emails, auth/session data, logos and raw source metadata are not included in assistant knowledge, even for admin. Free-form private notes are excluded. Stored business text is displayed as text, never HTML or executable instructions; URLs are only offered from recorded documents. Provenance retains existing records or the product guidance route internally. Snapshot mode is visibly labelled.
 
 ## LLM/RAG status and future gateway
 
@@ -36,6 +36,12 @@ Public Rassan feedback is disabled with `feedbackEnabled: false` in `pages-confi
 
 ## Validation
 
-`npm run typecheck`, `npm run build:pages`, and `npm test` cover context resolution, actual route/record links, retrieval, formula/owner/document facts, A/B entity switching, draft/reference distinction, public allowlist, missing data, exact scope refusal (including mixed/injected requests), safe links and disabled gateway behavior. Browser coverage includes all routes, mobile/desktop, reduced motion, once-only greeting, actual Persian questions, internal navigation, chart/architecture selection, native document links, tours/focus/clear, literal untrusted text and no production feedback controls. Existing charts, architecture, filters, auth/profile/video, feedback restoration, offline snapshot, private Worker and favicon scenarios were also exercised. Tests only use isolated in-memory fixtures, not production business writes.
+`npm run typecheck`, `npm run build:pages`, and `npm test` cover context resolution, actual route/record links, retrieval, formula/owner/document facts, A/B entity switching, draft/reference distinction, public allowlist, missing data, updated policy, technical-limit disclosure and instruction-override rejection, safe links and disabled gateway behavior. Browser coverage includes all routes, mobile/desktop, reduced motion, once-only greeting, actual Persian questions, internal navigation, chart/architecture selection, native document links, tours/focus/clear, literal untrusted text and no production feedback controls. Existing charts, architecture, filters, auth/profile/video, feedback restoration, offline snapshot, private Worker and favicon scenarios were also exercised. Tests only use isolated in-memory fixtures, not production business writes.
 
 Release verification: typecheck and Pages/Worker artifact build passed. 39 unit/security/context/retrieval tests passed. Across the full browser run and targeted reruns after fixing greeting click-through and a scoped status assertion, 52 browser scenarios passed; the optional legacy private-import scenario was skipped because no explicit test payload was supplied. One isolated mock API refresh timed out and passed on immediate focused rerun. Live process metadata was read-only verified: all 30 groups and 44 process records currently have top-level DRAFT status. No production records were created or updated.
+
+## November 10 validation
+
+The updated tests cover exact document types, multi-turn entity/type focus, explicit-name precedence, page reset, missing-type alternatives, general management explanations, unsupported-question disclosure, confidentiality, inline blue links, compact dimensions, hover hearts, mobile, navigation and tours. Tests use existing fixtures only; no product data was added.
+
+Revision checks: TypeScript passed; Pages and Worker artifacts built and validated; 41 unit/security/retrieval tests passed; 9 Playwright assistant scenarios passed (desktop/mobile, all routes, tours, navigation, type-specific documents, policy disclosure, inline links and avatar hover). No model-provider credentials were configured or shipped.
