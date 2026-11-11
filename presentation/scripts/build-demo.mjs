@@ -10,6 +10,14 @@ const publicBuild=await build({
  outdir:'pages',entryNames:'assets/[name]-[hash]',chunkNames:'assets/chunks/[name]-[hash]',assetNames:'assets/media/[name]-[hash]',
  format:'esm',splitting:true,platform:'browser',target:'es2022',jsx:'automatic',metafile:true,
  loader:{'.woff2':'file','.png':'file'},
+ plugins:[{
+  name:'inline-nama-wordmark',
+  setup(build){
+   build.onLoad({filter:/[/\\]nama-wordmark\.png$/},async ({path})=>({
+    contents:await readFile(path),loader:'dataurl'
+   }));
+  }
+ }],
  define:{'process.env.NODE_ENV':'"production"'}
 });
 const publicEntry=Object.entries(publicBuild.metafile.outputs).find(([,meta])=>meta.entryPoint==='portal/main.tsx');
