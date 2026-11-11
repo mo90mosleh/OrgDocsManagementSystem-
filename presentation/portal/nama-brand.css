@@ -9,7 +9,7 @@
 .nama-fold[aria-expanded=false] svg,.chart-menu-toggle[aria-expanded=false] svg{transform:rotate(180deg)}
 .app.sidebar-collapsed:not(.chart-menu-open) .nama-brand-row{gap:2px;padding:0;justify-content:center}
 .sidebar-collapsed:not(.chart-menu-open) .nama-brand-row .brand{padding:0}
-.sidebar-collapsed:not(.chart-menu-open) .nama-mark{width:29px}
+.sidebar-collapsed:not(.chart-menu-open) .nama-brand-row .nama-mark{width:29px}
 .sidebar-collapsed:not(.chart-menu-open) .nama-fold{width:25px;height:32px}
 .chart-header>.chart-menu-toggle{width:auto;min-width:66px;padding:0 8px}
 .chart-menu-open .nama-brand-row .chart-menu-close{align-self:center;margin:0}
