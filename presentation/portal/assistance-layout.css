@@ -3,7 +3,6 @@
 html,body{height:100%;overflow:hidden}
 #app{position:fixed;inset:0 0 calc(var(--assistance-height) + var(--navigation-height) + var(--navigation-safe)) 0;overflow:auto;overscroll-behavior-y:contain;scroll-padding-top:80px;scroll-padding-bottom:20px}
 .app>.side{bottom:var(--assistance-height)}
-.assistance-dock{position:fixed;left:0;right:0;bottom:calc(var(--navigation-height) + var(--navigation-safe));height:var(--assistance-height);background:#f9fbfdee;border-top:1px solid #e2e8ef;z-index:110;backdrop-filter:blur(14px)}
 .namayar-root .namayar-launcher,body .tour-launcher{width:52px;height:52px;bottom:calc(var(--navigation-height) + var(--navigation-safe) + 10px);margin:0;border-radius:16px;box-shadow:0 2px 9px #23395112}
 .namayar-root .namayar-launcher{right:max(18px,env(safe-area-inset-right))}
 body .tour-launcher{left:max(18px,env(safe-area-inset-left))}
@@ -25,11 +24,11 @@ body .tour-launcher{left:max(18px,env(safe-area-inset-left))}
 .organization-filters select{height:44px;min-height:44px;width:100%;max-width:none;min-width:0;flex:1;padding:0 4px;font-size:12px;box-sizing:border-box;background:transparent;color:var(--ink)}
 .organization-filters>.icon-button{min-width:46px;height:46px;border:1px solid #dce4eb;border-radius:10px;background:#fff}
 @media(max-width:760px){
- :root{--assistance-height:64px;--navigation-height:72px;--navigation-safe:env(safe-area-inset-bottom,0px)}
+ :root{--assistance-height:0px;--navigation-height:72px;--navigation-safe:env(safe-area-inset-bottom,0px)}
  .app>.workspace,.app.sidebar-collapsed>.workspace{padding-bottom:0}
  .namayar-root .namayar-launcher,body .tour-launcher{width:44px;height:44px;bottom:calc(var(--navigation-height) + var(--navigation-safe) + 10px);border-radius:13px}
  .namayar-root .namayar-launcher .namayar-avatar{width:40px;height:40px}
- .namayar-root .namayar-panel{left:auto;right:max(12px,env(safe-area-inset-right));width:min(350px,calc(100vw - 24px));height:min(440px,calc(100dvh - 160px - var(--navigation-safe)));max-height:calc(100dvh - 160px - var(--navigation-safe));bottom:calc(var(--navigation-height) + var(--navigation-safe) + var(--assistance-height) + 8px)}
+ .namayar-root .namayar-panel{left:auto;right:max(12px,env(safe-area-inset-right));width:min(350px,calc(100vw - 24px));height:min(440px,calc(100dvh - 160px - var(--navigation-safe)));max-height:calc(100dvh - 160px - var(--navigation-safe));bottom:calc(var(--navigation-height) + var(--navigation-safe) + 62px)}
  .namayar-input textarea{min-height:44px;max-height:70px}
  .namayar-root .namayar-input textarea{min-height:44px}
  .namayar-welcome{padding:8px 4px}.namayar-welcome p{font-size:11px}.namayar-welcome>.namayar-avatar{margin-bottom:6px}
@@ -40,7 +39,6 @@ body .tour-launcher{left:max(18px,env(safe-area-inset-left))}
  .organization-filters label{height:48px;min-height:48px;width:100%;max-width:none;flex:0 0 auto}
  .organization-filters select{height:46px;min-height:46px;max-width:none;width:100%;font-size:16px}
  .mobile-keyboard-open #app{bottom:0}
- .mobile-keyboard-open .assistance-dock{display:none}
  .mobile-keyboard-open .namayar-root .namayar-panel{bottom:calc(12px + var(--mobile-keyboard-height,0px));height:min(440px,calc(var(--mobile-visual-height,100dvh) - 24px));max-height:calc(var(--mobile-visual-height,100dvh) - 24px)}
  body:has(.feedback-root) .tour-launcher{bottom:calc(var(--navigation-height) + var(--navigation-safe) + 10px)}
  .feedback-root .feedback-launcher-group{bottom:calc(var(--navigation-height) + var(--navigation-safe) + var(--assistance-height) + 10px)}
@@ -60,7 +58,7 @@ body:has(.feedback-root) .namayar-launcher{bottom:calc(var(--navigation-height) 
 .desktop-assistance-controls{display:none}
 @media(min-width:761px){
  :root{--assistance-height:0px}
- .assistance-dock,.workspace>footer{display:none}
+ .workspace>footer{display:none}
  .desktop-assistance-controls{display:flex;align-items:center;gap:8px;flex-shrink:0}
  .desktop-assistance-controls .tour-launcher{position:relative;inset:auto;width:40px;height:40px;border-radius:12px;flex-shrink:0;margin:0;box-shadow:none;display:grid;place-items:center}
  .chart-header>.desktop-assistance-controls{order:10}
