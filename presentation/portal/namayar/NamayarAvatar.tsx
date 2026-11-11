@@ -1,4 +1,4 @@
-type AvatarState = 'idle' | 'thinking' | 'listening' | 'responding' | 'success';
+type AvatarState = 'idle' | 'awake' | 'thinking' | 'listening' | 'responding' | 'success';
 
 const ink = '#303030';
 const ivory = '#faf5ed';
@@ -8,7 +8,7 @@ const motion = `
 .namayar-avatar .namayar-shell.nm-character {animation:none;transform:none}
 .nm-resting-face {transform:translateY(10px)}
 .nm-sleepy-eyes,.nm-heart {transform-box:fill-box;transform-origin:center}
-.nm-sleepy-eyes {animation:nm-doze 4s ease-in-out infinite}
+.nm-sleepy-eyes {animation:nm-doze 8s ease-in-out infinite}
 .nm-standing-feet,.nm-standing-face {display:none}
 .namayar-launcher:is(:hover,:focus-visible) .nm-idle .nm-standing-feet,
 .namayar-launcher:is(:hover,:focus-visible) .nm-idle .nm-standing-face {display:block}
@@ -93,7 +93,7 @@ export function NamayarAvatar({state='idle',small=false}:{state?:AvatarState;sma
   return <svg className={'namayar-avatar nm-avatar '+(small?'is-small ':'')+'is-'+state} viewBox="0 0 64 64" aria-hidden="true">
     <style>{motion}</style>
     <g className="namayar-shell nm-character">
-      {working ? <Working/> : searching ? <><Feet/><g className="nm-search-head"><Body/><g className="nm-search-eyes"><Eyes/></g></g></> : <Resting/>}
+      {working ? <Working/> : searching ? <><Feet/><g className="nm-search-head"><Body/><g className="nm-search-eyes"><Eyes/></g></g></> : state === 'idle' ? <Resting/> : <><Feet/><Body/><Eyes/></>}
     </g>
   </svg>;
 }
