@@ -23,7 +23,12 @@ const motion = `
 .nm-hand-a {animation:nm-tap-a 4s ease-in-out infinite}
 .nm-hand-b {animation:nm-tap-b 4s ease-in-out infinite}
 .nm-search-head,.nm-working-head {transform-origin:32px 38px}
-@keyframes nm-doze {0%,12%,100%{transform:scaleY(1)}53%,67%{transform:scaleY(.09)}}
+@keyframes nm-doze {
+  0%,18% {transform:scaleY(1)}
+  71%,78% {transform:scaleY(.08)}
+  79.5% {transform:scaleY(1.12)}
+  83%,100% {transform:scaleY(1)}
+}
 @keyframes nm-rise {0%{transform:translateY(10px)}74%{transform:translateY(-1px)}100%{transform:translateY(0)}}
 @keyframes nm-heart-pop {0%{transform:scale(.12)}65%{transform:scale(1.18)}100%{transform:scale(1)}}
 @keyframes nm-scan-head {0%,14%,100%{transform:rotate(-4deg)}29%,45%{transform:rotate(9deg)}68%,84%{transform:rotate(-6deg)}}

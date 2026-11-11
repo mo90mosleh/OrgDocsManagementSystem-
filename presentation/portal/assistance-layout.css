@@ -66,19 +66,20 @@ body:has(.feedback-root) .namayar-launcher{bottom:calc(var(--navigation-height) 
  .chart-header>.desktop-assistance-controls{order:10}
  .app:not(.sidebar-collapsed) .side-bottom{margin-bottom:52px}
  .nama-brand-row .nama-mark,.app:not(.chart-menu-open) .chart-menu-toggle .nama-mark{anchor-name:--nama-logo}
- .namayar-root{--namayar-right:32px;--namayar-bottom:max(16px,env(safe-area-inset-bottom))}
+ .namayar-root{--namayar-right:26px;--namayar-bottom:max(16px,env(safe-area-inset-bottom))}
  body:has(.sidebar-collapsed) .namayar-root{--namayar-right:5px}
  @supports(right:anchor(--nama-logo center)){
-  .namayar-root .namayar-launcher{right:max(2px,calc(anchor(--nama-logo center,48px) - 22px))}
+  .namayar-root .namayar-launcher{right:max(2px,calc(anchor(--nama-logo center,48px) - 28px))}
  }
- .namayar-root .namayar-launcher{width:44px;height:44px;bottom:var(--namayar-bottom)}
+ .namayar-root .namayar-launcher{width:56px;height:56px;bottom:var(--namayar-bottom)}
  @supports not (right:anchor(--nama-logo center)){
   .namayar-root .namayar-launcher{right:var(--namayar-right)}
  }
- .namayar-root .namayar-launcher .namayar-avatar{width:40px;height:40px}
- .namayar-root .namayar-intro{top:auto;bottom:calc(var(--namayar-bottom) + 54px);right:16px;width:295px;background:white;border:1px solid #e2e8ef}
+ .namayar-root .namayar-launcher .namayar-avatar{width:52px;height:52px}
+ .namayar-root .namayar-intro{top:auto;bottom:calc(var(--namayar-bottom) + 66px);right:16px;width:295px;background:white;border:1px solid #e2e8ef}
  body .tour-notice{top:86px;bottom:auto;left:24px;background:white}
- .namayar-root .namayar-panel{top:auto;bottom:calc(var(--namayar-bottom) + 54px);right:16px}
+ .namayar-root .namayar-panel{top:auto;bottom:calc(var(--namayar-bottom) + 66px);right:16px}
+ .side .namayar-idle-callout{bottom:calc(max(16px,env(safe-area-inset-bottom)) + 66px)}
 }
 .chart-header>.chart-menu-toggle{display:grid;place-items:center;width:40px;height:40px;flex-shrink:0;background:#fff;border:1px solid #dfe6ed;border-radius:11px;color:#536e61;margin:0}
 .chart-header>.global-back{margin-right:auto}
