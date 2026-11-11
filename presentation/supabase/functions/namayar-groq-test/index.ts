@@ -1,4 +1,4 @@
-// Namayar Groq pilot. Public site, private access code; never embed provider credentials in frontend.
+// Public demo chat uses the server-configured model. The diagnostic tool can override it with a test token.
 const ORIGIN = "https://mo90mosleh.github.io";
 const SNAPSHOT = "https://mo90mosleh.github.io/OrgDocsManagementSystem-/rassan-presentation.json";
 const headers = { "Access-Control-Allow-Origin": ORIGIN, "Access-Control-Allow-Methods": "GET, POST, OPTIONS", "Access-Control-Allow-Headers": "content-type,x-namayar-test-token", "Content-Type": "application/json; charset=utf-8", "Vary": "Origin" };
@@ -65,8 +65,10 @@ Deno.serve(async (req: Request) => {
   if (req.method !== "POST" && req.method !== "GET") return response(405,{error:"METHOD_NOT_ALLOWED"});
   if (req.headers.get("origin") && req.headers.get("origin") !== ORIGIN) return response(403,{error:"ORIGIN_NOT_ALLOWED"});
   const apiKey=Deno.env.get("GROQ_API_KEY"), testCode=Deno.env.get("NAMAYAR_TEST_TOKEN");
-  if (!apiKey || !testCode || testCode.length < 24) return response(503,{error:"TEST_NOT_CONFIGURED",message:"کلید Groq یا کد تست در Secrets تنظیم نشده است."});
-  if (!await sameSecret(testCode,req.headers.get("x-namayar-test-token")||"")) return response(401,{error:"INVALID_TEST_TOKEN"});
+  if (!apiKey) return response(503,{error:"CHAT_UNAVAILABLE"});
+  const suppliedToken=req.headers.get("x-namayar-test-token");
+  const diagnostic=Boolean(suppliedToken && testCode && await sameSecret(testCode,suppliedToken));
+  if(suppliedToken && !diagnostic)return response(401,{error:"INVALID_TEST_TOKEN"});
   if(req.method==="GET"){try{return response(200,await quota());}catch{return response(503,{error:"USAGE_UNAVAILABLE"});}}
   let body: AnyRecord;
   try { const text=await req.text();if(text.length>6500)return response(413,{error:"TOO_LARGE"});body=JSON.parse(text); } catch {return response(400,{error:"INVALID_JSON"});}
@@ -82,7 +84,7 @@ Deno.serve(async (req: Request) => {
     const supportedModels=["qwen/qwen3.8-27b","openai/gpt-oss-20b","openai/gpt-oss-120b"];
     const requestedModel=typeof body.model==="string"?body.model:"";
     const envModel=Deno.env.get("GROQ_MODEL")||"";
-    const selectedModel=supportedModels.includes(requestedModel)?requestedModel:supportedModels.includes(envModel)?envModel:supportedModels[0];
+    const selectedModel=diagnostic&&supportedModels.includes(requestedModel)?requestedModel:supportedModels.includes(envModel)?envModel:supportedModels[0];
     const provider=await fetch("https://api.groq.com/openai/v1/chat/completions",{method:"POST",headers:{"Authorization":"Bearer "+apiKey,"Content-Type":"application/json"},body:JSON.stringify({model:selectedModel,messages:[{role:"system",content:prompt},...history,{role:"user",content:question}],temperature:0.45,max_tokens:700}),signal:AbortSignal.timeout(20000)});
     if (!provider.ok) {
       let providerMessage="";
