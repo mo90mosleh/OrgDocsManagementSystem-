@@ -1,0 +1,15 @@
+.nama-brand-row{display:flex;align-items:center;justify-content:space-between;gap:6px;margin:0 0 24px;padding:0 6px}
+.nama-brand-row .brand,.chart-menu-open .nama-brand-row .brand{padding:0;display:flex;flex-direction:column;align-items:flex-start;gap:4px}
+.nama-mark{display:block;height:auto;object-fit:contain}
+.nama-brand-row .brand small{margin:0}
+.nama-fold,.chart-header>.chart-menu-toggle{display:inline-flex;align-items:center;justify-content:center;gap:6px;color:#424744;background:#fff;border:1px solid #d9ddda;border-radius:8px;cursor:pointer;flex-shrink:0}
+.nama-fold{width:32px;height:32px;padding:0}
+.nama-fold:hover,.chart-header>.chart-menu-toggle:hover{background:#f2f4f2;color:#252925;border-color:#aeb6b0}
+.nama-fold:focus-visible,.chart-menu-toggle:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
+.nama-fold[aria-expanded=false] svg,.chart-menu-toggle[aria-expanded=false] svg{transform:rotate(180deg)}
+.app.sidebar-collapsed:not(.chart-menu-open) .nama-brand-row{gap:2px;padding:0;justify-content:center}
+.sidebar-collapsed:not(.chart-menu-open) .nama-brand-row .brand{padding:0}
+.sidebar-collapsed:not(.chart-menu-open) .nama-mark{width:29px}
+.sidebar-collapsed:not(.chart-menu-open) .nama-fold{width:25px;height:32px}
+.chart-header>.chart-menu-toggle{width:auto;min-width:66px;padding:0 8px}
+.chart-menu-open .nama-brand-row .chart-menu-close{align-self:center;margin:0}
