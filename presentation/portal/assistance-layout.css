@@ -64,6 +64,7 @@ body:has(.feedback-root) .namayar-launcher{bottom:calc(var(--navigation-height) 
  .desktop-assistance-controls{display:flex;align-items:center;gap:8px;flex-shrink:0}
  .desktop-assistance-controls .tour-launcher{position:relative;inset:auto;width:40px;height:40px;border-radius:12px;flex-shrink:0;margin:0;box-shadow:none;display:grid;place-items:center}
  .chart-header>.desktop-assistance-controls{order:10}
+ .app:not(.sidebar-collapsed) .side-bottom{margin-bottom:52px}
  .nama-brand-row .nama-mark,.app:not(.chart-menu-open) .chart-menu-toggle .nama-mark{anchor-name:--nama-logo}
  .namayar-root{--namayar-right:32px;--namayar-bottom:max(16px,env(safe-area-inset-bottom))}
  body:has(.sidebar-collapsed) .namayar-root{--namayar-right:5px}
