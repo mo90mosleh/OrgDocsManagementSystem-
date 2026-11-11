@@ -1,11 +1,11 @@
 .mobile-bottom-nav,.mobile-menu-button,.mobile-nama-brand{display:none}
 .mobile-filter-disclosure{display:contents}.mobile-filter-disclosure>summary{display:none}.mobile-filter-disclosure:not([open])>.organization-filters{display:flex}
 @media(max-width:760px){
- :root{--mobile-header-height:74px}
+ :root{--mobile-header-height:56px}
  :root{--mobile-nav-height:72px;--mobile-safe-bottom:env(safe-area-inset-bottom,0px)}
  html{scroll-padding-top:78px;scroll-padding-bottom:calc(100px + var(--mobile-safe-bottom))}
  body{font-size:14px;background:#f4f6f8}.app,.app.sidebar-collapsed{display:block;min-height:100dvh}.app>.side,.app.sidebar-collapsed>.side{display:none}.app>.workspace,.app.sidebar-collapsed>.workspace{margin:0;width:100%;min-width:0;padding-bottom:calc(var(--mobile-nav-height) + var(--mobile-safe-bottom) + 20px)}
- .app .topbar,.app.chart-focus-mode .topbar{display:flex;position:sticky;top:0;z-index:45;height:var(--mobile-header-height);min-height:var(--mobile-header-height);padding:8px 16px;border-bottom:1px solid #e3e8ed;background:#ffffffed;backdrop-filter:blur(16px);gap:12px}.topbar .organization{gap:clamp(18px,5vw,26px);min-width:0}
+ .app .topbar,.app.chart-focus-mode .topbar{display:flex;position:sticky;top:0;z-index:45;height:var(--mobile-header-height);min-height:var(--mobile-header-height);padding:5px 16px;border-bottom:1px solid #e3e8ed;background:#ffffffed;backdrop-filter:blur(16px);gap:12px}.topbar .organization{gap:clamp(18px,5vw,26px);min-width:0}
  .mobile-nama-brand::after{content:"";position:absolute;inset-inline-end:calc(-1 * clamp(9px,2.5vw,13px));top:9px;height:26px;border-inline-end:1px solid #d5dbdf}
  .mobile-nama-brand{position:relative;display:grid;place-items:center;width:44px;height:44px;flex:none}.topbar .company-logo{width:105px;height:34px;object-fit:contain}.topbar .layout-menu-toggle,.topbar .org-text,.topbar .profile-menu{display:none}.topbar-actions{gap:10px;margin-right:auto}.topbar-actions .global-back{min-height:44px;min-width:44px;justify-content:center;border:1px solid #e3e8ed;border-radius:12px}.mobile-menu-button{display:grid;place-items:center;min-width:44px;min-height:44px;background:#eef2f7;border-radius:12px;color:#34506b}
  .app main,.app.chart-focus-mode main{padding:18px 14px 24px;max-width:100%;min-width:0}.app .breadcrumb{display:none}.workspace>footer{display:none}.heading{align-items:flex-start;gap:10px;margin-bottom:18px;flex-wrap:wrap}.heading h1{font-size:23px;line-height:1.6;overflow-wrap:anywhere}.heading p{font-size:12px;line-height:1.9;margin-top:5px}.heading>.primary{font-size:12px}.panel{border-radius:16px;box-shadow:0 2px 8px #22344e04}.padded,.settings-panel{padding:18px}.panel-title{gap:10px;flex-wrap:wrap}.panel-title h2{font-size:16px}
