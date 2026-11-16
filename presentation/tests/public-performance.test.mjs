@@ -18,3 +18,14 @@ test('expensive chart and architecture are emitted as route-specific chunks',asy
  assert.ok(filenames.some(name=>/^Chart-.*\.js$/.test(name)),'chart module should be deferred');
  assert.ok(filenames.some(name=>/^Architecture-.*\.js$/.test(name)),'architecture module should be deferred');
 });
+test('startup preloads ESM dependencies and leaves help engines deferred',async()=>{
+ const html=await readFile(resolve(root,'index.html'),'utf8');
+ assert.match(html,/rel="modulepreload"/);
+ if(html.includes('snapshotPath'))assert.match(html,/rassan-presentation\.json" as="fetch"[^>]*crossorigin/);
+ const entry=html.match(/<script type="module" src="\.\/([^"]+)"/)[1];
+ assert.ok((await stat(resolve(root,entry))).size<300000,'main entry must remain below 300KB');
+ const chunks=await readdir(resolve(root,'assets/chunks'));
+ for(const name of ['tour-steps','conversation','Feedback'])assert.ok(chunks.some(p=>p.startsWith(name+'-')),name+' should load on demand');
+ const js=await readFile(resolve(root,entry),'utf8');
+ assert.doesNotMatch(js,/data:image\/png;base64/,'logos must use independently cacheable image files');
+});

@@ -1,5 +1,5 @@
 import{withinScope,refusalReply}from'./scope';
-import{useEffect,useRef,useState,type FormEvent}from'react';import{createPortal}from'react-dom';import{X,Send,BrushCleaning,ArrowUpLeft,ExternalLink,BookOpen,Route,Sparkles}from'lucide-react';import{Link,go}from'../ui';import{usePageContext}from'./PageContextProvider';import{NamayarAvatar}from'./NamayarAvatar';import{converse,type ConversationState}from'./conversation';import{llmAdapter,fetchSharedQuota,type HistoryMessage}from'./LLMAdapter';import type{PageContext,Reply,AssistantLink}from'./types';import'./style.css';
+import{useEffect,useRef,useState,type FormEvent}from'react';import{createPortal}from'react-dom';import{X,Send,BrushCleaning,ArrowUpLeft,ExternalLink,BookOpen,Route,Sparkles}from'lucide-react';import{Link,go}from'../ui';import{usePageContext}from'./PageContextProvider';import{NamayarAvatar}from'./NamayarAvatar';import type{ConversationState}from'./conversation';import{llmAdapter,fetchSharedQuota,type HistoryMessage}from'./LLMAdapter';import type{PageContext,Reply,AssistantLink}from'./types';import'./style.css';
 const idleMessages = [
  'دربارهٔ نما یا این صفحه سؤالی داری؟ از من بپرس.',
  'اولین باره اینجایی؟ بیا یه دور توی صفحه بزنیم.',
@@ -87,7 +87,7 @@ export function Namayar(){const{data,context,requestSelection}=usePageContext(),
         if(controller.signal.aborted)return;
         receivedDelta=true;
         updateDraft(visible+fragment);
-      }):converse(data,origin,question,conversation.current);
+      }):(await import('./conversation')).converse(data,origin,question,conversation.current);
     if(controller.signal.aborted)return;
     if(!receivedDelta)await reveal(reply.paragraphs.join('\n\n'));
     if(controller.signal.aborted)return;
