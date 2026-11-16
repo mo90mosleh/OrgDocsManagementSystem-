@@ -1,0 +1,270 @@
+/* Shared visual rules. Geometry-sensitive chart nodes and the approved Namayar
+   character/brand marks retain their own layouts and semantic color schemes. */
+:root {
+  --bg: #f4f6f8;
+  --ink: #243447;
+  --muted: #617185;
+  --line: #dce3eb;
+  --surface: #fff;
+  --surface-subtle: #f6f8fb;
+  --text-secondary: #526276;
+  --action: color-mix(in srgb, var(--brand) 78%, #5c1322);
+  --action-soft: color-mix(in srgb, var(--brand) 5%, white);
+  --focus: #507da3;
+  --focus-soft: #dce8f3;
+  --radius-control: 10px;
+  --radius-panel: 16px;
+  --radius-dialog: 20px;
+  --control-height: 44px;
+  --icon-size: 40px;
+  --page-space: 24px;
+  --panel-space: 24px;
+  --section-gap: 24px;
+  --shadow-popover: 0 12px 36px #172b4426;
+}
+body { background: var(--bg); color: var(--ink); }
+.app main, .app.chart-focus-mode main, .app:has(.architecture-page) main {
+  padding: var(--page-space); padding-bottom: 32px;
+}
+.heading, .architecture-heading { margin-bottom: 20px; gap: 12px; }
+.heading h1, .architecture-heading h1, .chart-header h1 {
+  font-size: 24px; font-weight: 700; line-height: 1.6; color: var(--ink);
+}
+.heading p { font-size: 13px; color: var(--muted); line-height: 1.9; }
+.panel-title { gap: 12px; margin-bottom: 16px; }
+.panel-title h2, .process-section summary h2, .reference-panel h2 { font-size: 16px; line-height: 1.8; }
+.padded, .settings-panel, .admin-card, .architecture-summary, .unit-detail {
+  padding: var(--panel-space);
+}
+.panel, .architecture-card, .document-card, .training-video {
+  border-color: var(--line); border-radius: var(--radius-panel); background: var(--surface);
+}
+.stats, .grid-two, .detail-grid, .admin-grid { gap: var(--section-gap); }
+.description, .profile-fields dd, .concept-card p, .admin-card p {
+  color: var(--text-secondary); font-size: 13px; line-height: 2.1;
+}
+.empty p, .empty-inline, .unrecorded, .document-disclaimer, .organization-filter-note,
+.flow-note, .chart-link-note, .architecture-owner, .architecture-card-meta,
+.architecture-card-copy > small, .architecture-card-copy > .code,
+.process-meta, .code, .requirement small { color: var(--muted); }
+.empty-inline, .empty p, .unrecorded { font-size: 12px; line-height: 1.9; }
+.code, .architecture-card-copy > .code { font-size: 11px; }
+.facts > div, .formula, .logo-preview {
+  background: var(--surface-subtle); border: 1px solid var(--line); border-radius: var(--radius-control);
+}
+.facts span, .formula small { color: var(--muted); font-size: 12px; }
+.facts b { color: var(--ink); font-size: 13px; line-height: 1.9; }
+.profile-fields > div, .related-link, .requirement { border-color: var(--line); }
+.profile-fields dt { font-size: 13px; color: var(--ink); }
+/* Same action hierarchy everywhere: solid primary, quiet soft primary,
+   outlined secondary, text link, destructive action. */
+.primary, .secondary {
+  min-height: var(--control-height); border-radius: var(--radius-control);
+  padding: 9px 14px; gap: 8px; font-size: 13px; line-height: 1.7; text-align: center;
+}
+.primary { background: var(--action); color: #fff; }
+.secondary { background: var(--surface); border-color: var(--line); color: var(--text-secondary); }
+.primary:hover { filter: brightness(.96); }
+.secondary:hover:not(:disabled) { background: var(--surface-subtle); border-color: #b6c5d5; }
+.primary.soft, .dashboard-concepts .primary.soft {
+  background: var(--action-soft); color: var(--action);
+  border-color: color-mix(in srgb, var(--brand) 16%, white);
+}
+.text-button, .related-link, td > a:not(.text-button), .profile-dropdown a { color: var(--action); }
+.text-button { min-height: 36px; font-size: 12px; line-height: 1.8; }
+.text-button.danger, .danger { color: #a72d43; }
+.icon-button { color: var(--text-secondary); border-radius: var(--radius-control); }
+.icon-button:hover:not(:disabled) { background: var(--surface-subtle); }
+.topbar-actions .icon-button, .topbar-actions .global-back,
+.desktop-assistance-controls .tour-launcher, .chart-header > .global-back,
+.chart-header > .chart-menu-toggle {
+  min-height: var(--icon-size); height: var(--icon-size); border-radius: var(--radius-control);
+}
+.desktop-assistance-controls .tour-launcher { color: var(--text-secondary); border-color: var(--line); }
+/* Keep icon-only controls usable without resizing native graph handles. */
+.panel-title > .icon-button, .entity-dialog .icon-button, .namayar-header .icon-button {
+  min-width: 36px; min-height: 36px;
+}
+button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible,
+textarea:focus-visible, summary:focus-visible {
+  outline: 2px solid var(--focus); outline-offset: 2px;
+}
+.organization-filters label:focus-within, .architecture-search:focus-within,
+.chart-search:focus-within, .mobile-chart-search:focus-within {
+  outline: none; border-color: #9cb4cb; box-shadow: 0 0 0 2px var(--focus-soft);
+}
+.organization-filters select:focus-visible, .architecture-search input:focus-visible,
+.chart-search input:focus-visible, .mobile-chart-search input:focus-visible {
+  outline: none; box-shadow: none;
+}
+.namayar-input textarea:focus-visible { outline: none; box-shadow: 0 0 0 2px var(--focus-soft); }
+/* Fields and filter boxes share one height and one neutral border treatment. */
+form input:not([type=checkbox]):not([type=radio]):not([type=color]):not([type=file]),
+form select, .toolbar > .search, .toolbar > select, .mobile-document-filters input,
+.mobile-document-filters select {
+  min-height: var(--control-height); height: var(--control-height);
+  border: 1px solid var(--line); border-radius: var(--radius-control);
+  background: var(--surface); color: var(--ink); font-size: 13px; padding: 9px 12px;
+}
+form textarea { border-color: var(--line); border-radius: var(--radius-control); color: var(--ink); font-size: 13px; }
+form label { color: var(--ink); font-size: 13px; gap: 8px; }
+form label > small { color: var(--muted); font-size: 11px; line-height: 1.8; }
+.toolbar { align-items: flex-start; gap: 12px; margin-bottom: 16px; }
+.organization-filters { gap: 12px; }
+.organization-filters label, .toolbar > select {
+  min-height: var(--control-height); height: var(--control-height);
+  flex: 0 0 220px; width: 220px; max-width: 220px;
+  border-radius: var(--radius-control); border-color: var(--line);
+}
+.organization-filters select {
+  height: calc(var(--control-height) - 2px); min-height: calc(var(--control-height) - 2px);
+  font-size: 13px; padding-block: 0; color: var(--ink); background: transparent;
+}
+.organization-filters > .icon-button { width: var(--control-height); height: var(--control-height); }
+/* Status colors convey meaning rather than being inherited from page chrome. */
+.badge { font-size: 11px; line-height: 1.7; padding: 4px 8px; border-radius: 8px; }
+.badge.neutral, .status-unassessed { color: #556579; background: #eef2f6; }
+.status-defined { color: #295f94; background: #edf4fc; }
+.status-gap { color: #855c15; background: #fff5df; }
+.status-ready { color: #216947; background: #eaf6ef; }
+.draft-note { color: #7d5812; background: #fff6e2; border: 1px solid #f0dfba; border-radius: var(--radius-control); }
+.alert { color: #315e88; background: #edf4fc; border-color: #cddff0; border-radius: var(--radius-control); }
+.alert.success { color: #216947; background: #eaf6ef; border-color: #cae3d3; }
+.alert.warning { color: #7d5812; background: #fff6e2; border-color: #f0dfba; }
+.alert.error { color: #9d2d40; background: #fff0f2; border-color: #ecc9d1; }
+/* Segmented controls use the same visual and keyboard-selected states. */
+.segmented-control { border: 1px solid var(--line); border-radius: 12px; background: #edf1f5; gap: 4px; padding: 3px; }
+.segmented-control button, .chart-header .segmented-control button,
+.architecture-display-switch button, .chart-insight-toggle button {
+  min-height: 36px; padding: 6px 10px; border-radius: 8px; color: var(--text-secondary);
+  border: 1px solid transparent; font-size: 12px; line-height: 1.7;
+}
+.segmented-control button[aria-checked=true], .chart-header .segmented-control button[aria-checked=true],
+.architecture-display-switch button[aria-checked=true], .chart-insight-toggle button[aria-checked=true] {
+  background: #fff; color: var(--action); border-color: var(--line); box-shadow: 0 1px 4px #1b2c4410;
+}
+.architecture-search, .chart-search, .mobile-chart-search {
+  border-radius: var(--radius-control); border-color: var(--line); min-height: var(--control-height);
+  background: var(--surface); color: var(--muted);
+}
+.architecture-page .architecture-search { min-height: var(--control-height); padding: 4px 12px; }
+.architecture-search input, .chart-search input { font-size: 13px; color: var(--ink); }
+.architecture-page .architecture-tools > .secondary, .architecture-tree-controls .secondary,
+.chart-zoom-toolbar .secondary { min-height: var(--control-height); padding: 8px 10px; font-size: 12px; }
+.chart-analysis-select { font-size: 12px; color: var(--muted); }
+.chart-analysis-select select { height: var(--control-height); border-color: var(--line); border-radius: var(--radius-control); background: #fff; font-size: 12px; }
+.architecture-page .architecture-stage-heading h2 { font-size: 16px; color: var(--ink); }
+.architecture-stage-heading .badge { font-size: 11px; }
+.architecture-card-main { padding: 20px; }
+.architecture-card-copy > strong { color: var(--ink); font-size: 14px; }
+.architecture-card-meta, .architecture-card-copy > small { font-size: 11px; }
+.architecture-card-actions { border-color: var(--line); background: var(--surface-subtle); }
+.architecture-summary .description, .architecture-summary .related-link { font-size: 13px; }
+.architecture-tree-row { border-color: var(--line); }
+.architecture-tree-row.is-group { background: #f3f6f9; }
+.architecture-tree-name, .architecture-tree-row > .code { color: var(--text-secondary); }
+.chart-layout-full .chart-insight-popover, .profile-dropdown, .chart-search-results,
+.architecture-search-results { border-color: var(--line); border-radius: var(--radius-panel); box-shadow: var(--shadow-popover); }
+thead { background: var(--surface-subtle); color: var(--text-secondary); }
+th { font-size: 12px; padding: 14px 16px; font-weight: 500; }
+td { border-color: var(--line); padding: 16px; font-size: 13px; }
+.document-content strong, .video-title h3 { color: var(--ink); font-size: 14px; }
+.document-content small, .document-content > a:not([target]), .video-empty p { font-size: 12px; color: var(--muted); }
+.document-content a[target], .video-source { color: var(--action); min-height: 40px; font-size: 12px; }
+.document-card .document-icon, .video-icon { border-radius: var(--radius-control); }
+.empty { border-radius: var(--radius-panel); gap: 12px; }
+.entity-dialog { border-color: var(--line); border-radius: var(--radius-dialog); box-shadow: var(--shadow-popover); }
+.entity-dialog header { padding: 20px 24px; border-color: var(--line); }
+.entity-dialog header h2 { font-size: 18px; }
+.entity-dialog form { padding: var(--panel-space); }
+.entity-dialog::backdrop, .mobile-menu-sheet::backdrop { background: #152b4380; }
+.tour-popover { border-color: var(--line); border-radius: var(--radius-panel); box-shadow: var(--shadow-popover); }
+.tour-popover p { color: var(--text-secondary); font-size: 13px; }
+.namayar-message.assistant, .namayar-welcome p { color: var(--text-secondary); }
+.namayar-context, .namayar-footer, .namayar-suggestions button { color: var(--muted); }
+@media(max-width:760px) {
+  :root { --control-height: 48px; --icon-size: 44px; --page-space: 14px; --panel-space: 18px; --section-gap: 14px; }
+  .heading h1, .architecture-heading h1, .chart-header h1 { font-size: 22px; }
+  .heading, .architecture-heading { margin-bottom: 16px; }
+  .heading p { font-size: 12px; }
+  .panel-title h2, .process-section summary h2 { font-size: 15px; }
+  .primary, .secondary { min-height: 44px; padding: 10px 12px; font-size: 12px; }
+  form input:not([type=checkbox]):not([type=radio]):not([type=color]):not([type=file]),
+  form select, form textarea, .toolbar > .search, .toolbar > select,
+  .organization-filters select, .mobile-document-filters input, .mobile-document-filters select { font-size: 16px; }
+  .organization-filters label, .toolbar > select { width: 100%; max-width: none; flex: 1 1 100%; }
+  .organization-filters { gap: 10px; }
+  .toolbar > .mobile-filter-disclosure { border: 0; background: transparent; overflow: visible; }
+  .toolbar > .mobile-filter-disclosure > summary { min-height: var(--control-height); border: 1px solid var(--line); border-radius: var(--radius-control); background: #fff; }
+  .mobile-filter-disclosure .organization-filters { padding: 10px 0 0; }
+  .segmented-control button, .chart-header .segmented-control button,
+  .architecture-display-switch button { min-height: 40px; padding: 6px 8px; font-size: 11px; }
+  .architecture-card-main { padding: 16px; min-height: 114px; }
+  .architecture-card-actions { padding: 8px 16px; }
+  .table-wrap tr { border-radius: var(--radius-panel); border-color: var(--line); }
+  .table-wrap td:before { color: var(--muted); }
+  .table-wrap td { font-size: 12px; }
+  .document-content a[target], .video-source { min-height: 44px; }
+  .entity-dialog { border-radius: 24px 24px 0 0; }
+  .entity-dialog header { padding: 16px 18px; }
+  .architecture-status summary { min-width: 36px; min-height: 40px; justify-content: center; }
+  .mobile-bottom-nav { border-color: var(--line); }
+  .mobile-bottom-nav a { color: var(--muted); }
+  .mobile-bottom-nav a[aria-current=page] { color: var(--action); }
+}
+@media(prefers-reduced-motion:reduce) { .primary, .secondary, .segmented-control button { transition: none; } }
+.nav a { color: var(--text-secondary); }
+.nav a.active { color: var(--action); }
+.nav-label, .side-bottom, .side-bottom small, .org-text small, .profile-menu summary small,
+.breadcrumb, .breadcrumb a { color: var(--muted); }
+.avatar { background: var(--surface-subtle); color: var(--action); }
+.stat > div, .stat small, .stat > div svg, .concept-icon { color: var(--muted); }
+.concept-card { background: var(--surface); border-color: var(--line); }
+@media(max-width:760px) {
+  /* Keep native table semantics, but avoid a second panel around mobile row cards. */
+  .table-wrap.panel { background: transparent; border: 0; box-shadow: none; }
+  .topbar .desktop-assistance-controls { display: flex; align-items: center; flex-shrink: 0; }
+  .topbar .desktop-assistance-controls .tour-launcher {
+    position: relative; inset: auto; width: 44px; height: 44px; min-width: 44px;
+    margin: 0; box-shadow: none; border-radius: var(--radius-control);
+  }
+  .app .topbar, .app.chart-focus-mode .topbar { padding-inline: 12px; gap: 8px; }
+  .topbar .organization { gap: clamp(16px, 5vw, 22px); }
+  .topbar .company-logo { width: clamp(76px, 22vw, 105px); }
+  .topbar-actions { gap: 6px; }
+  body:has(.mobile-menu-sheet[open]) .topbar .desktop-assistance-controls { visibility: hidden; }
+}
+.chart-zoom-toolbar { border-radius: var(--radius-panel) var(--radius-panel) 0 0; }
+@media(max-width:760px) { .primary, .secondary { min-height: var(--control-height); } }
+form input:not([type=checkbox]):not([type=radio]):not([type=color]):not([type=file]),
+form select, form textarea {
+  min-height: var(--control-height); border-color: var(--line); border-radius: var(--radius-control);
+  background: var(--surface); color: var(--ink); font-size: 14px;
+}
+@media(max-width:760px) {
+  form input:not([type=checkbox]):not([type=radio]):not([type=color]):not([type=file]),
+  form select, form textarea { font-size: 16px; }
+}
+form input:not([type=checkbox]):not([type=radio]):not([type=color]):not([type=file]), form select {
+  height: var(--control-height); padding: 9px 12px; line-height: 1.7;
+}
+:root { --control-font: 13px; }
+.concept-card .primary, .heading .primary,
+button.primary, a.primary, button.secondary, a.secondary {
+  min-height: var(--control-height); border-radius: var(--radius-control); font-size: var(--control-font);
+}
+@media(max-width:760px) { :root { --control-font: 12px; } }
+@media(max-width:760px) {
+  /* Keep the explorer above the fold without reducing type or touch targets. */
+  .architecture-heading { margin-bottom: 12px; }
+  .architecture-page .architecture-breadcrumb { padding-block: 0; margin-bottom: 8px; }
+}
+/* Apply the same chrome to the concurrently added chart context/history strip. */
+.chart-navigation-strip { border-color: var(--line); background: var(--surface); border-radius: var(--radius-control); }
+.chart-crumb button { color: var(--text-secondary); border-radius: 8px; }
+.chart-crumb button.current { color: #295f94; background: #edf4fc; border-color: #cddff0; }
+.chart-visit-actions .secondary { min-height: var(--control-height); border-radius: var(--radius-control); font-size: 12px; }
+/* A search menu must remain actionable above the floating detail popover. */
+.chart-search { z-index: 80; }
+.icon-button, .namayar-header .icon-button { color: var(--text-secondary); }
+.organization-filters > .icon-button { width: var(--control-height); min-width: var(--control-height); height: var(--control-height); }
