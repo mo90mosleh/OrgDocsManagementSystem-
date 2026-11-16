@@ -8,7 +8,7 @@ const raw=JSON.parse(await readFile(new URL('../data/rassan-presentation.json',i
 const data=allowedKnowledge(raw),context=resolveContext(data,'/organization/chart');
 
 test('Groq streaming mode progressively yields Unicode deltas and validates final links',async()=>{
- const previous=globalThis.fetch,encoder=new TextEncoder(),parts:string[]=[];
+ const previous=globalThis.fetch,encoder=new TextEncoder(),parts=[];
  try{
   globalThis.fetch=async(_url,opts)=>{
    const request=JSON.parse(String(opts.body));
@@ -31,7 +31,7 @@ test('Cached JSON assistant answers remain usable with a streaming callback',asy
  const previous=globalThis.fetch;
  try{
   globalThis.fetch=async()=>new Response(JSON.stringify({paragraphs:['متن آماده'],links:[]}),{headers:{'content-type':'application/json'}});
-  const received:string[]=[];
+  const received=[];
   const reply=await new GroqPilotAdapter().answer('امکانات نما چیه؟',context,data,new AbortController().signal,[],v=>received.push(v));
   assert.deepEqual(received,[]);
   assert.deepEqual(reply.paragraphs,['متن آماده']);
