@@ -30,3 +30,10 @@ Future server-side storage requires tenant-scoped:
 KPI records and OkrKeyResult are distinct: the KR has period-specific baseline/target/current and may reference an existing KPI definition, but registering a KR's sample measurement does not change the KPI catalog. An Objective is not a BPMS workflow.
 
 Test with npm run typecheck, npm run build:pages, and npm test from the presentation directory.
+
+## Cycle directory and page navigation (November 2026)
+
+- The main-workspace "مدیریت دوره‌ها" action opens a single cycle-directory dialog, listing every defined cycle regardless of the one currently selected, including lifecycle state, Persian-formatted dates when available, number of Objectives and KRs, and a "مشاهده دوره" action.
+- "دوره جدید" lives inside this directory, opens a focused creation form, and returns to the directory with the newly created period selected.
+- The sample-reset control lives only in the cycle-directory footer (for the public demo). The former sample-information banner is no longer shown in the workspace.
+- The global breadcrumb is intentionally omitted for /architecture, /kpis and /kpis/:id, and /okr to maximize working area. Other pages retain normal breadcrumbs.

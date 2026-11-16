@@ -73,3 +73,16 @@ test('Namayar product help routes OKR questions to the integrated workspace',()=
  assert.equal(topic?.route,'/okr');
  assert.ok(topic.paragraphs.some(p=>p.includes('پاییز ۱۴۰۵')));
 });
+
+test('cycle directory replaces the demo-data banner and offers creation from the directory',async()=>{
+ const workspace=await readFile(new URL('../portal/okr/OkrWorkspace.tsx',import.meta.url),'utf8');
+ const shell=await readFile(new URL('../portal/Shell.tsx',import.meta.url),'utf8');
+ assert.match(workspace,/aria-label="مدیریت دوره‌های OKR"/);
+ assert.match(workspace,/portfolio\.cycles\.map\(c=>/);
+ assert.match(workspace,/showForm\('cycle'\)/);
+ assert.match(workspace,/cycleManagerOpen/);
+ assert.match(workspace,/cycleObjectives\.length/);
+ assert.doesNotMatch(workspace,/okr-demo-banner/);
+ assert.match(shell,/hideBreadcrumb=path==='\/architecture'\|\|path==='\/okr'\|\|path==='\/kpis'\|\|path\.startsWith\('\/kpis\/'\)/);
+ assert.match(shell,/\{!hideBreadcrumb&&<div className="breadcrumb"/);
+});

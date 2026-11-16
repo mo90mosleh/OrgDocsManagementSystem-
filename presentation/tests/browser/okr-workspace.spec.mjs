@@ -7,7 +7,8 @@ test('OKR appears as one shared navigation entry with three workspace tabs',asyn
  await expect(page.getByRole('navigation',{name:'منوی اصلی'}).getByRole('link',{name:'مدیریت OKR'})).toHaveCount(1);
  const tabs=page.getByRole('navigation',{name:'بخش‌های مدیریت OKR'});
  await expect(tabs.getByRole('button')).toHaveCount(3);
- await expect(page.getByText(/داده‌های پاییز ۱۴۰۵ کاملاً فرضی/)).toBeVisible();
+ await expect(page.locator('.okr-demo-banner')).toHaveCount(0);
+ await expect(page.locator('.breadcrumb')).toHaveCount(0);
  await expect(page.locator('.okr-goal-card').first()).toBeVisible();
  await tabs.getByRole('button',{name:'اهداف و نتایج کلیدی'}).click();
  await expect(page.getByRole('button',{name:'جدولی'})).toBeVisible();
@@ -24,4 +25,35 @@ test('interactive OKR check-in updates current KR value in local demo workspace'
  await modal.getByRole('button',{name:'ذخیره آزمایشی'}).click();
  await expect(modal).toHaveCount(0);
  await expect(page.getByRole('dialog',{name:'جزئیات هدف OKR'})).toContainText('۲٫۶');
+});
+
+test('cycle management lists all periods and creates new ones without leaving the OKR workspace',async({page})=>{
+ await backend(page);await page.goto('./#/okr');
+ await page.getByRole('button',{name:'مدیریت دوره‌ها'}).click();
+ const manager=page.getByRole('dialog',{name:'مدیریت دوره‌های OKR'});
+ await expect(manager).toBeVisible();
+ await expect(manager.locator('.okr-cycle-item')).toHaveCount(2);
+ await expect(manager.getByRole('heading',{name:'پاییز ۱۴۰۵'})).toBeVisible();
+ await expect(manager.getByRole('heading',{name:'زمستان ۱۴۰۵'})).toBeVisible();
+ await expect(manager.getByText('۵ هدف')).toBeVisible();
+ await manager.getByRole('button',{name:'دوره جدید'}).click();
+ const create=page.getByRole('dialog',{name:'فرم مدیریت OKR'});
+ await expect(create.getByRole('heading',{name:'ایجاد دوره جدید'})).toBeVisible();
+ await create.getByRole('textbox',{name:'نام دوره'}).fill('بهار ۱۴۰۶');
+ await create.getByRole('button',{name:'ذخیره آزمایشی'}).click();
+ await expect(create).toHaveCount(0);
+ await expect(manager.locator('.okr-cycle-item')).toHaveCount(3);
+ await expect(manager.getByRole('heading',{name:'بهار ۱۴۰۶'})).toBeVisible();
+ await manager.locator('.okr-cycle-item').filter({has:page.getByRole('heading',{name:'زمستان ۱۴۰۵'})}).getByRole('button',{name:'مشاهده دوره'}).click();
+ await expect(manager).toHaveCount(0);
+ await expect(page.getByLabel('دوره OKR')).toHaveValue('1405-winter');
+});
+test('top breadcrumbs are removed from architecture, KPI and OKR but retained elsewhere',async({page})=>{
+ await backend(page);
+ for(const route of ['architecture','kpis','okr']){
+  await page.goto('./#/'+route);
+  await expect(page.locator('.breadcrumb')).toHaveCount(0);
+ }
+ await page.goto('./#/processes');
+ await expect(page.locator('.breadcrumb')).toBeVisible();
 });
