@@ -96,3 +96,12 @@ body:has(.feedback-root) .namayar-launcher{bottom:calc(150px + env(safe-area-ins
 @media(prefers-reduced-motion: reduce) {
   .namayar-idle-callout {animation: none}
 }
+
+
+/* Progressive responses keep the reader's current scroll position unchanged.
+   The viewport is positioned once at send time; no token-by-token scroll following. */
+.namayar-conversation{overflow-anchor:none!important;scroll-behavior:auto!important}
+.namayar-message.assistant p{white-space:pre-wrap;overflow-wrap:anywhere}
+.namayar-stream-caret{display:inline-block;vertical-align:-.17em;width:2px;height:1.05em;margin-inline:3px;background:#39779e;border-radius:1px;animation:namayar-type-caret .7s steps(1,end) infinite}
+@keyframes namayar-type-caret{50%{opacity:0}}
+@media(prefers-reduced-motion:reduce){.namayar-stream-caret{animation:none;opacity:1}}
