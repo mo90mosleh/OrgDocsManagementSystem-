@@ -38,7 +38,7 @@ function collectModules(path){
  }
 }
 collectModules(publicEntry[0]);
-const moduleHints=[...initialModules].map(path=>'<link rel="modulepreload" href="'+publicHref(path)+'">').join('');
+const moduleHints=[...initialModules].filter(path=>publicBuild.metafile.outputs[path]?.bytes>0).map(path=>'<link rel="modulepreload" href="'+publicHref(path)+'">').join('');
 
 
 const publicConfig=JSON.parse(await readFile('pages-config.json','utf8'));const adminUrl='https://orgdocs-demo.mo90mosleh.chatgpt.site/admin';

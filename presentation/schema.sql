@@ -32,7 +32,7 @@ CREATE TABLE positions (
 );
 CREATE TABLE persons (
  id uuid PRIMARY KEY DEFAULT gen_random_uuid(), organization_id uuid NOT NULL REFERENCES organizations(id), display_name text NOT NULL,
- email text, phone text, UNIQUE(organization_id,id)
+ email text, phone text, extension text CHECK(extension IS NULL OR extension ~ '^[0-9]{1,10}$'), avatar_data_url text CHECK(avatar_data_url IS NULL OR (length(avatar_data_url)<=300000 AND avatar_data_url ~ '^data:image/(png|jpeg|webp);base64,[A-Za-z0-9+/=]+$')), UNIQUE(organization_id,id)
 );
 CREATE TABLE assignments (
  id uuid PRIMARY KEY DEFAULT gen_random_uuid(), organization_id uuid NOT NULL REFERENCES organizations(id), person_id uuid NOT NULL, position_id uuid NOT NULL,

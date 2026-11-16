@@ -1,0 +1,13 @@
+BEGIN;
+ALTER TABLE public.persons ADD COLUMN IF NOT EXISTS extension text;
+ALTER TABLE public.persons ADD COLUMN IF NOT EXISTS avatar_data_url text;
+ALTER TABLE public.persons DROP CONSTRAINT IF EXISTS persons_contact_fields_valid;
+ALTER TABLE public.persons ADD CONSTRAINT persons_contact_fields_valid CHECK ((extension IS NULL OR extension ~ '^[0-9]{1,10}$') AND (avatar_data_url IS NULL OR (length(avatar_data_url)<=300000 AND avatar_data_url ~ '^data:image/(png|jpeg|webp);base64,[A-Za-z0-9+/=]+$')));
+ALTER TABLE public.persons ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.assignments ENABLE ROW LEVEL SECURITY;
+GRANT SELECT ON public.persons,public.assignments TO authenticated;
+DROP POLICY IF EXISTS pages_member_directory ON public.persons;
+CREATE POLICY pages_member_directory ON public.persons FOR SELECT TO authenticated USING (organization_id IN (SELECT m.organization_id FROM public.portal_memberships m WHERE m.user_id=(SELECT auth.uid())));
+DROP POLICY IF EXISTS pages_member_directory ON public.assignments;
+CREATE POLICY pages_member_directory ON public.assignments FOR SELECT TO authenticated USING (organization_id IN (SELECT m.organization_id FROM public.portal_memberships m WHERE m.user_id=(SELECT auth.uid())));
+COMMIT;

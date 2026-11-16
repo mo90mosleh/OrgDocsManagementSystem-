@@ -1,0 +1,1 @@
+export function dialNumber(value?:string|null){const digits=(value??'').replace(/[۰-۹]/g,c=>String('۰۱۲۳۴۵۶۷۸۹'.indexOf(c))).replace(/[٠-٩]/g,c=>String('٠١٢٣٤٥٦٧٨٩'.indexOf(c))).replace(/[\s().-]/g,'');return /^\+?[0-9]{1,20}$/.test(digits)?digits:null;}
