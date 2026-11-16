@@ -10,7 +10,7 @@ const publicBuild=await build({
  outdir:'pages',entryNames:'assets/[name]-[hash]',chunkNames:'assets/chunks/[name]-[hash]',assetNames:'assets/media/[name]-[hash]',
  format:'esm',splitting:true,platform:'browser',target:'es2022',jsx:'automatic',metafile:true,
  // Logo URLs are used by DOM images on nested Pages routes.
- loader:{'.woff2':'file','.png':'dataurl'},
+ loader:{'.woff2':'file','.png':'file'},
  define:{'process.env.NODE_ENV':'"production"'}
 });
 const publicEntry=Object.entries(publicBuild.metafile.outputs).find(([,meta])=>meta.entryPoint==='portal/main.tsx');
@@ -20,12 +20,23 @@ const publicJsHref=publicHref(publicEntry[0]);
 const publicCssHref=publicEntry[1].cssBundle?publicHref(publicEntry[1].cssBundle):null;
 if(!publicCssHref)throw Error('Public CSS bundle not generated');
 console.log('Cacheable public assets:',publicJsHref,publicCssHref);
+// Flatten the initial ESM dependency waterfall. Dynamic routes stay deferred.
+const initialModules=new Set();
+function collectModules(path){
+ for(const item of publicBuild.metafile.outputs[path]?.imports??[]){
+  if(item.kind!=='import-statement'||initialModules.has(item.path))continue;
+  initialModules.add(item.path);collectModules(item.path);
+ }
+}
+collectModules(publicEntry[0]);
+const moduleHints=[...initialModules].map(path=>'<link rel="modulepreload" href="'+publicHref(path)+'">').join('');
+
 
 const publicConfig=JSON.parse(await readFile('pages-config.json','utf8'));const adminUrl='https://orgdocs-demo.mo90mosleh.chatgpt.site/admin';
 const snapshot=process.env.PAGES_SNAPSHOT==='1';
 function html(mode){
  const cfg=mode==='public'?(snapshot?{...publicConfig,mode,authEnabled:true,organizationId:'8847c22d-0282-5b07-80b1-d34bc41a4efa',adminUrl:'#/login',snapshotPath:'./rassan-presentation.json'}:{...publicConfig,mode,adminUrl}):{mode,adminUrl:'/login'};
- const styles=mode==='public'?'<link rel="stylesheet" href="'+publicCssHref+'">':'<style>'+css+'</style>';
+ const styles=mode==='public'?moduleHints+(snapshot?'<link rel="preload" href="./rassan-presentation.json" as="fetch" type="application/json" crossorigin>':'')+'<link rel="stylesheet" href="'+publicCssHref+'">':'<style>'+css+'</style>';
  const scripts=mode==='public'?'<script type="module" src="'+publicJsHref+'"></script>':'<script>'+js+'</script>';
  return '<!doctype html><html lang="fa" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#bd2739"><title>نما | مدیریت سازمان و عملکرد</title>'+styles+'</head><body><div id="app"></div><script>window.__ORGDEMO_HASH_ROUTING__='+(mode==='public')+';window.__PORTAL_CONFIG__='+JSON.stringify(cfg)+';</script>'+scripts+'</body></html>';
 }
