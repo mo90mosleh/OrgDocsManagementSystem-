@@ -61,7 +61,7 @@ function findFacts(data: AnyRecord, question: string, entity: AnyRecord | null) 
   }
   const selectedIds = new Set(relevantNodes.map((p:AnyRecord)=>p.id));
   const chosenDocs = documents.filter((d:AnyRecord) => selectedIds.has(d.process_id) && permittedUrl(d.external_url))
-    .slice(0,24).map((d:AnyRecord)=>({id:d.id,title:safeText(d.title,160),type:d.doc_type,process_id:d.process_id,url:permittedUrl(d.external_url)}));
+    .slice(0,24).map((d:AnyRecord)=>({id:d.id,title:safeText(d.title,160),type:d.doc_type,process_id:d.process_id,url:permittedUrl(d.external_url)!}));
   const filteredLinks: {label:string;href:string;external?:boolean}[] = [];
   const isEducational = /آموزشی|راهنمای تصویری/.test(n);
   const isBpmn = /bpmn|استاندارد/.test(n);
