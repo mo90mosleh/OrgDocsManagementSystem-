@@ -4,7 +4,7 @@ import type{Data,ProcessRelation,ProcessRelationType}from'./types';
 import{Link,errorMessage,number}from'./ui';
 import{config,mutate}from'./api';
 import{usePageSelection}from'./namayar/PageContextProvider';
-import{duplicateRelation,loadProcessRelationOverlay,mergeProcessRelations,processNeighbors,processRelationTypes,removeDraftRelation,saveProcessRelationOverlay,upsertDraftRelation,validRelation,type RelationOverlay}from'./process-relationships';
+import{duplicateRelation,initialProcessFocus,loadProcessRelationOverlay,mergeProcessRelations,processNeighbors,processRelationTypes,removeDraftRelation,saveProcessRelationOverlay,upsertDraftRelation,validRelation,type RelationOverlay}from'./process-relationships';
 import{normalizeSearch}from'./architecture-navigation';
 import{ProcessNetwork}from'./ProcessNetwork';
 import{departmentTone}from'./process-map-layout';
@@ -16,7 +16,7 @@ export function ProcessMap({data,refresh}:{data:Data;refresh:()=>Promise<void>})
  const [overlay,setOverlay]=useState<RelationOverlay>(()=>demo?loadProcessRelationOverlay(data):{additions:[],updates:[],deletedIds:[]});
  const relations=useMemo(()=>demo?mergeProcessRelations(data.relations??[],overlay):data.relations??[],[data.relations,overlay,demo]);
  const processes=data.nodes.filter(n=>n.kind==='PROCESS');
- const [focus,setFocus]=useState('');
+ const [focus,setFocus]=useState(()=>initialProcessFocus(data.nodes,data.relations??[]));
  const [search,setSearch]=useState(''),[department,setDepartment]=useState(''),[edit,setEdit]=useState<ProcessRelation|null|undefined>(undefined),[busy,setBusy]=useState(false),[message,setMessage]=useState(''),[error,setError]=useState('');
  const current=processes.find(p=>p.id===focus);
  usePageSelection('/process-map',current?{kind:'process',id:current.id}:null);
