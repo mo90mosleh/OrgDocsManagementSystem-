@@ -121,7 +121,8 @@ Deno.serve(async (req: Request) => {
     const requestedModel=typeof body.model==="string"?body.model:"";
     const envModel=Deno.env.get("GROQ_MODEL")||"";
     const selectedModel=diagnostic&&supportedModels.includes(requestedModel)?requestedModel:supportedModels.includes(envModel)?envModel:supportedModels[0];
-    const provider=await fetch("https://api.groq.com/openai/v1/chat/completions",{method:"POST",headers:{"Authorization":"Bearer "+apiKey,"Content-Type":"application/json"},body:JSON.stringify({model:selectedModel,messages:[{role:"system",content:prompt},...(intent==='entity'||/^(بیشتر توضیح|ادامه بده|بازتر بگو|منظورت)/.test(norm(question))?history:[]),{role:"user",content:question}],temperature:0.45,max_tokens:700}),signal:AbortSignal.timeout(20000)});
+    const streaming=body.stream===true;
+    const provider=await fetch("https://api.groq.com/openai/v1/chat/completions",{method:"POST",headers:{"Authorization":"Bearer "+apiKey,"Content-Type":"application/json"},body:JSON.stringify({model:selectedModel,messages:[{role:"system",content:prompt},...(intent==='entity'||/^(بیشتر توضیح|ادامه بده|بازتر بگو|منظورت)/.test(norm(question))?history:[]),{role:"user",content:question}],temperature:0.45,max_tokens:700,stream:streaming}),signal:AbortSignal.timeout(35000)});
     if (!provider.ok) {
       let providerMessage="";
       let providerCode="";
@@ -129,6 +130,60 @@ Deno.serve(async (req: Request) => {
       providerMessage=providerMessage.replace(/gsk_[\w-]+/g,"[REDACTED]").replace(/Bearer\s+\S+/gi,"[REDACTED]").slice(0,280);
       console.error("Groq pilot upstream status:",provider.status,"model:",selectedModel,"code:",providerCode.slice(0,80));
       return response(provider.status===429?429:502,{error:"GROQ_REQUEST_FAILED",provider_status:provider.status,provider_code:providerCode.slice(0,80),provider_message:providerMessage,model:selectedModel,message:provider.status===429?"سهمیه Groq فعلاً به سقف رسیده است.":provider.status===401||provider.status===403?"کلید نامعتبر است یا ارائه‌دهنده اجازه استفاده نمی‌دهد.":"درخواست Groq موفق نبود."});
+    }
+    if(streaming&&provider.body){
+      const streamHeaders={...headers,"Content-Type":"application/x-ndjson; charset=utf-8","Cache-Control":"no-cache, no-transform","X-Content-Type-Options":"nosniff"};
+      const encode=new TextEncoder();
+      const sseBody=provider.body;
+      const output=new ReadableStream<Uint8Array>({
+        async start(controller){
+          const reader=sseBody.getReader();
+          const decoder=new TextDecoder();
+          let buffered="",answer="",upstreamDone=false;
+          const emit=(message:unknown)=>controller.enqueue(encode.encode(JSON.stringify(message)+"\n"));
+          const receive=(line:string)=>{
+            const trimmed=line.trim();
+            if(!trimmed.startsWith("data:"))return;
+            const payload=trimmed.slice(5).trim();
+            if(payload==="[DONE]"){upstreamDone=true;return;}
+            try{
+              const event=JSON.parse(payload);
+              const chunk=event?.choices?.[0]?.delta?.content;
+              if(typeof chunk==="string"&&chunk&&answer.length<4000){
+                const text=chunk.slice(0,4000-answer.length);
+                answer+=text;emit({type:"delta",text});
+              }
+            }catch{/* Ignore non-JSON upstream keepalive events. */}
+          };
+          try{
+            while(!upstreamDone){
+              const part=await reader.read();
+              if(part.done)break;
+              buffered+=decoder.decode(part.value,{stream:true});
+              let lineBreak=buffered.indexOf("\n");
+              while(lineBreak>=0){
+                receive(buffered.slice(0,lineBreak));buffered=buffered.slice(lineBreak+1);
+                lineBreak=buffered.indexOf("\n");
+              }
+              if(answer.length>=4000)break;
+            }
+            if(buffered.trim())receive(buffered);
+            if(!answer.trim())emit({type:"error",message:"پاسخ مدل دریافت نشد. دوباره امتحان کن."});
+            else{
+              emit({type:"done",links:found.links});
+              const usedTokens=Math.max(1,Math.round((prompt.length+question.length+answer.length)/3.5));
+              try{await usageStore('rpc/namayar_record_usage','POST',{p_day:usageDay(),p_tokens:usedTokens});}catch(e){console.error('Shared streaming usage tracking unavailable',e);}
+            }
+          }catch(e){
+            console.error("Streaming Groq response interrupted",e instanceof Error?e.name:"unknown");
+            try{emit({type:"error",message:"اتصال هنگام تولید پاسخ قطع شد؛ دوباره تلاش کن."});}catch{/* Client may have left. */}
+          }finally{
+            try{await reader.cancel();}catch{/* Provider already closed. */}
+            try{controller.close();}catch{/* Client disconnected. */}
+          }
+        }
+      });
+      return new Response(output,{status:200,headers:streamHeaders});
     }
     const completion=await provider.json();
     const usedTokens=Math.max(1,Math.round(Number(completion?.usage?.total_tokens)||((prompt.length+question.length+String(completion?.choices?.[0]?.message?.content||"").length)/3.5)));
