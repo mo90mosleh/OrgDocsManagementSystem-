@@ -1,6 +1,6 @@
 import type{MouseEvent,ReactNode}from'react';import{ArrowRight}from'lucide-react';import{config}from'./api';
 export const number=new Intl.NumberFormat('fa-IR');
-export function currentPath(){return config.mode==='public'?(location.hash.startsWith('#/')?location.hash.slice(1):'/dashboard'):(location.pathname==='/'?'/dashboard':location.pathname);}
+export function currentPath(){return config.mode==='public'?(location.hash.startsWith('#/')?location.hash.slice(1).split('?')[0]:'/dashboard'):(location.pathname==='/'?'/dashboard':location.pathname);}
 export function pageScroll(){const app=document.getElementById('app');return{x:app?.scrollLeft??window.scrollX,y:app?.scrollTop??window.scrollY};}
 export function scrollPage(x:number,y:number){const app=document.getElementById('app');if(app)app.scrollTo({left:x,top:y,behavior:'instant'});else window.scrollTo({left:x,top:y,behavior:'instant'});}
 export function go(path:string){const depth=Number(history.state?.namaDepth)||0;if(!Number.isFinite(history.state?.namaDepth))history.replaceState({...history.state,namaDepth:0},'');history.pushState({...history.state,namaDepth:depth+1},'',config.mode==='public'?'#'+path:path);window.dispatchEvent(new PopStateEvent('popstate'));window.dispatchEvent(new Event('orgdocs:route'));scrollPage(0,0);}

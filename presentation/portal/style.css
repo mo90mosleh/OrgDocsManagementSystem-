@@ -132,3 +132,25 @@
  .chart-header-switches .chart-view-switch{flex:0 1 auto}
  .chart-header-switches .chart-analysis-select{flex:0 1 auto;margin-inline-start:auto}
 }
+
+/* Context trail stays slim, RTL, and outside the graph viewport. */
+.chart-navigation-strip{display:flex;direction:rtl;align-items:center;justify-content:space-between;gap:9px;padding:7px 11px;margin:0 0 9px;border:1px solid #dfe9e3;background:#fbfcfb;border-radius:11px;min-height:43px}
+.chart-crumbs{display:flex;align-items:center;gap:5px;flex:1 1 250px;min-width:0;max-width:100%;overflow-x:auto;scrollbar-width:thin;overscroll-behavior-x:contain;padding:1px 0}
+.chart-crumb{display:inline-flex;align-items:center;gap:5px;flex:0 0 auto;color:#9cabaa}
+.chart-crumb button{padding:5px 7px;border:1px solid transparent;border-radius:7px;background:transparent;color:#657d6c;cursor:pointer;font:inherit;font-size:11px;white-space:nowrap;max-width:190px;overflow:hidden;text-overflow:ellipsis}
+.chart-crumb button:hover,.chart-crumb button:focus-visible{background:#eef5f0;color:#305b44;outline-offset:2px}
+.chart-crumb button.current{background:#e9f0f8;color:#174f79;font-weight:700;border-color:#d7e4f1}
+.chart-visit-actions{display:flex;align-items:center;flex-shrink:0;gap:5px;margin-inline-start:auto}
+.chart-visit-actions .secondary{display:inline-flex;align-items:center;justify-content:center;gap:4px;padding:6px 8px;border-radius:8px;font-size:10px;white-space:nowrap}
+.chart-visit-actions button:disabled{opacity:.38;cursor:default}
+.flow-org-node.on-reporting-path:not(.selected){border-color:#6998b5;box-shadow:0 0 0 2px #87b5d13d,0 4px 13px #21475e17}
+.chart-insight-popover .panel-title{display:flex;align-items:center;gap:7px}
+.chart-insight-popover .panel-title h2{flex:1 1 auto}
+.chart-insight-popover .chart-copy-detail{flex:0 0 auto}
+@media(max-width:760px){
+ .chart-navigation-strip{align-items:flex-start;flex-direction:column;gap:5px;padding:7px 9px}
+ .chart-crumbs{flex:auto;width:100%;min-width:0}
+ .chart-visit-actions{width:100%;justify-content:flex-end;margin-inline-start:0;flex-wrap:wrap}
+ .chart-crumb button{max-width:155px;font-size:10px}
+ .chart-visit-actions .secondary{font-size:10px;padding:5px 8px}
+}
