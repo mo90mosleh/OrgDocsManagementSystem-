@@ -83,7 +83,8 @@ test('cycle directory replaces the demo-data banner and offers creation from the
  assert.match(workspace,/cycleManagerOpen/);
  assert.match(workspace,/cycleObjectives\.length/);
  assert.doesNotMatch(workspace,/okr-demo-banner/);
- assert.match(shell,/hideBreadcrumb=path==='\/architecture'\|\|path==='\/okr'\|\|path==='\/kpis'\|\|path\.startsWith\('\/kpis\/'\)/);
+ assert.match(shell,/hideBreadcrumb=path==='\/architecture'\|\|path==='\/process-map'/);
+ assert.match(shell,/path==='\/okr'\|\|path==='\/kpis'/);
  assert.match(shell,/\{!hideBreadcrumb&&<div className="breadcrumb"/);
 });
 
