@@ -1,0 +1,22 @@
+/* Process management shares the same compact, horizontal module navigation as OKR. */
+.process-workspace{direction:rtl;min-width:0;color:var(--ink,#243447)}
+.process-workspace-header{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:10px}
+.process-workspace-header h1{font-size:23px;line-height:1.5;font-weight:800;margin:0}
+.process-workspace-header p{color:var(--text-secondary,var(--muted,#617185));font-size:11px;margin:2px 0 0}
+.process-workspace-tabs{display:flex;align-items:stretch;gap:5px;overflow-x:auto;scrollbar-width:thin;border-bottom:1px solid var(--line,#dce3eb);margin:0 0 12px}
+.process-workspace-tabs a{display:inline-flex;align-items:center;gap:7px;padding:10px 14px;border-bottom:2px solid transparent;color:var(--text-secondary,#6c7b8c);white-space:nowrap;font-size:12px;text-decoration:none}
+.process-workspace-tabs a:hover{background:var(--surface-subtle,#f6f8fb)}
+.process-workspace-tabs a.active{border-color:var(--action,var(--brand,#b92737));color:var(--action,var(--brand,#b92737));font-weight:700;background:#fff8f8}
+.process-workspace-body{min-width:0}
+.process-workspace-body .architecture-heading{margin-top:0}
+.process-workspace-body .architecture-heading h1{display:none}
+.process-workspace-body .architecture-heading:empty{display:none}
+.process-workspace-body .architecture-stage{min-width:0}
+.process-workspace-body>.toolbar{margin-top:4px}
+@media(max-width:760px){
+ .process-workspace-header h1{font-size:19px}
+ .process-workspace-header p{font-size:10px}
+ .process-workspace-tabs{gap:1px;margin-bottom:10px}
+ .process-workspace-tabs a{padding:10px 8px;font-size:11px;gap:4px}
+ .process-workspace-tabs a svg{width:15px;height:15px}
+}

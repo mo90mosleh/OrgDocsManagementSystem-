@@ -59,13 +59,13 @@ test('cycle management lists all periods and creates new ones without leaving th
  await expect(manager).toHaveCount(0);
  await expect(page.getByLabel('دوره OKR')).toHaveValue('1405-winter');
 });
-test('top breadcrumbs are removed from architecture, KPI and OKR but retained elsewhere',async({page})=>{
+test('top breadcrumbs are removed from the integrated process workspace, KPI and OKR',async({page})=>{
  await backend(page);
- for(const route of ['architecture','kpis','okr']){
+ for(const route of ['architecture','process-map','processes','kpis','okr']){
   await page.goto('./#/'+route);
   await expect(page.locator('.breadcrumb')).toHaveCount(0);
  }
- await page.goto('./#/processes');
+ await page.goto('./#/documents');
  await expect(page.locator('.breadcrumb')).toBeVisible();
 });
 

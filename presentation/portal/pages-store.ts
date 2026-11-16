@@ -14,7 +14,31 @@ const fieldSets:Record<string,string[]>={'org-units':['name','code','parent_id']
 export async function mutatePages(path:string,method:string,value?:unknown){if(!authClient)throw Error('ورود پیکربندی نشده است.');const identity=await verifiedSession();if(!identity||await roleFor(identity.user.id)!=='ADMIN')throw Error('فقط مدیر تأییدشده اجازهٔ ثبت تغییرات دارد.');
  const[kind,id]=path.split('/'),allowed=fieldSets[kind];if(!allowed)throw Error('عملیات پشتیبانی نمی‌شود.');if(id&&!/^[0-9a-f-]{36}$/i.test(id))throw Error('شناسه معتبر نیست.');const input=value&&typeof value==='object'?value as Record<string,unknown>:{};const clean:Record<string,string|null>={};for(const field of allowed)if(field in input){const v=input[field];if(v!==null&&typeof v!=='string')throw Error('مقدار فیلد معتبر نیست.');if(typeof v==='string'&&v.length>(kind==='profiles'?4000:field==='logo_data_url'?1400000:field==='email'?254:field==='external_url'?2048:150))throw Error('متن بیش از حد مجاز است.');clean[field]=typeof v==='string'?v.trim()||null:null;}
  if(kind==='training-videos'&&method==='POST'){const url=new URL(clean.external_url??'');if(url.protocol!=='https:'||url.username||url.password)throw Error('نشانی ویدئو باید HTTPS و بدون نام کاربری یا رمز باشد.');}
- const scope=org();if(kind==='organization'&&method==='PATCH'){const{data,error}=await authClient.from('organizations').update(clean).eq('id',scope).select('id,name,display_name,primary_color,logo_data_url').single();fail(error);return{organization:data};}
+ const scope=org();
+ if(kind==='relations'){
+  const table='process_relations';
+  if(method==='DELETE'&&id){
+   const{data,error}=await authClient.from(table).delete().eq('organization_id',scope).eq('id',id).select('id');fail(error);
+   if(!data?.length)throw Error('ارتباط پیدا نشد یا مجوز حذف وجود ندارد.');
+   return{ok:true};
+  }
+  if((method==='POST'&&!id)||(method==='PATCH'&&id)){
+   const source=input.source_process_id,target=input.target_process_id,type=input.relation_type,note=input.note;
+   if(typeof source!=='string'||typeof target!=='string'||typeof type!=='string'||!['RELATED','PREREQUISITE','INPUT_FROM','OUTPUT_TO'].includes(type)||source===target||![source,target].every(v=>/^[0-9a-f-]{36}$/i.test(v)))throw Error('مبدأ، مقصد یا نوع رابطه معتبر نیست.');
+   if(note!==undefined&&note!==null&&(typeof note!=='string'||note.length>400))throw Error('توضیح رابطه باید حداکثر ۴۰۰ کاراکتر باشد.');
+   const{data:nodes,error:nodeError}=await authClient.from('process_nodes').select('id').eq('organization_id',scope).eq('kind','PROCESS').in('id',[source,target]);fail(nodeError);
+   if(nodes?.length!==2)throw Error('فرآیند مبدأ و مقصد باید در همین سازمان وجود داشته باشند.');
+   const record={source_process_id:source,target_process_id:target,relation_type:type,note:typeof note==='string'?note.trim()||null:null};
+   const query=authClient.from(table);
+   if(method==='POST'){
+    const{data,error}=await query.insert({...record,organization_id:scope}).select().single();fail(error);return{record:data};
+   }
+   const{data,error}=await query.update(record).eq('organization_id',scope).eq('id',id).select().single();fail(error);
+   return{record:data};
+  }
+  throw Error('عملیات ارتباط فرآیندها معتبر نیست.');
+ }
+ if(kind==='organization'&&method==='PATCH'){const{data,error}=await authClient.from('organizations').update(clean).eq('id',scope).select('id,name,display_name,primary_color,logo_data_url').single();fail(error);return{organization:data};}
  if(kind==='profiles'&&id&&method==='PUT'){const p=await authClient.from('process_nodes').select('id').eq('organization_id',scope).eq('id',id).eq('kind','PROCESS').single();fail(p.error);const{data,error}=await authClient.from('process_profiles').upsert({...clean,organization_id:scope,process_id:id},{onConflict:'process_id'}).select().single();fail(error);return{profile:data};}
  const table=({'training-videos':'process_training_videos','org-units':'org_units',positions:'positions',persons:'persons',assignments:'assignments'}as Record<string,string>)[kind];if(!table)throw Error('عملیات معتبر نیست.');
  if(method==='POST'&&!id){const{data,error}=await authClient.from(table).insert({...clean,organization_id:scope}).select().single();fail(error);return{record:data};}

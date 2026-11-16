@@ -1,0 +1,76 @@
+import{test}from'node:test';
+import assert from'node:assert/strict';
+import{readFile}from'node:fs/promises';
+import{duplicateRelation,initialProcessFocus,mergeProcessRelations,parseRelationOverlay,processNeighbors,processRelationTypes,relatedProcessCount,removeDraftRelation,upsertDraftRelation,validRelation}from'../portal/process-relationships.ts';
+
+const data=JSON.parse(await readFile(new URL('../data/rassan-presentation.json',import.meta.url),'utf8'));
+const base=data.relations;
+test('existing process map represents only real links, and distinguishes relation types from hierarchy',()=>{
+ assert.equal(data.nodes.filter(n=>n.kind==='PROCESS').length,44);
+ assert.equal(base.length,19);
+ for(const r of base)assert.equal(validRelation(r,data.nodes),true);
+ assert.deepEqual(Object.keys(processRelationTypes),['RELATED','PREREQUISITE','INPUT_FROM','OUTPUT_TO']);
+ assert.ok(base.every(r=>r.content_status==='DRAFT'));
+ const focus=initialProcessFocus(data.nodes,base);
+ assert.ok(relatedProcessCount(base,focus)>0);
+ const first=base[0];
+ assert.ok(processNeighbors(base,first.source_process_id).some(x=>x.otherId===first.target_process_id&&x.direction==='outgoing'));
+ assert.ok(processNeighbors(base,first.target_process_id).some(x=>x.otherId===first.source_process_id&&x.direction==='incoming'));
+});
+test('invalid, duplicate or self-referential relationships are rejected without modifying source data',()=>{
+ const first=base[0];
+ assert.equal(validRelation({...first,target_process_id:first.source_process_id},data.nodes),false);
+ assert.equal(validRelation({...first,target_process_id:'missing'},data.nodes),false);
+ assert.equal(validRelation({...first,relation_type:'INVALID'},data.nodes),false);
+ assert.equal(duplicateRelation(base,first),true);
+ assert.equal(duplicateRelation(base,{...first,id:'new-id',source_process_id:first.target_process_id,target_process_id:first.source_process_id}),true);
+ assert.equal(duplicateRelation(base,{...first,id:'new-id',source_process_id:first.target_process_id,target_process_id:first.source_process_id,relation_type:'PREREQUISITE'}),false);
+});
+test('draft relations can be added, edited and removed locally; parser excludes invalid entries',()=>{
+ const first=base[0];
+ const nodeIds=data.nodes.filter(p=>p.kind==='PROCESS').map(p=>p.id);
+ const missingPair=nodeIds.find(id=>!base.some(r=>r.source_process_id===id||r.target_process_id===id));
+ assert.ok(missingPair);
+ const newRelation={id:'local-sample',source_process_id:missingPair,target_process_id:nodeIds.find(x=>x!==missingPair),relation_type:'OUTPUT_TO',note:'آزمون'};
+ const draft=upsertDraftRelation({additions:[],updates:[],deletedIds:[]},base,newRelation);
+ assert.equal(mergeProcessRelations(base,draft).length,20);
+ const edited=upsertDraftRelation(draft,base,{...newRelation,note:'ویرایش'});
+ assert.equal(mergeProcessRelations(base,edited).at(-1).note,'ویرایش');
+ const removed=removeDraftRelation(edited,base,newRelation.id);
+ assert.equal(mergeProcessRelations(base,removed).length,19);
+ const removeExisting=removeDraftRelation(removed,base,first.id);
+ assert.equal(mergeProcessRelations(base,removeExisting).length,18);
+ assert.equal(base.length,19);
+ const parsed=parseRelationOverlay({additions:[newRelation,{...newRelation,target_process_id:'invalid'}],updates:[],deletedIds:['x',12]},data.nodes);
+ assert.equal(parsed.additions.length,1);
+ assert.deepEqual(parsed.deletedIds,['x']);
+});
+test('architecture, process map and catalog share one module while keeping legacy process links',async()=>{
+ const app=await readFile(new URL('../portal/App.tsx',import.meta.url),'utf8');
+ const shell=await readFile(new URL('../portal/Shell.tsx',import.meta.url),'utf8');
+ const workspace=await readFile(new URL('../portal/ProcessWorkspace.tsx',import.meta.url),'utf8');
+ const map=await readFile(new URL('../portal/ProcessMap.tsx',import.meta.url),'utf8');
+ assert.match(app,/section="architecture"/);
+ assert.match(app,/section="map"/);
+ assert.match(app,/section="catalog"/);
+ assert.match(app,/detailId=\{path.split\('\/'\)\[2\]\}/);
+ assert.match(shell,/\['\/architecture','مدیریت فرآیندها'/);
+ assert.doesNotMatch(shell,/\['\/processes','شناسنامه فرآیندها'/);
+ assert.match(workspace,/aria-label="بخش‌های مدیریت فرآیندها"/);
+ assert.match(workspace,/\/process-map/);
+ assert.match(map,/processNeighbors\(relations,current.id\)/);
+ assert.match(map,/mutate\(edit\?\.id\?'relations\/'\+edit.id:'relations'/);
+ const cards=app.match(/className="hero panel concept-card"/g)||[];
+ assert.equal(cards.length,4);
+ assert.doesNotMatch(app,/eyebrow">روش انجام کار را بشناسید/);
+ assert.match(app,/h2>مدیریت OKR<\/h2>/);
+});
+test('target-and-arrow OKR icon is reused on desktop and mobile',async()=>{
+ const icon=await readFile(new URL('../portal/TargetArrowIcon.tsx',import.meta.url),'utf8');
+ const shell=await readFile(new URL('../portal/Shell.tsx',import.meta.url),'utf8');
+ const mobile=await readFile(new URL('../portal/mobile.tsx',import.meta.url),'utf8');
+ assert.match(icon,/<circle cx="11\.2"/);
+ assert.match(icon,/M20\.8 2\.4 11\.2 12\.8/);
+ assert.match(shell,/\['\/okr','مدیریت OKR',TargetArrowIcon\]/);
+ assert.match(mobile,/\['\/okr','OKR',TargetArrowIcon\]/);
+});
