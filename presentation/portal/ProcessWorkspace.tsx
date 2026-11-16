@@ -1,10 +1,11 @@
+import{lazy,Suspense}from'react';
 import{Layers3,GitBranch,ClipboardList}from'lucide-react';
 import type{Data}from'./types';
 import{Link}from'./ui';
-import{Architecture}from'./Architecture';
-import{ProcessCatalog}from'./ProcessCatalog';
-import{ProcessMap}from'./ProcessMap';
-import{ProcessProfile}from'./ProcessDetail';
+const Architecture=lazy(()=>import('./Architecture').then(module=>({default:module.Architecture})));
+const ProcessCatalog=lazy(()=>import('./ProcessCatalog').then(module=>({default:module.ProcessCatalog})));
+const ProcessMap=lazy(()=>import('./ProcessMap').then(module=>({default:module.ProcessMap})));
+const ProcessProfile=lazy(()=>import('./ProcessDetail').then(module=>({default:module.ProcessProfile})));
 import'./process-workspace.css';
 export type ProcessWorkspaceSection='architecture'|'map'|'catalog';
 const tabs:[ProcessWorkspaceSection,string,string,typeof Layers3][]=[
@@ -19,7 +20,7 @@ export function ProcessWorkspace({data,section,refresh,detailId}:{data:Data;sect
    {tabs.map(([id,label,to,Icon])=><Link key={id} to={to} className={section===id?'active':''} ariaLabel={label}><Icon size={17}/><span>{label}</span></Link>)}
   </nav>
   <section className="process-workspace-body" aria-label={tabs.find(x=>x[0]===section)?.[1]}>
-   {section==='architecture'?<Architecture data={data} embedded/>:section==='map'?<ProcessMap data={data} refresh={refresh}/>:detailId?<ProcessProfile key={detailId} data={data} id={detailId} refresh={refresh}/>:<ProcessCatalog data={data} embedded/>}
+   <Suspense fallback={<p className="loading" role="status">در حال دریافت بخش فرآیندها…</p>}>{section==='architecture'?<Architecture data={data} embedded/>:section==='map'?<ProcessMap data={data} refresh={refresh}/>:detailId?<ProcessProfile key={detailId} data={data} id={detailId} refresh={refresh}/>:<ProcessCatalog data={data} embedded/>}</Suspense>
   </section>
  </div>;
 }
