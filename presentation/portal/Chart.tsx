@@ -68,6 +68,16 @@ export function Chart({data,refresh}:{data:Data;refresh:()=>Promise<void>}){
  },[data.positions,data.units]);
  useEffect(()=>{if(!detailsOpen)return;const esc=(event:KeyboardEvent)=>{if(event.key==='Escape')closeDetails();};const outside=(event:PointerEvent)=>{if(event.target instanceof Element&&!event.target.closest('.chart-insight-popover, .flow-org-node .node-select, .mobile-chart-select'))setDetailsOpen(false);};document.addEventListener('keydown',esc);document.addEventListener('pointerdown',outside);return()=>{document.removeEventListener('keydown',esc);document.removeEventListener('pointerdown',outside);};},[detailsOpen]);
  useEffect(()=>{if(detailsOpen)requestAnimationFrame(()=>popupRef.current?.focus({preventScroll:true}));},[detailsOpen]);
+ useEffect(()=>{
+  if(!detailsOpen)return;
+  const header=document.querySelector<HTMLElement>('.chart-header');if(!header)return;
+  let frame=0;
+  const update=()=>{cancelAnimationFrame(frame);frame=requestAnimationFrame(()=>popupRef.current?.style.setProperty('--chart-popup-top',Math.max(8,header.getBoundingClientRect().bottom+8)+'px'));};
+  const observer=new ResizeObserver(update);observer.observe(header);update();
+  window.addEventListener('resize',update);window.addEventListener('scroll',update,true);
+  return()=>{cancelAnimationFrame(frame);observer.disconnect();window.removeEventListener('resize',update);window.removeEventListener('scroll',update,true);};
+ },[detailsOpen]);
+
  function closeDetails(){setDetailsOpen(false);requestAnimationFrame(()=>document.querySelector<HTMLButtonElement>('.flow-org-node.selected .node-select, .mobile-chart-browser li.selected .mobile-chart-select')?.focus({preventScroll:true}));}
  function choose(id:string){activateCard({kind:chartMode==='positions'?'position':'unit',id});}
  function toggle(id:string){setDetailsOpen(false);setSelection({kind:chartMode==='positions'?'position':'unit',id});setClosed(old=>{const next=new Set(old);if(next.has(id))next.delete(id);else next.add(id);return next;});}
