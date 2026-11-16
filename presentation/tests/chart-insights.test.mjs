@@ -37,13 +37,13 @@ test('department colors use real organization branches and do not recolor defaul
  assert.equal(colors.find(n=>n.id==='a').tone,colors.find(n=>n.id==='a1').tone);
  assert.notEqual(colors.find(n=>n.id==='a').tone,colors.find(n=>n.id==='b').tone);
 });
-test('the canvas remains full width and linked insights require an explicit trigger',async()=>{
+test('the canvas remains full width and card click directly reveals KPI-first details',async()=>{
  const chart=await readFile(new URL('../portal/Chart.tsx',import.meta.url),'utf8');
  const viewport=await readFile(new URL('../portal/ChartViewport.tsx',import.meta.url),'utf8');
  assert.match(chart,/chart-layout-full/);
  assert.doesNotMatch(chart,/with-detail/);
  assert.match(chart,/detailsOpen/);
- assert.match(viewport,/node-linked-trigger/);
+ assert.doesNotMatch(viewport,/node-linked-trigger/);assert.match(chart,/function choose\(id:string\).*setDetailsOpen\(true\)/);assert.match(chart,/value=\{relatedTab\}/);
  assert.match(viewport,/chart-zoom-overview/);
  assert.match(viewport,/chart-node-preview/);
 });
