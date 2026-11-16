@@ -1,6 +1,6 @@
 /* Canvas-shell layout for the organization chart.
    Never override the shared SegmentedControl buttons or their ARIA states. */
-.app.chart-focus-mode:not(.chart-immersive) .topbar{
+.app.chart-focus-mode .topbar{
  display:flex;position:sticky;top:0;z-index:45;
  width:100%;height:var(--app-header-height,60px);min-height:var(--app-header-height,60px);padding:5px 20px;
  background:var(--surface,#fff);border-bottom:1px solid var(--line,#dce3eb);
@@ -36,14 +36,6 @@
  display:flex;align-items:center;justify-content:flex-end;flex:0 0 auto;
  gap:8px;margin-inline-start:auto;
 }
-.app.chart-focus-mode .chart-focus-toggle{
- display:inline-flex;align-items:center;justify-content:center;gap:7px;
- min-height:40px;height:40px;padding:7px 11px;
- background:var(--surface,#fff);color:var(--text-secondary,#526276);
- border:1px solid var(--line,#dce3eb);
- border-radius:var(--radius-control,10px);font-size:11px;white-space:nowrap;
-}
-.app.chart-focus-mode .chart-focus-toggle:hover{background:var(--surface-subtle,#f6f8fb)}
 .app.chart-focus-mode .chart-content{
  padding:10px 20px 18px;position:relative;
 }
@@ -60,17 +52,6 @@
   background:var(--surface,#fff);
  }
 }
-/* The optional immersive view hides chrome, not the canvas interaction controls. */
-.app.chart-focus-mode.chart-immersive .topbar{display:none!important}
-.app.chart-focus-mode.chart-immersive .chart-focus-controls{
- position:sticky;top:0;min-height:54px;padding:7px 20px;
- justify-content:flex-end;
-}
-.app.chart-focus-mode.chart-immersive .chart-header-switches,
-.app.chart-focus-mode.chart-immersive .chart-header>.primary,
-.app.chart-focus-mode.chart-immersive .chart-header>.tabs{display:none}
-.app.chart-focus-mode.chart-immersive .chart-header-actions{margin-inline-start:auto}
-.app.chart-focus-mode.chart-immersive .interactive-chart{height:calc(100dvh - 168px);min-height:460px}
 @media(max-width:1130px) and (min-width:761px){
  .app.chart-focus-mode .topbar .org-text{display:none}
  .app.chart-focus-mode .chart-focus-controls{flex-wrap:wrap}
@@ -79,7 +60,7 @@
  .app.chart-focus-mode .interactive-chart{height:calc(100dvh - 295px)}
 }
 @media(max-width:760px){
- .app.chart-focus-mode:not(.chart-immersive) .topbar{
+ .app.chart-focus-mode .topbar{
   display:flex;position:sticky;top:0;z-index:45;
   height:var(--app-header-height,56px);min-height:var(--app-header-height,56px);
   padding:5px 10px;
@@ -107,15 +88,9 @@
   display:flex;order:2;flex-basis:100%;justify-content:flex-end;
   margin:0;
  }
- .app.chart-focus-mode .chart-focus-toggle{min-height:36px;height:36px;padding:6px 10px;font-size:10px}
  .app.chart-focus-mode .chart-content{padding:8px 10px 14px}
  .app.chart-focus-mode .chart-content>.chart-navigation-strip{position:static;width:auto;margin:0 0 9px;box-shadow:none}
  .app.chart-focus-mode .interactive-chart{height:calc(100dvh - 400px);min-height:320px}
- .app.chart-focus-mode.chart-immersive .chart-focus-controls{
-  position:relative;top:auto;min-height:44px;padding:5px 12px;
- }
- .app.chart-focus-mode.chart-immersive .chart-header-actions{flex-basis:100%;order:0}
- .app.chart-focus-mode.chart-immersive .interactive-chart{height:calc(100dvh - 292px);min-height:360px}
 }
 @media(max-width:375px){
  .app.chart-focus-mode .topbar .organization{gap:4px}
@@ -124,8 +99,3 @@
  .app.chart-focus-mode .topbar .company-logo{width:68px}
 }
 
-@media(max-width:760px){
- .app.chart-focus-mode.chart-immersive .mobile-bottom-nav{display:none}
- .app.chart-focus-mode.chart-immersive>.workspace{padding-bottom:0}
- .app.chart-focus-mode.chart-immersive .interactive-chart{height:calc(100dvh - 222px);min-height:400px}
-}
