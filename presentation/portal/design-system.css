@@ -2,6 +2,8 @@
    character/brand marks retain their own layouts and semantic color schemes. */
 :root {
   --bg: #f4f6f8;
+  /* Match the organization chart's approved compact header. */
+  --app-header-height: 60px;
   --ink: #243447;
   --muted: #617185;
   --line: #dce3eb;
@@ -23,6 +25,14 @@
   --shadow-popover: 0 12px 36px #172b4426;
 }
 body { background: var(--bg); color: var(--ink); }
+/* One header height across pages; chart canvas keeps its dedicated shell layout. */
+.app:not(.chart-focus-mode) .topbar {
+  height: var(--app-header-height);
+  min-height: var(--app-header-height);
+  padding-block: 5px;
+  padding-inline: 20px;
+}
+
 .app main, .app.chart-focus-mode main, .app:has(.architecture-page) main {
   padding: var(--page-space); padding-bottom: 32px;
 }
@@ -221,6 +231,8 @@ td { border-color: var(--line); padding: 16px; font-size: 13px; }
 .stat > div, .stat small, .stat > div svg, .concept-icon { color: var(--muted); }
 .concept-card { background: var(--surface); border-color: var(--line); }
 @media(max-width:760px) {
+  :root { --app-header-height: var(--mobile-header-height, 56px); }
+  .app:not(.chart-focus-mode) .topbar { padding-inline: 12px; }
   /* Keep native table semantics, but avoid a second panel around mobile row cards. */
   .table-wrap.panel { background: transparent; border: 0; box-shadow: none; }
   .topbar .desktop-assistance-controls { display: flex; align-items: center; flex-shrink: 0; }

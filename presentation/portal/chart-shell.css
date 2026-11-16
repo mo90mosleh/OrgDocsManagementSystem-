@@ -2,7 +2,7 @@
    Never override the shared SegmentedControl buttons or their ARIA states. */
 .app.chart-focus-mode:not(.chart-immersive) .topbar{
  display:flex;position:sticky;top:0;z-index:45;
- width:100%;height:60px;min-height:60px;padding:5px 20px;
+ width:100%;height:var(--app-header-height,60px);min-height:var(--app-header-height,60px);padding:5px 20px;
  background:var(--surface,#fff);border-bottom:1px solid var(--line,#dce3eb);
 }
 .app.chart-focus-mode .topbar .organization{gap:13px;min-width:0}
@@ -29,7 +29,7 @@
  display:flex;align-items:center;gap:10px;
  padding:8px 20px;min-height:60px;
  background:var(--surface,#fff);border-bottom:1px solid var(--line,#dce3eb);
- position:sticky;top:60px;z-index:35;
+ position:sticky;top:var(--app-header-height,60px);z-index:35;
 }
 .app.chart-focus-mode .chart-header-switches{flex:1 1 auto;min-width:0;gap:9px}
 .app.chart-focus-mode .chart-header-actions{
@@ -81,7 +81,7 @@
 @media(max-width:760px){
  .app.chart-focus-mode:not(.chart-immersive) .topbar{
   display:flex;position:sticky;top:0;z-index:45;
-  height:var(--mobile-header-height,56px);min-height:var(--mobile-header-height,56px);
+  height:var(--app-header-height,56px);min-height:var(--app-header-height,56px);
   padding:5px 10px;
  }
  .app.chart-focus-mode .topbar .organization{gap:7px;min-width:0;flex:1 1 auto}
