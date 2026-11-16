@@ -52,8 +52,10 @@ test('public route detection ignores the selection query and current implementat
  assert.match(ui,/location\.hash\.slice\(1\)\.split\('\?'\)\[0\]/);
  assert.match(chart,/readChartLink/);
  assert.match(chart,/chart-navigation-strip/);
- assert.match(chart,/copyCardLink/);
- assert.match(chart,/chartHistoryTarget/);
+ assert.doesNotMatch(chart,/copyCardLink|کارت قبلی|کارت بعدی|کپی لینک/);
+ assert.match(chart,/pathVisible&&selectedRef&&trail.length>0/);
+ assert.ok(chart.indexOf('chart-navigation-strip')<chart.indexOf('</header><div className="chart-content">'));
+ assert.match(chart,/showPath:false/);
  assert.match(viewport,/on-reporting-path/);
  assert.match(viewport,/pathIds\.has/);
 });
