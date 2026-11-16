@@ -49,7 +49,7 @@ function findFacts(data: AnyRecord, question: string, entity: AnyRecord | null) 
     :false).map((l:AnyRecord)=>l.kpi_id));
   const n = norm(question);
   const score = (name: unknown) => { const txt = norm(name); if (!txt || txt.length < 3) return 0; if (n.includes(txt)) return 20; return n.split(/\s+/).filter(w => w.length > 3 && txt.includes(w)).length; };
-  const relevantNodes = nodes.filter((x: AnyRecord) => x.kind === "PROCESS" && (score(x.name) > 1 || x.id === entity?.id)).sort((a:AnyRecord,b:AnyRecord) => (b.id === entity?.id ? 30 : score(b.name))-(a.id === entity?.id ? 30 : score(a.name))).slice(0,6);
+  const relevantNodes = nodes.filter((x: AnyRecord) => x.kind === "PROCESS" && (score(x.name) > 1 || x.id === entity?.id || (selectedUnit && x.owner_org_unit_id === selectedUnit.id))).sort((a:AnyRecord,b:AnyRecord) => (b.id === entity?.id ? 30 : score(b.name))-(a.id === entity?.id ? 30 : score(a.name))).slice(0,6);
   const relevantKpis = kpis.filter((x: AnyRecord) => score(x.name)>1 || x.id === entity?.id || relatedKpiIds.has(x.id)).slice(0,8);
   if (entity?.kind === "process") {
     const p = nodes.find((x:AnyRecord) => x.id === entity.id && x.kind === "PROCESS");
