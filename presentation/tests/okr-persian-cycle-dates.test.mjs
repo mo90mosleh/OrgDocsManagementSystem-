@@ -35,7 +35,7 @@ test('user-customized Persian dates convert to persisted ISO and validate order 
  assert.deepEqual(validateCycleRange('1406/01/01','1406/03/31'),{startDate:'2027-03-21',endDate:'2027-06-21'});
  assert.throws(()=>validateCycleRange('۱۴۰۶/۰۲/۱۵','۱۴۰۶/۰۱/۱۵'),/تاریخ پایان/);
  assert.throws(()=>validateCycleRange('۱۴۰۶/۱۳/۰۱','۱۴۰۶/۰۳/۳۱'),/تاریخ شروع/);
- assert.throws(()=>validateCycleRange('۱۴۰۶/۰۱/۰۱','۱۴۰۶/۰۴/۳۱'),/تاریخ پایان/);
+ assert.throws(()=>validateCycleRange('۱۴۰۶/۰۱/۰۱','۱۴۰۶/۰۷/۳۱'),/تاریخ پایان/);
  assert.throws(()=>validateCycleRange('','۱۴۰۶/۰۳/۳۱'),/تاریخ شروع/);
 });
 test('cycle form keeps date fields editable and distinguishes creation from editing',async()=>{
