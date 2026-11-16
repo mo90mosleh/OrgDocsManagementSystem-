@@ -19,6 +19,7 @@ test('general chart-color question is answered while a finance role is selected'
  assert.match(t,/۱ تا ۴/);
  assert.match(t,/۵ فرآیند/);
  assert.match(t,/دپارتمان/);
+ assert.match(t,/تعداد شاخص‌ها/);
  assert.doesNotMatch(t,/اطلاعاتی.*در دسترس نیست/);
  assert.equal(answer.links[0].href,'/organization/chart');
 });
