@@ -22,9 +22,9 @@ jobs:
       - name: TypeScript
         working-directory: presentation
         run: npm run typecheck
-      - name: Unit and integration tests
-        working-directory: presentation
-        run: npm test
       - name: Build preview artifact
         working-directory: presentation
         run: npm run build:pages
+      - name: Unit and integration tests
+        working-directory: presentation
+        run: npm test
