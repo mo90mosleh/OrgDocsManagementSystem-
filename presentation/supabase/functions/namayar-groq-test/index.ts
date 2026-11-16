@@ -38,7 +38,7 @@ function findFacts(data: AnyRecord, question: string, entity: AnyRecord | null) 
   const links = Array.isArray(data.links) ? data.links : [];
   const kpiOrgLinks = Array.isArray(data.kpiOrgLinks) ? data.kpiOrgLinks : [];
   const positions = Array.isArray(data.positions) ? data.positions : [];
-  const positionRoleKey=(p:AnyRecord)=>'role:'+String(p.org_unit_id)+'|'+String(p.title??'').normalize('NFKC').replace(/ي/g,'ی').replace(/ك/g,'ک').replace(/\\s+/g,' ').trim();
+  const positionRoleKey=(p:AnyRecord)=>'role:'+String(p.org_unit_id)+'|'+String(p.title??'').normalize('NFKC').replace(/ي/g,'ی').replace(/ك/g,'ک').replace(/\s+/g,' ').trim();
   const selectedPositionMembers=entity?.kind==='position'?positions.filter((p:AnyRecord)=>p.id===entity.id||positionRoleKey(p)===entity.id):[];
   const selectedPosition=selectedPositionMembers[0]??null;
   const selectedUnit=units.find((x:AnyRecord)=>x.id===(selectedPosition?.org_unit_id??(entity?.kind==='unit'?entity.id:null)));
@@ -126,7 +126,7 @@ Deno.serve(async (req: Request) => {
       let providerMessage="";
       let providerCode="";
       try { const errorBody=await provider.json(); providerMessage=typeof errorBody?.error?.message==="string"?errorBody.error.message:"";providerCode=typeof errorBody?.error?.code==="string"?errorBody.error.code:""; } catch { /* Provider returned non-JSON error */ }
-      providerMessage=providerMessage.replace(/gsk_[\\w-]+/g,"[REDACTED]").replace(/Bearer\\s+\\S+/gi,"[REDACTED]").slice(0,280);
+      providerMessage=providerMessage.replace(/gsk_[\w-]+/g,"[REDACTED]").replace(/Bearer\s+\S+/gi,"[REDACTED]").slice(0,280);
       console.error("Groq pilot upstream status:",provider.status,"model:",selectedModel,"code:",providerCode.slice(0,80));
       return response(provider.status===429?429:502,{error:"GROQ_REQUEST_FAILED",provider_status:provider.status,provider_code:providerCode.slice(0,80),provider_message:providerMessage,model:selectedModel,message:provider.status===429?"سهمیه Groq فعلاً به سقف رسیده است.":provider.status===401||provider.status===403?"کلید نامعتبر است یا ارائه‌دهنده اجازه استفاده نمی‌دهد.":"درخواست Groq موفق نبود."});
     }
