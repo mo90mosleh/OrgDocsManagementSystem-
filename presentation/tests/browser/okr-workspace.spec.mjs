@@ -1,6 +1,17 @@
 import{test,expect}from'@playwright/test';
 import{backend}from'./pages-backend.mjs';
 test.skip(!process.env.PAGES_BASE_PATH,'Pages build only');
+async function loginAdmin(page){
+ await page.goto('./#/login');
+ await page.getByLabel('ایمیل',{exact:true}).fill('mo90mosleh@gmail.com');
+ await page.getByLabel('رمز عبور',{exact:true}).fill('correct-password');
+ await page.getByRole('button',{name:'ورود',exact:true}).click();
+ await expect(page).toHaveURL(/#\/admin$/);
+ await expect(page.getByRole('heading',{name:'پنل مدیریت',exact:true})).toBeVisible();
+ await page.goto('./#/okr');
+ await expect(page.getByRole('button',{name:'مدیریت دوره‌ها',exact:true})).toBeVisible();
+}
+
 test('OKR appears as one shared navigation entry with three workspace tabs',async({page})=>{
  await backend(page);await page.goto('./#/okr');
  await expect(page.getByRole('heading',{name:'مدیریت OKR'})).toBeVisible();
@@ -16,7 +27,7 @@ test('OKR appears as one shared navigation entry with three workspace tabs',asyn
  await expect(page.getByRole('heading',{name:'تحقق اهداف به تفکیک دپارتمان'})).toBeVisible();
 });
 test('interactive OKR check-in updates current KR value in local demo workspace',async({page})=>{
- await backend(page);await page.goto('./#/okr');
+ await backend(page);await loginAdmin(page);
  await page.locator('.okr-goal-card').first().click();
  await expect(page.getByRole('dialog',{name:'جزئیات هدف OKR'})).toBeVisible();
  await page.getByRole('dialog',{name:'جزئیات هدف OKR'}).getByRole('button',{name:'ثبت Check-in'}).first().click();
@@ -28,7 +39,7 @@ test('interactive OKR check-in updates current KR value in local demo workspace'
 });
 
 test('cycle management lists all periods and creates new ones without leaving the OKR workspace',async({page})=>{
- await backend(page);await page.goto('./#/okr');
+ await backend(page);await loginAdmin(page);
  await page.getByRole('button',{name:'مدیریت دوره‌ها'}).click();
  const manager=page.getByRole('dialog',{name:'مدیریت دوره‌های OKR'});
  await expect(manager).toBeVisible();

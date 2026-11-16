@@ -4,7 +4,7 @@ async function setup(page){const d=await backend(page),position=d.positions.find
  d.persons=Array.from({length:6},(_,i)=>({id:crypto.randomUUID(),display_name:'همکار آزمون '+i,email:null,phone:'0912123456'+i,extension:'20'+i,avatar_data_url:null}));
  d.assignments=d.persons.map(p=>({id:crypto.randomUUID(),person_id:p.id,position_id:position.id}));
  await page.goto('./#/login');await page.getByLabel('ایمیل',{exact:true}).fill('mo90mosleh@gmail.com');await page.getByLabel('رمز عبور',{exact:true}).fill('correct-password');await page.getByRole('button',{name:'ورود',exact:true}).click();
- await expect(page.getByRole('button',{name:'ورود',exact:true})).toHaveCount(0);
+ await expect(page).toHaveURL(/#\/admin$/);await expect(page.getByRole('heading',{name:'پنل مدیریت',exact:true})).toBeVisible();
  await page.goto('./#/organization/chart');await page.getByLabel('یافتن واحد یا سمت در چارت').fill(position.title);await page.getByRole('region',{name:'نتایج جست‌وجوی چارت'}).getByRole('button',{name:position.title+' فروش تهران',exact:true}).click();
  await page.getByRole('button',{name:'بستن اطلاعات مرتبط'}).click();return d;
 }
