@@ -106,3 +106,7 @@
  .mobile-chart-insight-trigger{position:absolute;left:-7px;top:-10px;z-index:8;width:34px;height:34px;display:grid;place-items:center;border:1px solid #9cb9cc;border-radius:50%;background:#fff;color:#47718a;box-shadow:0 3px 10px #183d4435}
  .mobile-chart-insight-trigger:focus-visible{outline:2px solid #487aa0;outline-offset:3px}
 }
+
+
+.chart-analysis-legend{position:absolute;top:72px;right:16px;z-index:4;display:inline-flex;align-items:center;max-width:calc(100% - 32px);padding:5px 10px;background:#ffffffec;border:1px solid #d8e6dc;box-shadow:0 3px 9px #243c3112;border-radius:7px;color:#607b6b;font-size:10px;line-height:1.7;pointer-events:none}
+@media(max-width:760px){.chart-analysis-legend{position:relative;top:auto;right:auto;margin:8px 0;max-width:100%;white-space:normal}}
