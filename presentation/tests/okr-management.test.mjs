@@ -36,16 +36,16 @@ test('KR progress supports decreasing targets, weights and zero progress',()=>{
  assert.equal(averageProgress(demo,'1405-winter'),0);
  for(const goal of activeObjectives(demo,'1405-fall'))assert.ok(objectiveProgress(demo,goal.id)>=0&&objectiveProgress(demo,goal.id)<=100);
 });
-test('check-in records prior/current values without mutating input and updates objective confidence',()=>{
+test('check-in records prior/current values and automatically sets objective confidence',()=>{
  const demo=sampleAutumn1405(),kr=demo.keyResults[0],before=kr.current;
- const next=registerCheckIn(demo,{keyResultId:kr.id,value:2.8,confidence:'ON_TRACK',note:'آزمون ثبت پیشرفت'},'2026-11-16T08:00:00.000Z');
+ const next=registerCheckIn(demo,{keyResultId:kr.id,value:2.8,note:'آزمون ثبت پیشرفت'},'2026-11-16T08:00:00.000Z');
  assert.equal(demo.keyResults[0].current,before);
  assert.equal(next.keyResults[0].current,2.8);
  assert.equal(next.checkins.at(-1).previous,before);
  assert.equal(next.checkins.at(-1).value,2.8);
  assert.equal(next.objectives.find(o=>o.id===kr.objectiveId).confidence,'ON_TRACK');
- assert.throws(()=>registerCheckIn(demo,{keyResultId:'missing',value:1,confidence:'ON_TRACK',note:''},'2026-11-16T08:00:00Z'));
- assert.throws(()=>registerCheckIn(demo,{keyResultId:kr.id,value:NaN,confidence:'ON_TRACK',note:''},'2026-11-16T08:00:00Z'));
+ assert.throws(()=>registerCheckIn(demo,{keyResultId:'missing',value:1,note:''},'2026-11-16T08:00:00Z'));
+ assert.throws(()=>registerCheckIn(demo,{keyResultId:kr.id,value:NaN,note:''},'2026-11-16T08:00:00Z'));
 });
 test('new objectives and KRs can be drafted without editing the organization KPI catalog',()=>{
  const portfolio=sampleAutumn1405(),newId='obj-custom';

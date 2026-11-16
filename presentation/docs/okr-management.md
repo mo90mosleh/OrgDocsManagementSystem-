@@ -45,3 +45,19 @@ Test with npm run typecheck, npm run build:pages, and npm test from the presenta
 - The existing cycle list offers "ویرایش تاریخ‌ها" for editing name and dates, including repairing older records created with blank dates.
 - Dates are validated for real Persian-calendar days and range order, including leap-year Esfand. Internally they are stored as Gregorian YYYY-MM-DD ISO date-only strings to preserve the existing model and display correctly in Jalali.
 - The demo still stores edits only in the browser; no Supabase migration is involved.
+
+## Time-based pace status (current pilot rule)
+
+Each Objective badge is **derived** from the selected cycle's start/end dates and each Objective's numeric KR progress, rather than the manually assigned confidence value. The legacy confidence field remains in JSON for compatibility but is not authoritative in current views.
+
+- **Expected** is the linear share of elapsed **calendar days**, clamped to 0% before the period starts and 100% on or after its final day. The first day is 0%, and about one month into a three-month quarter it is 33%.
+- **Actual** is the weighted average of KR achievements.
+- Actual >= expected: **در مسیر** (ON_TRACK).
+- Up to 15 percentage points below expected: **نیازمند توجه** (AT_RISK).
+- More than 15 percentage points below expected: **خارج از مسیر** (OFF_TRACK).
+- Future cycles are **شروع‌نشده**; missing valid cycle dates or any measurable KRs is **بدون داده**. Neither is counted as in-path or at-risk.
+- The comparison is made against each Objective's **own cycle**, so editing that period's start/end dates changes expected progress instantly.
+- Strategy Map, the Goal list, the Executive monitoring view, and Objective detail drawers all use the same dynamic status calculation. Current date refreshes after local midnight or when the page becomes visible.
+- Check-in now asks for the **actual KR value and commentary only**. The historical confidence field on saved check-ins stores a computed point-in-time snapshot for backward compatibility; current badges always recompute automatically as time passes.
+- Progress **bar color** remains independent: <40% red, 40–70% yellow, >70% green. Progress color is not a risk status.
+- Escalation at 15 percentage points is an initial product default; it can later become an organization-level setting.

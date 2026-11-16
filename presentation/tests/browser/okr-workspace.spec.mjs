@@ -68,3 +68,18 @@ test('top breadcrumbs are removed from architecture, KPI and OKR but retained el
  await page.goto('./#/processes');
  await expect(page.locator('.breadcrumb')).toBeVisible();
 });
+
+
+test('automatically updates goal schedule status from quarter elapsed time, not manual check-in confidence',async({page})=>{
+ await page.clock.setFixedTime(new Date('2026-11-16T12:00:00Z'));
+ await backend(page);await page.goto('./#/okr');
+ await expect(page.locator('.okr-current-cycle')).toContainText('انتظار تا امروز:');
+ await expect(page.locator('.okr-goal-card.is-company .okr-card-expected')).toContainText('مورد انتظار تا امروز:');
+ await page.locator('.okr-goal-card.is-company').click();
+ const details=page.getByRole('dialog',{name:'جزئیات هدف OKR'});
+ await expect(details.locator('.okr-pace-detail')).toContainText('پیشرفت مورد انتظار تا امروز');
+ await details.getByRole('button',{name:'ثبت Check-in'}).first().click();
+ const checkin=page.getByRole('dialog',{name:'فرم مدیریت OKR'});
+ await expect(checkin.locator('[name="confidence"]')).toHaveCount(0);
+ await expect(checkin).toContainText('به‌صورت خودکار');
+});

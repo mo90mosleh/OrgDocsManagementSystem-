@@ -35,6 +35,39 @@ export function objectiveProgress(portfolio:OkrPortfolio,objectiveId:string):num
  const total=results.reduce((sum,x)=>sum+x.weight,0);
  return Math.round(results.reduce((sum,x)=>sum+keyResultProgress(x)*x.weight,0)/total);
 }
+/** The pacing benchmark is linear in elapsed calendar days of the selected OKR cycle. */
+export type OkrPaceStatus=OkrConfidence|'NOT_STARTED'|'NO_DATA';
+export type OkrPace={status:OkrPaceStatus;actual:number;expected:number|null;gap:number|null};
+export const paceStatusLabels:Record<OkrPaceStatus,string>={
+ ...confidenceLabels,NOT_STARTED:'شروع‌نشده',NO_DATA:'بدون داده'
+};
+const utcDay=(date:Date)=>Date.UTC(date.getFullYear(),date.getMonth(),date.getDate())/86400000;
+function isoDay(value:string):number|null{
+ if(!/^\d{4}-\d{2}-\d{2}$/.test(value))return null;
+ const parsed=Date.parse(value+'T00:00:00Z');
+ if(!Number.isFinite(parsed)||new Date(parsed).toISOString().slice(0,10)!==value)return null;
+ return parsed/86400000;
+}
+export function expectedCycleProgress(cycle:OkrCycle,asOf:Date):number|null{
+ const first=isoDay(cycle.startDate),last=isoDay(cycle.endDate);
+ if(first===null||last===null||last<=first||!Number.isFinite(asOf.getTime()))return null;
+ const elapsed=utcDay(asOf)-first;
+ return Math.max(0,Math.min(100,Math.round(elapsed/(last-first)*100)));
+}
+export function objectivePace(portfolio:OkrPortfolio,objectiveId:string,asOf:Date):OkrPace{
+ const objective=portfolio.objectives.find(x=>x.id===objectiveId);
+ const actual=objectiveProgress(portfolio,objectiveId);
+ const cycle=portfolio.cycles.find(x=>x.id===objective?.cycleId);
+ const expected=cycle?expectedCycleProgress(cycle,asOf):null;
+ const hasResults=portfolio.keyResults.some(x=>x.objectiveId===objectiveId&&x.weight>0&&Number.isFinite(x.weight));
+ if(!objective||!hasResults||expected===null)return{status:'NO_DATA',actual,expected,gap:null};
+ const first=isoDay(cycle!.startDate);
+ if(first!==null&&utcDay(asOf)<first)return{status:'NOT_STARTED',actual,expected,gap:actual-expected};
+ const gap=actual-expected;
+ // 0pp deficit: on track; 1..15pp behind: at risk; >15pp behind: off track.
+ const status:OkrConfidence=gap>=0?'ON_TRACK':gap>=-15?'AT_RISK':'OFF_TRACK';
+ return{status,actual,expected,gap};
+}
 export function averageProgress(portfolio:OkrPortfolio,cycleId:string):number{
  const rootObjectives=portfolio.objectives.filter(x=>x.cycleId===cycleId&&x.level==='COMPANY');
  const base=rootObjectives.length?rootObjectives:portfolio.objectives.filter(x=>x.cycleId===cycleId);
@@ -44,17 +77,19 @@ export function averageProgress(portfolio:OkrPortfolio,cycleId:string):number{
 export function activeObjectives(portfolio:OkrPortfolio,cycleId:string):OkrObjective[]{
  return portfolio.objectives.filter(x=>x.cycleId===cycleId);
 }
-export function registerCheckIn(portfolio:OkrPortfolio,input:{keyResultId:string;value:number;confidence:OkrConfidence;note:string},createdAt:string):OkrPortfolio{
+export function registerCheckIn(portfolio:OkrPortfolio,input:{keyResultId:string;value:number;note:string},createdAt:string):OkrPortfolio{
  if(!Number.isFinite(input.value)||!Number.isFinite(new Date(createdAt).getTime()))throw Error('مقدار یا تاریخ Check-in معتبر نیست.');
  const kr=portfolio.keyResults.find(x=>x.id===input.keyResultId);
  if(!kr)throw Error('نتیجهٔ کلیدی پیدا نشد.');
- if(!['ON_TRACK','AT_RISK','OFF_TRACK'].includes(input.confidence))throw Error('وضعیت اطمینان معتبر نیست.');
  const note=input.note.trim().slice(0,800);
+ const updatedResults=portfolio.keyResults.map(x=>x.id===kr.id?{...x,current:input.value}:x);
+ const next={...portfolio,keyResults:updatedResults};
+ const calculated=objectivePace(next,kr.objectiveId,new Date(createdAt));
+ const confidence:OkrConfidence=calculated.status==='ON_TRACK'||calculated.status==='AT_RISK'||calculated.status==='OFF_TRACK'?calculated.status:portfolio.objectives.find(x=>x.id===kr.objectiveId)?.confidence??'ON_TRACK';
  return{
-  ...portfolio,
-  keyResults:portfolio.keyResults.map(x=>x.id===kr.id?{...x,current:input.value}:x),
-  objectives:portfolio.objectives.map(x=>x.id===kr.objectiveId?{...x,confidence:input.confidence}:x),
-  checkins:[...portfolio.checkins,{id:'ci-'+createdAt+'-'+portfolio.checkins.length,keyResultId:kr.id,objectiveId:kr.objectiveId,previous:kr.current,value:input.value,confidence:input.confidence,note,createdAt}]
+  ...next,
+  objectives:portfolio.objectives.map(x=>x.id===kr.objectiveId?{...x,confidence}:x),
+  checkins:[...portfolio.checkins,{id:'ci-'+createdAt+'-'+portfolio.checkins.length,keyResultId:kr.id,objectiveId:kr.objectiveId,previous:kr.current,value:input.value,confidence,note,createdAt}]
  };
 }
 export function portfolioIsValid(value:unknown):value is OkrPortfolio{

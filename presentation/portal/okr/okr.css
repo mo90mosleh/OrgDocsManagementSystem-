@@ -234,3 +234,14 @@
  .okr-workspace .okr-form-numbers>label{min-width:0}
  .okr-workspace .okr-form-numbers input{min-width:0}
 }
+
+
+/* Chronological OKR status: progress bars keep their independent red/yellow/green bands. */
+.okr-workspace .okr-status.is-neutral{background:#f0f2f5;color:#687787}
+.okr-workspace .okr-pace-detail{font-size:11px;line-height:1.85;color:var(--text-secondary,var(--okr-muted))}
+.okr-workspace .okr-pace-detail b{color:var(--ink);font-variant-numeric:tabular-nums}
+.okr-workspace .okr-card-expected{font-size:10px;line-height:1.6;color:var(--text-secondary,var(--okr-muted))}
+@media(max-width:760px){
+ .okr-workspace .okr-list-row>.okr-status{display:inline-flex;grid-column:1/-1;justify-self:start}
+ .okr-workspace .okr-list-progress small{font-size:9px;line-height:1.55;white-space:normal;overflow-wrap:break-word}
+}
