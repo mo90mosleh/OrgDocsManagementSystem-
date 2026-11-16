@@ -49,8 +49,8 @@ function ProcessNetworkSvg({data,relations,focus,view,onFocus}:{data:Data;relati
  </svg>{layout.nodes.length===0&&<p className="process-map-empty-canvas">هنوز ارتباطی ثبت نشده است. برای شروع یک فرآیند و ارتباط آن را تعریف کنید.</p>}</div>;
 }
 export function ProcessMap({data,refresh}:{data:Data;refresh:()=>Promise<void>}){
- const demo=config.mode==='public'&&data.user.role!=='ADMIN';
- const editable=demo||data.user.role==='ADMIN';
+ const editable=data.user.role==='ADMIN';
+ const demo=editable&&config.mode==='public'&&!config.authEnabled;
  const [overlay,setOverlay]=useState<RelationOverlay>(()=>demo?loadProcessRelationOverlay(data):{additions:[],updates:[],deletedIds:[]});
  const relations=useMemo(()=>demo?mergeProcessRelations(data.relations??[],overlay):data.relations??[],[data.relations,overlay,demo]);
  const processes=data.nodes.filter(n=>n.kind==='PROCESS');
@@ -120,7 +120,7 @@ export function ProcessMap({data,refresh}:{data:Data;refresh:()=>Promise<void>})
      {neighbors.length?neighbors.map((r,i)=><article key={r.id??i} className="process-map-neighbor"><div><button className="process-map-link" onClick={()=>reveal(r.otherId)}>{byId.get(r.otherId)?.name??'فرآیند نامشخص'}<ArrowRight size={14}/></button><small>{processRelationTypes[r.relation_type]} · {r.direction==='incoming'?'ورودی به این فرآیند':'خروجی از این فرآیند'}{r.note?' · '+r.note:''}</small></div>{editable&&<div className="process-map-actions"><button aria-label={'ویرایش ارتباط با '+(byId.get(r.otherId)?.name??'')} onClick={()=>{setEdit(r);setError('');}}><PenLine size={15}/></button><button aria-label={'حذف ارتباط با '+(byId.get(r.otherId)?.name??'')} disabled={busy} onClick={()=>void remove(r)}><Trash2 size={15}/></button></div>}</article>):<p className="empty-inline">این فرآیند هنوز ارتباط ثبت‌شده‌ای ندارد.</p>}
     </>:<p className="empty-inline">ابتدا فرآیند را انتخاب کنید.</p>}</aside>
   </div>}
-  {edit!==undefined&&<div className="process-map-modal-backdrop" onPointerDown={e=>{if(e.target===e.currentTarget)setEdit(undefined);}}><form className="process-map-form" role="dialog" aria-modal="true" aria-label="تعریف ارتباط فرآیندها" onSubmit={e=>void save(e)}>
+  {editable&&edit!==undefined&&<div className="process-map-modal-backdrop" onPointerDown={e=>{if(e.target===e.currentTarget)setEdit(undefined);}}><form className="process-map-form" role="dialog" aria-modal="true" aria-label="تعریف ارتباط فرآیندها" onSubmit={e=>void save(e)}>
    <header><h2>{edit?'ویرایش ارتباط فرآیندها':'تعریف ارتباط جدید'}</h2><button type="button" className="icon-button" aria-label="بستن فرم ارتباط" onClick={()=>setEdit(undefined)}><X size={20}/></button></header>
    <label>فرآیند مبدأ<select name="source_process_id" required defaultValue={edit?.source_process_id??current?.id??''}>{processes.map(p=><option value={p.id} key={p.id}>{p.name}</option>)}</select></label>
    <label>نوع ارتباط<select name="relation_type" required defaultValue={edit?.relation_type??'RELATED'}>{Object.entries(processRelationTypes).map(([id,label])=><option key={id} value={id}>{label}</option>)}</select></label>

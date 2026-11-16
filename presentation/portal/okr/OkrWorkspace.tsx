@@ -18,9 +18,9 @@ const EMPTY:OkrPortfolio={cycles:[],objectives:[],keyResults:[],checkins:[]};
 const actionTime=()=>new Date().toISOString();
 const titleByTab:Record<Tab,string>={strategy:'نقشه استراتژی',goals:'اهداف و نتایج کلیدی',monitor:'پایش و عملکرد'};
 const copy=(value:OkrPortfolio)=>JSON.parse(JSON.stringify(value)) as OkrPortfolio;
-function loadPortfolio(orgId:string,orgName:string){
+function loadPortfolio(orgId:string,orgName:string,canEdit:boolean){
  try{
-  const saved=localStorage.getItem('nama-okr-workspace-v1:'+orgId);
+  const saved=canEdit?localStorage.getItem('nama-okr-workspace-v1:'+orgId):null;
   if(saved){const value:unknown=JSON.parse(saved);if(portfolioIsValid(value))return value;}
  }catch{/* Browser storage unavailable. */}
  return config.mode==='public'&&/راسان|rassan/i.test(orgName)?sampleAutumn1405():copy(EMPTY);
@@ -37,7 +37,7 @@ function EntryCard({goal,portfolio,onSelect,owner,pace}:{goal:OkrObjective;portf
  </button>;
 }
 export function OkrWorkspace({data}:{data:Data}){
- const [portfolio,setPortfolio]=useState<OkrPortfolio>(()=>loadPortfolio(data.organization.id,data.organization.name));
+ const [portfolio,setPortfolio]=useState<OkrPortfolio>(()=>loadPortfolio(data.organization.id,data.organization.name,data.user.role==='ADMIN'));
  const [activeCycle,setActiveCycle]=useState(()=>portfolio.cycles.find(c=>c.status==='ACTIVE')?.id??portfolio.cycles[0]?.id??'');
  const [tab,setTab]=useState<Tab>('strategy'),[pillar,setPillar]=useState('all'),[listView,setListView]=useState<'tree'|'table'>('tree');
  const [search,setSearch]=useState(''),[scope,setScope]=useState('ALL');
@@ -47,8 +47,8 @@ export function OkrWorkspace({data}:{data:Data}){
  const [feedback,setFeedback]=useState(''),[error,setError]=useState('');
  const [today,setToday]=useState(()=>new Date());
  const ref=useRef<HTMLDivElement>(null);
- const demo=config.mode==='public',canEdit=demo||data.user.role==='ADMIN'||data.user.role==='EDITOR';
- useEffect(()=>{try{localStorage.setItem('nama-okr-workspace-v1:'+data.organization.id,JSON.stringify(portfolio));}catch{}},[portfolio,data.organization.id]);
+ const demo=config.mode==='public',canEdit=data.user.role==='ADMIN';
+ useEffect(()=>{if(!canEdit)return;try{localStorage.setItem('nama-okr-workspace-v1:'+data.organization.id,JSON.stringify(portfolio));}catch{}},[portfolio,data.organization.id,canEdit]);
  // Refresh pacing after each local midnight, including when a background tab is reopened.
  useEffect(()=>{
   let timer:number;
@@ -103,7 +103,7 @@ export function OkrWorkspace({data}:{data:Data}){
   const suggestion=suggestCycleDates(cycleDraft.title);
   if(suggestion)setCycleDraft(prev=>({...prev,start:suggestion.start,end:suggestion.end,editedStart:false,editedEnd:false}));
  };
- const write=(next:OkrPortfolio,message:string)=>{setPortfolio(next);setFeedback(message);setError('');};
+ const write=(next:OkrPortfolio,message:string)=>{if(!canEdit)return;setPortfolio(next);setFeedback(message);setError('');};
  const cycleDateFormat=new Intl.DateTimeFormat('fa-IR-u-ca-persian',{year:'numeric',month:'short',day:'numeric'});
  const cycleDates=(start:string,end:string)=>start&&end?cycleDateFormat.format(new Date(start+'T12:00:00'))+' تا '+cycleDateFormat.format(new Date(end+'T12:00:00')):'تاریخ شروع و پایان ثبت نشده';
  const selectCycle=(id:string)=>{setActiveCycle(id);setSelectedId(null);setPillar('all');setCycleManagerOpen(false);setFeedback('');};
@@ -156,7 +156,7 @@ export function OkrWorkspace({data}:{data:Data}){
    }
   }catch(err){setError(err instanceof Error?err.message:'ذخیره انجام نشد.');}
  }
- function resetDemo(){if(!demo)return;if(!window.confirm('تغییرات آزمایشی OKR بازنشانی شود؟'))return;const next=sampleAutumn1405();write(next,'اطلاعات نمونه پاییز ۱۴۰۵ بازنشانی شد.');setActiveCycle('1405-fall');setSelectedId(null);}
+ function resetDemo(){if(!canEdit||!demo)return;if(!window.confirm('تغییرات آزمایشی OKR بازنشانی شود؟'))return;const next=sampleAutumn1405();write(next,'اطلاعات نمونه پاییز ۱۴۰۵ بازنشانی شد.');setActiveCycle('1405-fall');setSelectedId(null);}
  const summary=<div className="okr-metrics">
   {metric('اهداف دوره',number.format(objectives.length),'سازمانی و دپارتمانی')}
   {metric('نتایج کلیدی',number.format(results.length),'مقادیر قابل سنجش')}
@@ -221,7 +221,7 @@ export function OkrWorkspace({data}:{data:Data}){
  return <div ref={ref} className="okr-workspace">
   <header className="okr-heading"><div><p className="okr-eyebrow"><Target size={14}/>مدیریت استراتژی و اهداف</p><h1>مدیریت OKR</h1><p>از اهداف سازمانی تا نتایج کلیدی، شاخص‌ها و فرآیندهای مرتبط</p></div>
    <div className="okr-heading-actions"><label className="okr-cycle-control"><CalendarDays size={16}/><select aria-label="دوره OKR" value={cycle?.id??''} onChange={e=>{setActiveCycle(e.target.value);setSelectedId(null);setPillar('all');}}>{!portfolio.cycles.length&&<option value="">دوره‌ای تعریف نشده</option>}{portfolio.cycles.map(c=><option key={c.id} value={c.id}>{c.title} {c.status==='PLANNING'?'· برنامه‌ریزی':''}</option>)}</select><ChevronDown size={13}/></label>
-    <button className="okr-button okr-button-muted" onClick={()=>{setSelectedId(null);setCycleManagerOpen(true);setError('');setFeedback('');}}><CalendarDays size={15}/>مدیریت دوره‌ها</button>
+    {canEdit&&<button className="okr-button okr-button-muted" onClick={()=>{setSelectedId(null);setCycleManagerOpen(true);setError('');setFeedback('');}}><CalendarDays size={15}/>مدیریت دوره‌ها</button>}
     {canEdit&&<button className="okr-button okr-button-primary" onClick={()=>showForm('objective')}><Plus size={17}/>هدف جدید</button>}
    </div>
   </header>
@@ -242,7 +242,7 @@ export function OkrWorkspace({data}:{data:Data}){
    {detailTab==='links'&&<div className="okr-detail-body"><h3><ChartNoAxesCombined size={17}/>KPIهای مرتبط</h3>{selectedResults.filter(k=>k.kpiId&&data.kpis.some(item=>item.id===k.kpiId)).map(k=>{const linked=data.kpis.find(item=>item.id===k.kpiId)!;return <Link key={k.id} to={'/kpis/'+linked.id} className="okr-related-link" >{linked.name}<ArrowUpLeft size={16}/></Link>;})}{!selectedResults.some(k=>data.kpis.some(item=>item.id===k.kpiId))&&<p className="okr-empty">ارتباط KPI ثبت نشده است.</p>}<h3><ClipboardList size={17}/>فرآیندهای مرتبط</h3>{selected.processIds.map(id=>data.nodes.find(n=>n.id===id&&n.kind==='PROCESS')).filter((n):n is NonNullable<typeof n>=>Boolean(n)).map(p=><Link to={'/processes/'+p.id} key={p.id} className="okr-related-link">{p.name}<ArrowUpLeft size={16}/></Link>)}{!selected.processIds.length&&<p className="okr-empty">ارتباطی با فرآیند ثبت نشده است.</p>}<p className="okr-note">این پیوندها، ارتباط مستندشده را نمایش می‌دهند و نشان‌دهنده اثر علّی اثبات‌شده نیستند.</p></div>}
    {detailTab==='history'&&<div className="okr-detail-body">{portfolio.checkins.filter(c=>c.objectiveId===selected.id).slice().reverse().map(c=><div className="okr-history-row" key={c.id}><strong>{portfolio.keyResults.find(k=>k.id===c.keyResultId)?.title}</strong><small>{new Intl.DateTimeFormat('fa-IR-u-ca-persian',{dateStyle:'medium'}).format(new Date(c.createdAt))}</small><p>{c.note||'ثبت مقدار نتیجه کلیدی'}</p><span>{number.format(c.previous)} ← {number.format(c.value)}</span></div>)}{!portfolio.checkins.some(c=>c.objectiveId===selected.id)&&<p className="okr-empty">هنوز تغییری برای این هدف ثبت نشده است.</p>}</div>}
   </aside></div>}
-  {cycleManagerOpen&&<div className="okr-form-backdrop okr-cycle-backdrop" onPointerDown={e=>{if(e.target===e.currentTarget)setCycleManagerOpen(false);}}><section className="okr-cycle-manager" role="dialog" aria-modal={form?undefined:true} aria-label="مدیریت دوره‌های OKR">
+  {canEdit&&cycleManagerOpen&&<div className="okr-form-backdrop okr-cycle-backdrop" onPointerDown={e=>{if(e.target===e.currentTarget)setCycleManagerOpen(false);}}><section className="okr-cycle-manager" role="dialog" aria-modal={form?undefined:true} aria-label="مدیریت دوره‌های OKR">
     <header className="okr-cycle-manager-header"><div><h2>مدیریت دوره‌های OKR</h2><p>تمام دوره‌های تعریف‌شده را مرور کنید یا یک دوره جدید بسازید.</p></div><button className="okr-icon-button" aria-label="بستن مدیریت دوره‌ها" onClick={()=>setCycleManagerOpen(false)}><X size={19}/></button></header>
     <div className="okr-cycle-manager-tools"><span>{number.format(portfolio.cycles.length)} دوره تعریف‌شده</span>{canEdit&&<button className="okr-button okr-button-primary" onClick={()=>showForm('cycle')}><Plus size={16}/>دوره جدید</button>}</div>
     {feedback&&<p className="okr-feedback" role="status">{feedback}</p>}
@@ -252,9 +252,9 @@ export function OkrWorkspace({data}:{data:Data}){
       <div className="okr-cycle-counts"><span>{number.format(cycleObjectives.length)} هدف</span><span>{number.format(countKrs)} نتیجه کلیدی</span></div>
       <div className="okr-cycle-actions"><button className={'okr-button '+(selectedCycle?'okr-button-muted':'okr-button-primary')} onClick={()=>selectCycle(c.id)}>{selectedCycle?'دوره انتخاب‌شده':'مشاهده دوره'}<ChevronLeft size={15}/></button>{canEdit&&<button className="okr-button okr-button-muted" onClick={()=>showForm('cycle',{cycleId:c.id})}>ویرایش تاریخ‌ها</button>}</div>
     </article>;})}{!portfolio.cycles.length&&<p className="okr-empty">هنوز دوره‌ای تعریف نشده است. از «دوره جدید» شروع کنید.</p>}</div>
-    {demo&&<footer className="okr-cycle-manager-footer"><button className="okr-text-button" onClick={resetDemo}><RefreshCw size={14}/>بازنشانی داده‌های نمونه</button></footer>}
+    {canEdit&&demo&&<footer className="okr-cycle-manager-footer"><button className="okr-text-button" onClick={resetDemo}><RefreshCw size={14}/>بازنشانی داده‌های نمونه</button></footer>}
    </section></div>}
-  {form&&<div className="okr-form-backdrop" onPointerDown={e=>{if(e.target===e.currentTarget)setForm(null);}}><form className="okr-form" onSubmit={saveForm} role="dialog" aria-label="فرم مدیریت OKR" aria-modal="true"><header><h2>{form==='checkin'?'ثبت Check-in':form==='kr'?'تعریف نتیجه کلیدی':form==='objective'?'هدف جدید':(draft.cycleId?'ویرایش دوره':'ایجاد دوره جدید')}</h2><button type="button" aria-label="بستن فرم" onClick={()=>setForm(null)}><X size={19}/></button></header>
+  {canEdit&&form&&<div className="okr-form-backdrop" onPointerDown={e=>{if(e.target===e.currentTarget)setForm(null);}}><form className="okr-form" onSubmit={saveForm} role="dialog" aria-label="فرم مدیریت OKR" aria-modal="true"><header><h2>{form==='checkin'?'ثبت Check-in':form==='kr'?'تعریف نتیجه کلیدی':form==='objective'?'هدف جدید':(draft.cycleId?'ویرایش دوره':'ایجاد دوره جدید')}</h2><button type="button" aria-label="بستن فرم" onClick={()=>setForm(null)}><X size={19}/></button></header>
    {form==='cycle'&&<><label>نام دوره<input name="title" required minLength={4} maxLength={70} placeholder="مثلاً بهار ۱۴۰۶" value={cycleDraft.title} onChange={e=>changeCycleName(e.target.value)}/></label><div className="okr-form-numbers"><label>تاریخ شروع (شمسی)<input name="startDate" inputMode="numeric" autoComplete="off" required placeholder="۱۴۰۶/۰۱/۰۱" value={cycleDraft.start} onChange={e=>setCycleDraft(prev=>({...prev,start:e.target.value,editedStart:true}))}/></label><label>تاریخ پایان (شمسی)<input name="endDate" inputMode="numeric" autoComplete="off" required placeholder="۱۴۰۶/۰۳/۳۱" value={cycleDraft.end} onChange={e=>setCycleDraft(prev=>({...prev,end:e.target.value,editedEnd:true}))}/></label></div><div className="okr-cycle-form-help"><span>با نامی مثل «بهار ۱۴۰۶» بازه به‌طور خودکار پیشنهاد می‌شود. می‌توانید هر دو تاریخ را تغییر دهید.</span>{suggestCycleDates(cycleDraft.title)&&<button type="button" className="okr-text-button" onClick={restoreCycleSuggestion}>بازگردانی تاریخ پیشنهادی</button>}</div></>}
    {form==='objective'&&<><label>عنوان هدف<input name="title" required minLength={8} maxLength={220} placeholder="هدف روشن و نتیجه‌محور"/></label><label>توضیح<textarea name="description" maxLength={500} rows={2}/></label><label>هدف بالادستی<select name="parentId"><option value="">هدف سازمانی (ریشه)</option>{objectives.filter(x=>x.level==='COMPANY').map(g=><option key={g.id} value={g.id}>{g.title}</option>)}</select></label><label>واحد مالک<select name="ownerUnitId"><option value="">کل سازمان</option>{data.units.map(unit=><option key={unit.id} value={unit.id}>{unit.name}</option>)}</select></label><label>محور استراتژیک<input name="pillar" defaultValue="تجربه مشتری" maxLength={80}/></label></>}
    {form==='kr'&&<><label>عنوان نتیجه کلیدی<input name="title" required minLength={8} maxLength={220} placeholder="کاهش / افزایش عددی قابل سنجش"/></label><div className="okr-form-numbers"><label>مقدار مبنا<input name="baseline" required type="number" step="any" defaultValue={10}/></label><label>مقدار هدف<input name="target" required type="number" step="any" defaultValue={5}/></label></div><label>واحد سنجش<input name="unit" maxLength={25} placeholder="روز، درصد، عدد…"/></label><label>ارتباط با KPI موجود<select name="kpiId"><option value="">بدون KPI مرتبط</option>{data.kpis.map(k=><option key={k.id} value={k.id}>{k.name}</option>)}</select></label></>}
