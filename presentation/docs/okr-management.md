@@ -37,3 +37,11 @@ Test with npm run typecheck, npm run build:pages, and npm test from the presenta
 - "دوره جدید" lives inside this directory, opens a focused creation form, and returns to the directory with the newly created period selected.
 - The sample-reset control lives only in the cycle-directory footer (for the public demo). The former sample-information banner is no longer shown in the workspace.
 - The global breadcrumb is intentionally omitted for /architecture, /kpis and /kpis/:id, and /okr to maximize working area. Other pages retain normal breadcrumbs.
+
+## Persian dates for OKR cycles
+
+- Creating a cycle named بهار ۱۴۰۶, تابستان ۱۴۰۶, پاییز ۱۴۰۶, or زمستان ۱۴۰۶ automatically proposes the full Jalali season; سالانه ۱۴۰۶ and سال ۱۴۰۶ propose a full year.
+- Start/end fields are editable Jalali dates (۱۴۰۶/۰۱/۰۱ format); explicit edits are never automatically overwritten by subsequently editing the title. A "بازگردانی تاریخ پیشنهادی" button restores the default for a recognizable name.
+- The existing cycle list offers "ویرایش تاریخ‌ها" for editing name and dates, including repairing older records created with blank dates.
+- Dates are validated for real Persian-calendar days and range order, including leap-year Esfand. Internally they are stored as Gregorian YYYY-MM-DD ISO date-only strings to preserve the existing model and display correctly in Jalali.
+- The demo still stores edits only in the browser; no Supabase migration is involved.

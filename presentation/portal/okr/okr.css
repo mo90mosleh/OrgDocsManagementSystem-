@@ -217,3 +217,17 @@
  .okr-workspace .okr-cycle-item{padding:13px}
  .okr-workspace .okr-cycle-manager-header h2{font-size:16px}
 }
+
+
+/* Persian-calendar cycle editing, shared with the new/edit dialog. */
+.okr-workspace .okr-cycle-form-help{display:flex;align-items:center;justify-content:space-between;gap:7px 11px;flex-wrap:wrap;color:var(--text-secondary,var(--muted));font-size:11px;line-height:1.9;background:var(--surface-subtle,#f6f8fb);padding:9px 11px;border-radius:var(--radius-control,10px);margin-top:5px}
+.okr-workspace .okr-cycle-form-help span{flex:1 1 190px}
+.okr-workspace .okr-cycle-form-help .okr-text-button{font-weight:600;color:var(--action,var(--brand,#b92737))}
+.okr-workspace .okr-cycle-actions{display:flex;flex-wrap:wrap;align-items:center;gap:7px;margin-top:auto}
+.okr-workspace .okr-cycle-actions .okr-button{min-height:36px;padding:7px 10px;font-size:11px}
+.okr-workspace .okr-cycle-form-help+footer{margin-top:16px}
+@media(max-width:610px){
+ .okr-workspace .okr-cycle-form-help{align-items:flex-start;flex-direction:column}
+ .okr-workspace .okr-form-numbers>label{min-width:0}
+ .okr-workspace .okr-form-numbers input{min-width:0}
+}
