@@ -50,7 +50,7 @@ test('the canvas remains full width and card click directly reveals KPI-first de
  assert.match(chart,/chart-layout-full/);
  assert.doesNotMatch(chart,/with-detail/);
  assert.match(chart,/detailsOpen/);
- assert.doesNotMatch(viewport,/node-linked-trigger/);assert.match(chart,/function choose\(id:string\).*setDetailsOpen\(true\)/);assert.match(chart,/value=\{relatedTab\}/);
+ assert.doesNotMatch(viewport,/node-linked-trigger/);assert.match(chart,/function choose\(id:string\).*activateCard/);assert.match(chart,/setDetailsOpen\(true\)/);assert.match(chart,/value=\{relatedTab\}/);
  assert.match(viewport,/chart-zoom-overview/);
  assert.match(viewport,/chart-node-preview/);
 });
