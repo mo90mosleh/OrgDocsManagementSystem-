@@ -3,7 +3,7 @@ export type OkrLevel='COMPANY'|'DEPARTMENT';
 export type OkrCycle={id:string;title:string;status:'ACTIVE'|'PLANNING'|'CLOSED';startDate:string;endDate:string};
 export type OkrObjective={
  id:string;code:string;title:string;description:string;cycleId:string;parentId:string|null;
- level:OkrLevel;ownerUnitId:string|null;pillar:string;confidence:OkrConfidence;processIds:string[];
+ level:OkrLevel;ownerUnitId:string|null;pillar:string;confidence:OkrConfidence;
 };
 export type OkrKeyResult={
  id:string;objectiveId:string;title:string;baseline:number;target:number;current:number;
@@ -107,4 +107,11 @@ export function withObjective(portfolio:OkrPortfolio,objective:OkrObjective):Okr
 export function withKeyResult(portfolio:OkrPortfolio,kr:OkrKeyResult):OkrPortfolio{
  if(!portfolio.objectives.some(x=>x.id===kr.objectiveId)||!kr.title.trim()||!Number.isFinite(kr.target)||!Number.isFinite(kr.baseline))throw Error('مشخصات نتیجه کلیدی معتبر نیست.');
  return {...portfolio,keyResults:[...portfolio.keyResults,kr]};
+}
+/** Remove retired direct process links from browser drafts without changing KR history. */
+export function withoutProcessLinks(portfolio:OkrPortfolio):OkrPortfolio{
+ return {...portfolio,objectives:portfolio.objectives.map(objective=>{
+  const {processIds:retired,...current}=objective as OkrObjective&{processIds?:unknown};
+  return current;
+ })};
 }

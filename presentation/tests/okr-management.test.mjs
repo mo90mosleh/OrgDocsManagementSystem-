@@ -3,7 +3,7 @@ import assert from'node:assert/strict';
 import{readFile}from'node:fs/promises';
 import{sampleAutumn1405}from'../portal/okr/sample.ts';
 import{findProductHelp}from'../supabase/functions/namayar-groq-test/product-guide.ts';
-import{activeObjectives,averageProgress,keyResultProgress,objectiveProgress,portfolioIsValid,progressBand,registerCheckIn,withKeyResult,withObjective}from'../portal/okr/model.ts';
+import{activeObjectives,averageProgress,keyResultProgress,objectiveProgress,portfolioIsValid,withoutProcessLinks,progressBand,registerCheckIn,withKeyResult,withObjective}from'../portal/okr/model.ts';
 
 const data=JSON.parse(await readFile(new URL('../data/rassan-presentation.json',import.meta.url),'utf8'));
 test('Autumn 1405 demo stays separate from live records and references existing organization entities',()=>{
@@ -15,7 +15,7 @@ test('Autumn 1405 demo stays separate from live records and references existing 
  for(const objective of demo.objectives){
   if(objective.ownerUnitId)assert.ok(data.units.some(u=>u.id===objective.ownerUnitId),'unknown unit '+objective.ownerUnitId);
   if(objective.parentId)assert.ok(demo.objectives.some(o=>o.id===objective.parentId),'unknown parent '+objective.parentId);
-  for(const processId of objective.processIds)assert.ok(data.nodes.some(p=>p.id===processId&&p.kind==='PROCESS'),'unknown process '+processId);
+  assert.equal('processIds' in objective,false);
  }
  for(const kr of demo.keyResults){
   assert.ok(demo.objectives.some(o=>o.id===kr.objectiveId));
@@ -98,4 +98,13 @@ test('OKR progress bars use exactly the configured color thresholds with inclusi
  assert.match(workspace,/function Progress\(\{value\}:\{value:number\}\)\{const band=progressBand\(value\)/);
  for(const band of ['low','medium','high'])assert.match(styles,new RegExp('\\.okr-progress\\.okr-progress-'+band+'\\{'));
  assert.match(workspace,/aria-valuenow=\{value\}/);
+});
+
+test('legacy drafts drop direct process links and preserve KPI references, progress and history',()=>{
+ const portfolio=sampleAutumn1405();
+ const legacy={...portfolio,objectives:portfolio.objectives.map(o=>({...o,processIds:['retired-process']}))};
+ const normalized=withoutProcessLinks(legacy);
+ assert.deepEqual(normalized,portfolio);
+ assert.ok(legacy.objectives.every(o=>o.processIds.length===1));
+ assert.deepEqual(withoutProcessLinks(normalized),normalized);
 });

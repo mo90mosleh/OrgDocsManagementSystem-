@@ -25,3 +25,7 @@ The dashboard concept grid remains four cards: organizational chart, integrated 
 ## Validation
 
 From `presentation`, run `npm run typecheck`, `npm test`, `npm run build:pages`, and `PAGES_BASE_PATH=/OrgDocsManagementSystem-demo/ npm run test:e2e`. Browser tests cover tab navigation, sample relation editor, profile cross-links, dashboard grid and mobile menu.
+
+## Compact mobile controls
+
+At widths up to 760px, KPI filters and expanded organization filters use two columns, with 44px touch targets and 16px select text to avoid input zoom. Architecture search occupies one row; parent/root actions and expand/collapse actions each share a two-column row. Desktop styles are unchanged. Browser coverage includes 320px, 390px and 760px widths, filter selection/reset, tree controls and viewport overflow.

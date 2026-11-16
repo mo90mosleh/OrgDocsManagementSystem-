@@ -41,12 +41,12 @@ jobs:
           npm run typecheck
           npm run build:pages
           npm test
-      - name: Verify chart contacts on desktop and mobile
+      - name: Verify chart contacts, OKR and mobile controls
         working-directory: presentation
         run: |
           npx playwright install --with-deps chromium
           export CHROMIUM_PATH="$(node --input-type=module -e 'import {chromium} from "@playwright/test"; console.log(chromium.executablePath())')"
-          PAGES_BASE_PATH=/OrgDocsManagementSystem-demo/ npm run test:e2e -- tests/browser/person-contacts.spec.mjs tests/browser/chart-card-click.spec.mjs
+          PAGES_BASE_PATH=/OrgDocsManagementSystem-demo/ npm run test:e2e -- tests/browser/person-contacts.spec.mjs tests/browser/chart-card-click.spec.mjs tests/browser/okr-workspace.spec.mjs tests/browser/compact-mobile-controls.spec.mjs
       - name: Publish artifacts to gh-pages
         shell: bash
         run: |

@@ -86,3 +86,13 @@ test('keeps automatic schedule status without displaying expected percentages',a
   await expect(page.locator('main')).not.toContainText('انتظار');
  }
 });
+
+test('OKR links contain KPI records without direct process links',async({page})=>{
+ await backend(page);await page.goto('./#/okr');
+ await page.locator('.okr-goal-card').first().click();
+ const details=page.getByRole('dialog',{name:'جزئیات هدف OKR'});
+ await details.getByRole('tab',{name:'ارتباطات'}).click();
+ await expect(details.locator('a[href*="/kpis/"]')).not.toHaveCount(0);
+ await expect(details.locator('a[href*="/processes/"]')).toHaveCount(0);
+ await expect(details).not.toContainText('فرآیندهای مرتبط');
+});

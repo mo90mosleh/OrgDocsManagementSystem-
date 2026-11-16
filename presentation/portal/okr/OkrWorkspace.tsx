@@ -1,11 +1,11 @@
 import{useEffect,useMemo,useRef,useState,type FormEvent}from'react';
-import{Target,Network,LayoutList,Table2,ChartNoAxesCombined,ClipboardList,Building2,Plus,CalendarDays,ChevronLeft,ChevronDown,ChartColumnIncreasing,Activity,CheckCircle2,AlertTriangle,Clock3,ArrowUpLeft,X,RefreshCw,History,GitBranch,Search,Save}from'lucide-react';
+import{Target,Network,LayoutList,Table2,ChartNoAxesCombined,Building2,Plus,CalendarDays,ChevronLeft,ChevronDown,ChartColumnIncreasing,Activity,CheckCircle2,AlertTriangle,Clock3,ArrowUpLeft,X,RefreshCw,History,GitBranch,Search,Save}from'lucide-react';
 import type{Data}from'../types';
 import{config}from'../api';
 import{Link}from'../ui';
 import{sampleAutumn1405}from'./sample';
 import{isoToJalaliInput,suggestCycleDates,validateCycleRange}from'./persian-cycle-dates';
-import{activeObjectives,averageProgress,keyResultProgress,number,objectivePace,objectiveProgress,paceStatusLabels,portfolioIsValid,progressBand,registerCheckIn,withKeyResult,withObjective,type OkrPortfolio,type OkrObjective,type OkrPace,type OkrPaceStatus,type OkrKeyResult}from'./model';
+import{activeObjectives,averageProgress,keyResultProgress,number,objectivePace,objectiveProgress,paceStatusLabels,portfolioIsValid,withoutProcessLinks,progressBand,registerCheckIn,withKeyResult,withObjective,type OkrPortfolio,type OkrObjective,type OkrPace,type OkrPaceStatus,type OkrKeyResult}from'./model';
 import'./okr.css';
 
 type Tab='strategy'|'goals'|'monitor';
@@ -21,7 +21,7 @@ const copy=(value:OkrPortfolio)=>JSON.parse(JSON.stringify(value)) as OkrPortfol
 function loadPortfolio(orgId:string,orgName:string,canEdit:boolean){
  try{
   const saved=canEdit?localStorage.getItem('nama-okr-workspace-v1:'+orgId):null;
-  if(saved){const value:unknown=JSON.parse(saved);if(portfolioIsValid(value))return value;}
+  if(saved){const value:unknown=JSON.parse(saved);if(portfolioIsValid(value))return withoutProcessLinks(value);}
  }catch{/* Browser storage unavailable. */}
  return config.mode==='public'&&/راسان|rassan/i.test(orgName)?sampleAutumn1405():copy(EMPTY);
 }
@@ -141,7 +141,7 @@ export function OkrWorkspace({data}:{data:Data}){
     const parentId=String(values.get('parentId')??'')||null;
     const ownerUnitId=String(values.get('ownerUnitId')??'')||null;
     const level=parentId?'DEPARTMENT' as const:'COMPANY' as const;
-    const objective:OkrObjective={id:'obj-'+Date.now(),code:'O-'+String(Date.now()).slice(-5),title,description:String(values.get('description')??'').slice(0,500),cycleId:cycle.id,parentId,level,ownerUnitId,pillar:String(values.get('pillar')??'توسعه سازمانی').trim()||'توسعه سازمانی',confidence:'ON_TRACK',processIds:[]};
+    const objective:OkrObjective={id:'obj-'+Date.now(),code:'O-'+String(Date.now()).slice(-5),title,description:String(values.get('description')??'').slice(0,500),cycleId:cycle.id,parentId,level,ownerUnitId,pillar:String(values.get('pillar')??'توسعه سازمانی').trim()||'توسعه سازمانی',confidence:'ON_TRACK'};
     write(withObjective(portfolio,objective),'هدف جدید در فضای آزمایشی اضافه شد.');setForm(null);open(objective.id);return;
    }
    if(form==='kr'){
@@ -165,7 +165,7 @@ export function OkrWorkspace({data}:{data:Data}){
  const strategy=<>
   {summary}
   <div className="okr-panel">
-   <div className="okr-panel-head"><div><h3>نقشه هم‌راستاسازی اهداف</h3><small>روی هر کارت کلیک کنید تا جزئیات، KPIها و فرآیندهای مرتبط نمایش داده شوند.</small></div><div className="okr-pill-switch">{pillars.map(p=><button key={p} className={pillar===p?'active':''} onClick={()=>setPillar(p)}>{p==='all'?'همه محورها':p}</button>)}</div></div>
+   <div className="okr-panel-head"><div><h3>نقشه هم‌راستاسازی اهداف</h3><small>روی هر کارت کلیک کنید تا جزئیات و KPIهای مرتبط نمایش داده شوند.</small></div><div className="okr-pill-switch">{pillars.map(p=><button key={p} className={pillar===p?'active':''} onClick={()=>setPillar(p)}>{p==='all'?'همه محورها':p}</button>)}</div></div>
    {objectives.length?<div className="okr-map">
     {objectives.filter(x=>!x.parentId&&(pillar==='all'||x.pillar===pillar||objectives.some(child=>child.parentId===x.id&&child.pillar===pillar))).map(rootGoal=><div key={rootGoal.id} className="okr-map-tree">
       <div className="okr-map-parent"><EntryCard goal={rootGoal} portfolio={portfolio} pace={pace(rootGoal)} owner={owner(rootGoal)} onSelect={()=>open(rootGoal.id)}/></div>
@@ -176,9 +176,8 @@ export function OkrWorkspace({data}:{data:Data}){
    </div>:<p className="okr-empty">برای این دوره هنوز هدفی ثبت نشده است.</p>}
   </div>
   <div className="okr-bottom-grid">
-   <div className="okr-panel"><div className="okr-panel-head"><h3>ردیابی ارتباط‌ها در نما</h3><small>OKR → KPI → فرآیند</small></div>
+   <div className="okr-panel"><div className="okr-panel-head"><h3>ردیابی ارتباط‌ها در نما</h3><small>OKR → KPI</small></div>
     <div className="okr-info-row"><span><ChartNoAxesCombined size={15}/>نتایج کلیدی دارای KPI مرتبط</span><strong>{number.format(results.filter(k=>k.kpiId&&data.kpis.some(x=>x.id===k.kpiId)).length)}</strong></div>
-    <div className="okr-info-row"><span><ClipboardList size={15}/>ارتباط‌های ثبت‌شده با فرآیندها</span><strong>{number.format(objectives.reduce((n,x)=>n+x.processIds.filter(id=>data.nodes.some(p=>p.id===id&&p.kind==='PROCESS')).length,0))}</strong></div>
     <div className="okr-info-row"><span><Building2 size={15}/>دپارتمان‌های دارای هدف</span><strong>{number.format(new Set(objectives.map(x=>x.ownerUnitId).filter(Boolean)).size)}</strong></div>
    </div>
    <div className="okr-panel"><div className="okr-panel-head"><h3>مرور دوره</h3><small>{cycle?.title??'دوره انتخاب نشده'}</small></div>
@@ -218,7 +217,7 @@ export function OkrWorkspace({data}:{data:Data}){
   </section>
  </>;
  return <div ref={ref} className="okr-workspace">
-  <header className="okr-heading"><div><p className="okr-eyebrow"><Target size={14}/>مدیریت استراتژی و اهداف</p><h1>مدیریت OKR</h1><p>از اهداف سازمانی تا نتایج کلیدی، شاخص‌ها و فرآیندهای مرتبط</p></div>
+  <header className="okr-heading"><div><p className="okr-eyebrow"><Target size={14}/>مدیریت استراتژی و اهداف</p><h1>مدیریت OKR</h1><p>از اهداف سازمانی تا نتایج کلیدی و شاخص‌های مرتبط</p></div>
    <div className="okr-heading-actions"><label className="okr-cycle-control"><CalendarDays size={16}/><select aria-label="دوره OKR" value={cycle?.id??''} onChange={e=>{setActiveCycle(e.target.value);setSelectedId(null);setPillar('all');}}>{!portfolio.cycles.length&&<option value="">دوره‌ای تعریف نشده</option>}{portfolio.cycles.map(c=><option key={c.id} value={c.id}>{c.title} {c.status==='PLANNING'?'· برنامه‌ریزی':''}</option>)}</select><ChevronDown size={13}/></label>
     {canEdit&&<button className="okr-button okr-button-muted" onClick={()=>{setSelectedId(null);setCycleManagerOpen(true);setError('');setFeedback('');}}><CalendarDays size={15}/>مدیریت دوره‌ها</button>}
     {canEdit&&<button className="okr-button okr-button-primary" onClick={()=>showForm('objective')}><Plus size={17}/>هدف جدید</button>}
@@ -238,7 +237,7 @@ export function OkrWorkspace({data}:{data:Data}){
     {!selectedResults.length&&<p className="okr-empty">نتیجه کلیدی برای این هدف تعریف نشده است.</p>}
     {canEdit&&<button className="okr-button okr-add-kr" onClick={()=>showForm('kr',{objectiveId:selected.id})}><Plus size={16}/>تعریف نتیجه کلیدی</button>}
    </div>}
-   {detailTab==='links'&&<div className="okr-detail-body"><h3><ChartNoAxesCombined size={17}/>KPIهای مرتبط</h3>{selectedResults.filter(k=>k.kpiId&&data.kpis.some(item=>item.id===k.kpiId)).map(k=>{const linked=data.kpis.find(item=>item.id===k.kpiId)!;return <Link key={k.id} to={'/kpis/'+linked.id} className="okr-related-link" >{linked.name}<ArrowUpLeft size={16}/></Link>;})}{!selectedResults.some(k=>data.kpis.some(item=>item.id===k.kpiId))&&<p className="okr-empty">ارتباط KPI ثبت نشده است.</p>}<h3><ClipboardList size={17}/>فرآیندهای مرتبط</h3>{selected.processIds.map(id=>data.nodes.find(n=>n.id===id&&n.kind==='PROCESS')).filter((n):n is NonNullable<typeof n>=>Boolean(n)).map(p=><Link to={'/processes/'+p.id} key={p.id} className="okr-related-link">{p.name}<ArrowUpLeft size={16}/></Link>)}{!selected.processIds.length&&<p className="okr-empty">ارتباطی با فرآیند ثبت نشده است.</p>}<p className="okr-note">این پیوندها، ارتباط مستندشده را نمایش می‌دهند و نشان‌دهنده اثر علّی اثبات‌شده نیستند.</p></div>}
+   {detailTab==='links'&&<div className="okr-detail-body"><h3><ChartNoAxesCombined size={17}/>KPIهای مرتبط</h3>{selectedResults.filter(k=>k.kpiId&&data.kpis.some(item=>item.id===k.kpiId)).map(k=>{const linked=data.kpis.find(item=>item.id===k.kpiId)!;return <Link key={k.id} to={'/kpis/'+linked.id} className="okr-related-link" >{linked.name}<ArrowUpLeft size={16}/></Link>;})}{!selectedResults.some(k=>data.kpis.some(item=>item.id===k.kpiId))&&<p className="okr-empty">ارتباط KPI ثبت نشده است.</p>}<p className="okr-note">این پیوندها، ارتباط مستندشده را نمایش می‌دهند و نشان‌دهنده اثر علّی اثبات‌شده نیستند.</p></div>}
    {detailTab==='history'&&<div className="okr-detail-body">{portfolio.checkins.filter(c=>c.objectiveId===selected.id).slice().reverse().map(c=><div className="okr-history-row" key={c.id}><strong>{portfolio.keyResults.find(k=>k.id===c.keyResultId)?.title}</strong><small>{new Intl.DateTimeFormat('fa-IR-u-ca-persian',{dateStyle:'medium'}).format(new Date(c.createdAt))}</small><p>{c.note||'ثبت مقدار نتیجه کلیدی'}</p><span>{number.format(c.previous)} ← {number.format(c.value)}</span></div>)}{!portfolio.checkins.some(c=>c.objectiveId===selected.id)&&<p className="okr-empty">هنوز تغییری برای این هدف ثبت نشده است.</p>}</div>}
   </aside></div>}
   {canEdit&&cycleManagerOpen&&<div className="okr-form-backdrop okr-cycle-backdrop" onPointerDown={e=>{if(e.target===e.currentTarget)setCycleManagerOpen(false);}}><section className="okr-cycle-manager" role="dialog" aria-modal={form?undefined:true} aria-label="مدیریت دوره‌های OKR">
