@@ -2,6 +2,7 @@ import{test}from'node:test';
 import assert from'node:assert/strict';
 import{readFile}from'node:fs/promises';
 import{sampleAutumn1405}from'../portal/okr/sample.ts';
+import{findProductHelp}from'../supabase/functions/namayar-groq-test/product-guide.ts';
 import{activeObjectives,averageProgress,keyResultProgress,objectiveProgress,portfolioIsValid,registerCheckIn,withKeyResult,withObjective}from'../portal/okr/model.ts';
 
 const data=JSON.parse(await readFile(new URL('../data/rassan-presentation.json',import.meta.url),'utf8'));
@@ -64,4 +65,11 @@ test('OKR module lives in the shared Nama workspace rather than a second vertica
  assert.match(workspace,/className="okr-tabs"/);
  assert.match(workspace,/className="okr-detail"/);
  assert.doesNotMatch(workspace,/className="sidebar"/);
+});
+
+test('Namayar product help routes OKR questions to the integrated workspace',()=>{
+ const topic=findProductHelp('در نما مدیریت OKR چه امکاناتی دارد؟');
+ assert.equal(topic?.id,'okr-management');
+ assert.equal(topic?.route,'/okr');
+ assert.ok(topic.paragraphs.some(p=>p.includes('پاییز ۱۴۰۵')));
 });
