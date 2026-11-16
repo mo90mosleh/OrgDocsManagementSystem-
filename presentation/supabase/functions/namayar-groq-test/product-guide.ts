@@ -92,7 +92,7 @@ export function findProductHelp(question:string):ProductHelpTopic|null{
  // A contextual request for the records of the current card takes precedence
  // over generic platform documentation, unless the question explicitly asks
  // how a visual feature (such as chart coloring) operates.
- const contextual=/\b(?:این|همین|اون|آن|انتخاب شده)\s+(?:سمت|واحد|دپارتمان|فرآیند|فرایند|شاخص|کارت)\b/.test(q)
+ const contextual=/(?:^|\s)(?:این|همین|اون|آن|انتخاب شده)\s+(?:سمت|واحد|دپارتمان|فرآیند|فرایند|شاخص|کارت)(?:\s|$)/.test(q)
   && !/(?:رنگ|چارت|نمایش|چطور کار می کند)/.test(q);
  if(contextual)return null;
  return topics.find(topic=>topic.test.test(q))??null;
