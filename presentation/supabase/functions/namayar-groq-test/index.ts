@@ -119,7 +119,7 @@ Deno.serve(async (req: Request) => {
     const requestedModel=typeof body.model==="string"?body.model:"";
     const envModel=Deno.env.get("GROQ_MODEL")||"";
     const selectedModel=diagnostic&&supportedModels.includes(requestedModel)?requestedModel:supportedModels.includes(envModel)?envModel:supportedModels[0];
-    const provider=await fetch("https://api.groq.com/openai/v1/chat/completions",{method:"POST",headers:{"Authorization":"Bearer "+apiKey,"Content-Type":"application/json"},body:JSON.stringify({model:selectedModel,messages:[{role:"system",content:prompt},...history,{role:"user",content:question}],temperature:0.45,max_tokens:700}),signal:AbortSignal.timeout(20000)});
+    const provider=await fetch("https://api.groq.com/openai/v1/chat/completions",{method:"POST",headers:{"Authorization":"Bearer "+apiKey,"Content-Type":"application/json"},body:JSON.stringify({model:selectedModel,messages:[{role:"system",content:prompt},...(intent==='entity'||/^(بیشتر توضیح|ادامه بده|بازتر بگو|منظورت)/.test(norm(question))?history:[]),{role:"user",content:question}],temperature:0.45,max_tokens:700}),signal:AbortSignal.timeout(20000)});
     if (!provider.ok) {
       let providerMessage="";
       let providerCode="";
