@@ -8,7 +8,7 @@ test('shared header height matches compact chart on desktop and existing mobile 
  assert.match(shared,/--app-header-height:\s*60px/);
  assert.match(shared,/\.app:not\(\.chart-focus-mode\)\s+\.topbar\s*\{[^}]*height:\s*var\(--app-header-height\)/);
  assert.match(shared,/@media\(max-width:760px\)\s*\{\s*:root\s*\{\s*--app-header-height:\s*var\(--mobile-header-height,\s*56px\)/);
- assert.match(chart,/\.app\.chart-focus-mode:not\(\.chart-immersive\)\s+\.topbar\s*\{[^}]*height:\s*var\(--app-header-height,\s*60px\)/);
+ assert.match(chart,/\.app\.chart-focus-mode\s+\.topbar\s*\{[^}]*height:\s*var\(--app-header-height,\s*60px\)/);
  assert.match(mobile,/--mobile-header-height:56px/);
  // Keep the existing shared component semantics and graph toggles.
  const chartCode=await readFile(new URL('../portal/Chart.tsx',import.meta.url),'utf8');
