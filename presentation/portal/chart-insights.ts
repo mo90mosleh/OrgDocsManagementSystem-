@@ -17,7 +17,7 @@ export function enrichChartItems(items:ChartItem[],data:Data,mode:ChartAnalysisM
   const chain:string[]=[];const seen=new Set<string>();let id:string|null=unitId;
   while(id&&!seen.has(id)){seen.add(id);chain.push(id);id=units.get(id)?.parent_id??null;}
   // Direct children of a single organization root are distinct departments.
-  const bucket=chain.length>=2?chain[chain.length-2]:chain[0]??unitId;
+  const bucket=chain.length>=2?chain[chain.length-2]:(chain[0]??unitId);
   if(!rootColors.has(bucket))rootColors.set(bucket,rootColors.size);
   return rootColors.get(bucket)!;
  }
