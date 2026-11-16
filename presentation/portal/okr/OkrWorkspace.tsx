@@ -15,12 +15,12 @@ const EMPTY:OkrPortfolio={cycles:[],objectives:[],keyResults:[],checkins:[]};
 const actionTime=()=>new Date().toISOString();
 const titleByTab:Record<Tab,string>={strategy:'نقشه استراتژی',goals:'اهداف و نتایج کلیدی',monitor:'پایش و عملکرد'};
 const copy=(value:OkrPortfolio)=>JSON.parse(JSON.stringify(value)) as OkrPortfolio;
-function loadPortfolio(orgId:string){
+function loadPortfolio(orgId:string,orgName:string){
  try{
   const saved=localStorage.getItem('nama-okr-workspace-v1:'+orgId);
   if(saved){const value:unknown=JSON.parse(saved);if(portfolioIsValid(value))return value;}
  }catch{/* Browser storage unavailable. */}
- return config.mode==='public'?sampleAutumn1405():copy(EMPTY);
+ return config.mode==='public'&&/راسان|rassan/i.test(orgName)?sampleAutumn1405():copy(EMPTY);
 }
 function Status({value}:{value:OkrConfidence}){return <span className={'okr-status '+(value==='ON_TRACK'?'is-good':value==='AT_RISK'?'is-risk':'is-bad')}>{confidenceLabels[value]}</span>;}
 function Progress({value}:{value:number}){return <div className="okr-progress" role="progressbar" aria-label="درصد پیشرفت" aria-valuemin={0} aria-valuemax={100} aria-valuenow={value}><span style={{width:value+'%'}}/></div>;}
@@ -34,7 +34,7 @@ function EntryCard({goal,portfolio,onSelect,owner}:{goal:OkrObjective;portfolio:
  </button>;
 }
 export function OkrWorkspace({data}:{data:Data}){
- const [portfolio,setPortfolio]=useState<OkrPortfolio>(()=>loadPortfolio(data.organization.id));
+ const [portfolio,setPortfolio]=useState<OkrPortfolio>(()=>loadPortfolio(data.organization.id,data.organization.name));
  const [activeCycle,setActiveCycle]=useState(()=>portfolio.cycles.find(c=>c.status==='ACTIVE')?.id??portfolio.cycles[0]?.id??'');
  const [tab,setTab]=useState<Tab>('strategy'),[pillar,setPillar]=useState('all'),[listView,setListView]=useState<'tree'|'table'>('tree');
  const [search,setSearch]=useState(''),[scope,setScope]=useState('ALL');
