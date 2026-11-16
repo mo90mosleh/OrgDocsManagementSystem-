@@ -5,7 +5,7 @@ import{config}from'../api';
 import{Link}from'../ui';
 import{sampleAutumn1405}from'./sample';
 import{isoToJalaliInput,suggestCycleDates,validateCycleRange}from'./persian-cycle-dates';
-import{activeObjectives,averageProgress,confidenceLabels,keyResultProgress,number,objectiveProgress,portfolioIsValid,registerCheckIn,withKeyResult,withObjective,type OkrPortfolio,type OkrObjective,type OkrConfidence,type OkrKeyResult}from'./model';
+import{activeObjectives,averageProgress,confidenceLabels,keyResultProgress,number,objectiveProgress,portfolioIsValid,progressBand,registerCheckIn,withKeyResult,withObjective,type OkrPortfolio,type OkrObjective,type OkrConfidence,type OkrKeyResult}from'./model';
 import'./okr.css';
 
 type Tab='strategy'|'goals'|'monitor';
@@ -26,7 +26,7 @@ function loadPortfolio(orgId:string,orgName:string){
  return config.mode==='public'&&/راسان|rassan/i.test(orgName)?sampleAutumn1405():copy(EMPTY);
 }
 function Status({value}:{value:OkrConfidence}){return <span className={'okr-status '+(value==='ON_TRACK'?'is-good':value==='AT_RISK'?'is-risk':'is-bad')}>{confidenceLabels[value]}</span>;}
-function Progress({value}:{value:number}){return <div className="okr-progress" role="progressbar" aria-label="درصد پیشرفت" aria-valuemin={0} aria-valuemax={100} aria-valuenow={value}><span style={{width:value+'%'}}/></div>;}
+function Progress({value}:{value:number}){const band=progressBand(value);return <div className={'okr-progress okr-progress-'+band} role="progressbar" aria-label="درصد پیشرفت" aria-valuemin={0} aria-valuemax={100} aria-valuenow={value}><span style={{width:value+'%'}}/></div>;}
 function EntryCard({goal,portfolio,onSelect,owner}:{goal:OkrObjective;portfolio:OkrPortfolio;onSelect:()=>void;owner:string}){
  const pct=objectiveProgress(portfolio,goal.id),krCount=portfolio.keyResults.filter(x=>x.objectiveId===goal.id).length;
  return <button className={'okr-goal-card '+(goal.level==='COMPANY'?'is-company':'')} onClick={onSelect} aria-label={'جزئیات هدف '+goal.title}>

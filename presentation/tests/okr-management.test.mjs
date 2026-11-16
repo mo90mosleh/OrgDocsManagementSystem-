@@ -3,7 +3,7 @@ import assert from'node:assert/strict';
 import{readFile}from'node:fs/promises';
 import{sampleAutumn1405}from'../portal/okr/sample.ts';
 import{findProductHelp}from'../supabase/functions/namayar-groq-test/product-guide.ts';
-import{activeObjectives,averageProgress,keyResultProgress,objectiveProgress,portfolioIsValid,registerCheckIn,withKeyResult,withObjective}from'../portal/okr/model.ts';
+import{activeObjectives,averageProgress,keyResultProgress,objectiveProgress,portfolioIsValid,progressBand,registerCheckIn,withKeyResult,withObjective}from'../portal/okr/model.ts';
 
 const data=JSON.parse(await readFile(new URL('../data/rassan-presentation.json',import.meta.url),'utf8'));
 test('Autumn 1405 demo stays separate from live records and references existing organization entities',()=>{
@@ -85,4 +85,16 @@ test('cycle directory replaces the demo-data banner and offers creation from the
  assert.doesNotMatch(workspace,/okr-demo-banner/);
  assert.match(shell,/hideBreadcrumb=path==='\/architecture'\|\|path==='\/okr'\|\|path==='\/kpis'\|\|path\.startsWith\('\/kpis\/'\)/);
  assert.match(shell,/\{!hideBreadcrumb&&<div className="breadcrumb"/);
+});
+
+test('OKR progress bars use exactly the configured color thresholds with inclusive 40 and 70 percent',async()=>{
+ for(const [value,band]of [[0,'low'],[39,'low'],[39.9,'low'],[40,'medium'],[50,'medium'],[70,'medium'],[70.1,'high'],[71,'high'],[100,'high']]){
+  assert.equal(progressBand(value),band,value+'%');
+ }
+ assert.equal(progressBand(Number.NaN),'low');
+ const workspace=await readFile(new URL('../portal/okr/OkrWorkspace.tsx',import.meta.url),'utf8');
+ const styles=await readFile(new URL('../portal/okr/okr.css',import.meta.url),'utf8');
+ assert.match(workspace,/function Progress\(\{value\}:\{value:number\}\)\{const band=progressBand\(value\)/);
+ for(const band of ['low','medium','high'])assert.match(styles,new RegExp('\\.okr-progress\\.okr-progress-'+band+'\\{'));
+ assert.match(workspace,/aria-valuenow=\{value\}/);
 });

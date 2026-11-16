@@ -60,7 +60,10 @@
 .okr-status.is-risk{background:#fff3e1;color:#9c7328}
 .okr-status.is-bad{background:#ffebeb;color:#a3444d}
 .okr-progress{width:100%;height:7px;background:#edf1ed;border-radius:20px;overflow:hidden;direction:ltr}
-.okr-progress span{height:100%;border-radius:20px;background:#66a987;display:block;transition:width .2s}
+.okr-progress span{height:100%;border-radius:20px;background:var(--okr-progress-color,#318a60);display:block;transition:width .2s,background-color .2s}
+.okr-progress.okr-progress-low{--okr-progress-color:#d34b53}
+.okr-progress.okr-progress-medium{--okr-progress-color:#e0b43f}
+.okr-progress.okr-progress-high{--okr-progress-color:#36a36d}
 .okr-bottom-grid{display:grid;grid-template-columns:1.15fr 1fr;gap:12px}
 .okr-bottom-grid .okr-panel{margin-bottom:0}
 .okr-info-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 1px;border-bottom:1px solid #edf1ed;font-size:11px}

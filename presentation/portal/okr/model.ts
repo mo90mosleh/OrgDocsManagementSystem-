@@ -18,6 +18,12 @@ export const confidenceLabels:Record<OkrConfidence,string>={
  ON_TRACK:'در مسیر',AT_RISK:'نیازمند توجه',OFF_TRACK:'خارج از مسیر'
 };
 export const number=new Intl.NumberFormat('fa-IR',{maximumFractionDigits:1});
+/** Visual progress band; independent of confidence/risk from check-ins. */
+export type OkrProgressBand='low'|'medium'|'high';
+export function progressBand(percent:number):OkrProgressBand{
+ if(!Number.isFinite(percent)||percent<40)return'low';
+ return percent<=70?'medium':'high';
+}
 export function keyResultProgress(kr:OkrKeyResult):number{
  if(![kr.baseline,kr.current,kr.target].every(Number.isFinite))return 0;
  if(kr.target===kr.baseline)return kr.current===kr.target?100:0;
