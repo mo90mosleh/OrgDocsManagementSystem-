@@ -7,7 +7,7 @@ export type ProductHelpTopic={
  id:string;
  test:RegExp;
  paragraphs:string[];
- route:'/dashboard'|'/organization/chart'|'/architecture'|'/processes'|'/kpis'|'/documents'|'/settings';
+ route:'/dashboard'|'/organization/chart'|'/architecture'|'/processes'|'/kpis'|'/okr'|'/documents'|'/settings';
 };
 export function normalizedHelpQuestion(value:string):string{
  return String(value??'').normalize('NFKC').replace(/[يى]/g,'ی').replace(/ك/g,'ک')
