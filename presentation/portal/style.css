@@ -110,3 +110,10 @@
 
 .chart-analysis-legend{position:absolute;top:72px;right:16px;z-index:4;display:inline-flex;align-items:center;max-width:calc(100% - 32px);padding:5px 10px;background:#ffffffec;border:1px solid #d8e6dc;box-shadow:0 3px 9px #243c3112;border-radius:7px;color:#607b6b;font-size:10px;line-height:1.7;pointer-events:none}
 @media(max-width:760px){.chart-analysis-legend{position:relative;top:auto;right:auto;margin:8px 0;max-width:100%;white-space:normal}}
+
+/* Floating chart details do not resize the canvas. KPI tab opens first. */
+.chart-insight-toggle{width:100%;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:4px;margin:8px 0 16px}
+.chart-insight-toggle button{display:flex;align-items:center;justify-content:center;gap:7px;min-width:0;border:1px solid transparent;border-radius:8px;padding:8px 9px;background:transparent;color:#627a69;font-size:12px}
+.chart-insight-toggle button[aria-checked="true"]{background:#fff;color:var(--brand);border-color:#dce6e0;box-shadow:0 2px 5px #1a312315;font-weight:700}
+.chart-insight-toggle button:focus-visible{outline:2px solid #608b99;outline-offset:2px}
+.chart-insight-popover .chart-related{min-height:72px}
