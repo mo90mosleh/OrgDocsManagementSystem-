@@ -6,6 +6,15 @@ await mkdir('pages',{recursive:true});
 // GitHub Pages: cacheable, fingerprinted ESM chunks instead of an inlined mega-HTML.
 // Keep the private Worker artifact unchanged (it still receives the IIFE above).
 const publicBuild=await build({
+ plugins:[{name:'document-relative-images',setup(builder){
+  builder.onLoad({filter:/\.png$/},async({path})=>{
+   const bytes=await readFile(path),name=path.split('/').pop().replace(/\.png$/,'')+'-'+createHash('sha256').update(bytes).digest('hex').slice(0,12)+'.png';
+   await mkdir('pages/assets/media',{recursive:true});
+   await writeFile('pages/assets/media/'+name,bytes);
+   // Image src resolves against the document, unlike an ESM import.
+   return{loader:'js',contents:'export default new URL('+JSON.stringify('./assets/media/'+name)+',document.baseURI).href;'};
+  });
+ }}],
  entryPoints:['portal/main.tsx'],bundle:true,minify:true,write:true,
  outdir:'pages',entryNames:'assets/[name]-[hash]',chunkNames:'assets/chunks/[name]-[hash]',assetNames:'assets/media/[name]-[hash]',
  format:'esm',splitting:true,platform:'browser',target:'es2022',jsx:'automatic',metafile:true,

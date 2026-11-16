@@ -29,3 +29,13 @@ test('startup preloads ESM dependencies and leaves help engines deferred',async(
  const js=await readFile(resolve(root,entry),'utf8');
  assert.doesNotMatch(js,/data:image\/png;base64/,'logos must use independently cacheable image files');
 });
+
+test('external logo URLs resolve to emitted files relative to the Pages document',async()=>{
+ const html=await readFile(resolve(root,'index.html'),'utf8');
+ const entry=html.match(/<script type="module" src="\.\/([^"]+)"/)[1];
+ const js=await readFile(resolve(root,entry),'utf8');
+ const images=[...js.matchAll(/new URL\("(\.\/assets\/media\/[^"]+\.png)",document.baseURI\)/g)];
+ assert.ok(images.length>=2,'both brand images must use a document-relative asset URL');
+ for(const image of images)assert.ok((await stat(resolve(root,image[1]))).size>0);
+ assert.doesNotMatch(js,/"\.\/media\/[^"]+\.png"/);
+});
