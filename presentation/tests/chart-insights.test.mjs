@@ -6,6 +6,9 @@ import {enrichChartItems} from '../portal/chart-insights.ts';
 const item=(id,parentId,unitId=id)=>({id,parentId,label:id,unitId,kind:'unit',closed:false,childCount:0,selected:false});
 const items=[item('root',null),item('a','root'),item('a1','a'),item('a2','a'),item('b','root')];
 const data={
+ kpis:[{id:'k1'},{id:'k2'},{id:'k3'},{id:'k4'}],
+ positions:[{id:'p1',org_unit_id:'a',title:'کارشناس فروش',reports_to_position_id:null},{id:'p2',org_unit_id:'a',title:'کارشناس فروش',reports_to_position_id:null},{id:'p3',org_unit_id:'b',title:'کارشناس مالی',reports_to_position_id:null}],
+ kpiOrgLinks:[{kpi_id:'k1',org_unit_id:'a',position_id:null},{kpi_id:'k2',org_unit_id:null,position_id:'p1'},{kpi_id:'k2',org_unit_id:null,position_id:'p2'},{kpi_id:'k3',org_unit_id:null,position_id:'p2'},{kpi_id:'k4',org_unit_id:null,position_id:'p3'}],
  units:[{id:'root',parent_id:null},{id:'a',parent_id:'root'},{id:'a1',parent_id:'a'},{id:'a2',parent_id:'a'},{id:'b',parent_id:'root'}],
  nodes:[
   {id:'p1',kind:'PROCESS',owner_org_unit_id:'a',content_status:'DRAFT'},
@@ -21,14 +24,18 @@ test('direct child count and all descendants remain distinct',()=>{
  assert.deepEqual(annotated.find(n=>n.id==='a').previewChildren,['a1','a2']);
  assert.equal(annotated.find(n=>n.id==='b').descendantCount,0);
 });
-test('analytics are scoped to actual owning unit and DRAFT process records',()=>{
+test('analytics are scoped to real unit-owned processes and directly mapped KPIs',()=>{
  const counts=enrichChartItems(items,data,'processes');
  assert.equal(counts.find(n=>n.id==='a').analysisValue,2);
  assert.equal(counts.find(n=>n.id==='a1').analysisValue,0);
- const drafts=enrichChartItems(items,data,'drafts');
- assert.equal(drafts.find(n=>n.id==='a').analysisValue,1);
- assert.equal(drafts.find(n=>n.id==='b').analysisValue,1);
- assert.equal(drafts.find(n=>n.id==='root').analysisValue,0);
+ const kpis=enrichChartItems(items,data,'kpis');
+ assert.equal(kpis.find(n=>n.id==='a').analysisValue,3);
+ assert.equal(kpis.find(n=>n.id==='b').analysisValue,1);
+ assert.equal(kpis.find(n=>n.id==='root').analysisValue,0);
+ assert.equal(kpis.find(n=>n.id==='a').tone,'#f2ebfc');
+ const role={id:'role:a|کارشناس فروش',parentId:null,label:'کارشناس فروش',unitId:'a',kind:'position',closed:false,childCount:0,selected:false};
+ const roleMetrics=enrichChartItems([role],data,'kpis');
+ assert.equal(roleMetrics[0].analysisValue,2,'position-specific KPIs exclude department-only ones');
 });
 test('department colors use real organization branches and do not recolor default mode',()=>{
  const regular=enrichChartItems(items,data,'normal');
