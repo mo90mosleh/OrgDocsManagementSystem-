@@ -1,5 +1,14 @@
 # نمایار — راهنمای مبتنی بر دادهٔ نما
 
+## Current release — November 16, 2026
+
+The public chat panel now defaults to the active Groq pilot when its AI toggle is on; the offline, deterministic guide remains available when AI is off. The older November 10 sections below document the *historical* disabled-LLM implementation and should not be interpreted as the current production model configuration.
+
+Question intent is independent of the page selection. Product and general-knowledge questions must not be treated as requests about the selected chart card or process. References such as «این سمت»، «همین فرآیند» and «فرمولش» may use the selected entity. A verified, version-controlled capability guide is shared by the client and the Supabase Edge gateway in `supabase/functions/namayar-groq-test/product-guide.ts`. In particular, chart coloring is based on unit branch, directly owned process counts, and DRAFT process counts; the chart-position coloring is still inherited from the unit, while position KPI links are direct and separate. Semantic zoom, drilldown, hover branch preview, KPI-first auto-open floating detail and document-type distinctions are recorded. Product help does not require a Groq call; broader general questions continue to use the model, without irrelevant current-entity facts.
+
+The gateway uses only the public Rassan snapshot, never user contacts or private auth data. For explicit questions about a selected organizational role, it resolves the UI's grouped `role:` reference to its constituent stored positions and their KPI mappings. It rejects instruction overrides and does not turn unverified future capabilities into current features. After modifying the guide, verify typecheck, build, unit tests, Deno check and then deploy the Edge function separately from GitHub Pages.
+
+
 ## Active behavior
 
 Namayar is an original animated SVG/CSS character and a Persian RTL floating assistant, available on all main portal pages. Idle/hover/thinking states and panel entry/exit use transform/opacity; reduced-motion disables animations. The first-visit greeting is a single local boolean preference, auto-dismisses and does not intercept underlying page clicks. Conversations remain in memory, clear on reload/account-role change, and have a clear action. Enter sends, Shift+Enter inserts a line, Escape closes and returns focus. The panel is non-modal so users can select a chart or architecture entity while asking questions.
