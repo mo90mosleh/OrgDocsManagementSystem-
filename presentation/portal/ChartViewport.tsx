@@ -1,6 +1,6 @@
-import{useCallback,useEffect,useMemo,useRef,useState,memo}from'react';
-import{ReactFlow,ReactFlowProvider,Handle,Position,MiniMap,Background,BackgroundVariant,useReactFlow,type Node,type NodeProps,type Viewport}from'@xyflow/react';
-import{ZoomIn,ZoomOut,Maximize,ScanLine,GitFork,BriefcaseBusiness,Building2,ChevronLeft,ChevronDown,Search,ChevronsUpDown,ChevronsDownUp}from'lucide-react';
+import{useCallback,useEffect,useMemo,useRef,useState,memo,useId,type ReactNode}from'react';
+import{ReactFlow,ReactFlowProvider,Handle,Position,MiniMap,Panel,Background,BackgroundVariant,useReactFlow,type Node,type NodeProps,type Viewport}from'@xyflow/react';
+import{ZoomIn,ZoomOut,Maximize,ScanLine,GitFork,BriefcaseBusiness,Building2,ChevronLeft,ChevronDown}from'lucide-react';
 import{number}from'./ui';import{layoutChart,type ChartItem,type ChartDirection}from'./chart-layout';import'@xyflow/react/dist/style.css';
 type ItemData=Record<string,unknown>&{item:ChartItem;admin:boolean;direction:ChartDirection;select:(id:string)=>void;toggle:(id:string)=>void;onPath:boolean};
 type ItemNode=Node<ItemData,'organization'>;
@@ -11,9 +11,9 @@ const OrganizationNode=memo(function OrganizationNode({data}:NodeProps<ItemNode>
 const nodeTypes={organization:OrganizationNode};
 const MIN=.08,MAX=2;
 function readViewport(key:string):Viewport|undefined{try{const v=JSON.parse(sessionStorage.getItem(key)??'null');if(v&&[v.x,v.y,v.zoom].every(Number.isFinite)&&v.zoom>=MIN&&v.zoom<=MAX)return v;}catch{}return undefined;}
-export function ChartViewport(props:{items:ChartItem[];allItems:ChartItem[];admin:boolean;cacheKey:string;direction:ChartDirection;onExpandAll:()=>void;onCollapseAll:()=>void;focusId:string|null;selectedId:string|null;trailIds:string[];centerRequest:{id:string;nonce:number}|null;onSelect:(id:string)=>void;onToggle:(id:string)=>void;onFocus:(id:string|null)=>void}){return <ReactFlowProvider><InteractiveChart {...props}/></ReactFlowProvider>;}
-function InteractiveChart({items,allItems,admin,cacheKey,direction,onExpandAll,onCollapseAll,focusId,selectedId,trailIds,centerRequest,onSelect,onToggle,onFocus}:Parameters<typeof ChartViewport>[0]){
- const flow=useReactFlow<ItemNode>(),container=useRef<HTMLDivElement>(null),initialized=useRef(false),[zoom,setZoom]=useState(1),[query,setQuery]=useState('');
+export function ChartViewport(props:{items:ChartItem[];admin:boolean;cacheKey:string;direction:ChartDirection;focusId:string|null;selectedId:string|null;trailIds:string[];centerRequest:{id:string;nonce:number}|null;onSelect:(id:string)=>void;onToggle:(id:string)=>void;onFocus:(id:string|null)=>void}){return <ReactFlowProvider><InteractiveChart {...props}/></ReactFlowProvider>;}
+function InteractiveChart({items,admin,cacheKey,direction,focusId,selectedId,trailIds,centerRequest,onSelect,onToggle,onFocus}:Parameters<typeof ChartViewport>[0]){
+ const flow=useReactFlow<ItemNode>(),container=useRef<HTMLDivElement>(null),initialized=useRef(false),[zoom,setZoom]=useState(1);
  const key=cacheKey+':viewport:'+ (focusId??'all'),initial=useMemo(()=>readViewport(key),[key]);
  const layout=useMemo(()=>layoutChart(items,admin,direction),[items,admin,direction]);
  const pathKey=trailIds.join('|'),pathIds=new Set(trailIds);
@@ -31,16 +31,17 @@ function InteractiveChart({items,allItems,admin,cacheKey,direction,onExpandAll,o
  useEffect(()=>()=>{if(initialized.current)try{sessionStorage.setItem(key,JSON.stringify(flow.getViewport()));}catch{}},[key,flow]);
  // Resize preserves the user's readable zoom; it never fits the full organization automatically.
  // Selecting a card never recenters or resizes the canvas. Navigation/search may center explicitly.
- const matches=query.trim()?allItems.filter(n=>(n.label+' '+(n.subtitle??'')).includes(query.trim())).slice(0,12):[];
- return <section className="panel chart-viewport"><div className="chart-zoom-toolbar" data-tour="chart-zoom" role="group" aria-label="بزرگ‌نمایی چارت"><button className="secondary" aria-label="بزرگ‌نمایی چارت" title="بزرگ‌نمایی" disabled={zoom>=MAX} onClick={()=>void flow.zoomIn({duration:120})}><ZoomIn size={18}/></button><output aria-live="polite" aria-label="میزان بزرگ‌نمایی">{number.format(Math.round(zoom*100))}٪</output><button className="secondary" aria-label="کوچک‌نمایی چارت" title="کوچک‌نمایی" disabled={zoom<=MIN} onClick={()=>void flow.zoomOut({duration:120})}><ZoomOut size={18}/></button><div className="chart-toolbar-branches" role="group" aria-label="نمایش شاخه‌ها"><button className="secondary" onClick={onExpandAll} title="باز کردن همهٔ شاخه‌ها"><ChevronsUpDown size={17}/>باز کردن همه</button><button className="secondary" onClick={onCollapseAll} title="بستن همهٔ شاخه‌ها"><ChevronsDownUp size={17}/>بستن همه</button></div><button className="secondary" onClick={fit}><Maximize size={16}/>نمایش کل چارت</button>
- <button type="button" className="secondary chart-branch-focus" disabled={!focusId&&!selectedId}
-   aria-pressed={Boolean(focusId)} onClick={()=>onFocus(focusId?null:selectedId)}>
-   {focusId?<GitFork size={17}/>:<ScanLine size={17}/>}
-   {focusId?'نمایش همهٔ شاخه‌ها':'تمرکز روی شاخهٔ انتخاب‌شده'}
- </button>
- <div className="chart-search"><Search size={16}/><input aria-label="یافتن واحد یا سمت در چارت" placeholder="یافتن واحد یا سمت…" value={query} onChange={e=>setQuery(e.target.value)}/>{query&&<div className="chart-search-results" role="region" aria-label="نتایج جست‌وجوی چارت">{matches.length?matches.map(n=><button key={n.id} onClick={()=>{onFocus(n.id);onSelect(n.id);setQuery('');}}><strong>{n.label}</strong>{n.subtitle&&<small>{n.subtitle}</small>}</button>):<p>موردی پیدا نشد.</p>}</div>}</div>
- </div>
+ return <section className="panel chart-viewport">
  <div ref={container} className={"interactive-chart "+(zoom<.48?"chart-zoom-overview":zoom<.7?"chart-zoom-compact":"")} tabIndex={0} data-tour="chart-canvas" aria-label="نمودار تعاملی ساختار سازمانی" onKeyDown={e=>{if(e.target instanceof HTMLInputElement||e.ctrlKey||e.metaKey||e.altKey)return;if(['+','=','-','0'].includes(e.key)){e.preventDefault();void flow.zoomTo(e.key==='0'?1:Math.min(MAX,Math.max(MIN,zoom*(e.key==='-'?.8:1.2))),{duration:100});}else if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.key)){e.preventDefault();const v=flow.getViewport();void flow.setViewport({...v,x:v.x+(e.key==='ArrowLeft'?60:e.key==='ArrowRight'?-60:0),y:v.y+(e.key==='ArrowUp'?60:e.key==='ArrowDown'?-60:0)});}}}>
  <ReactFlow<ItemNode> nodes={nodes} edges={edges} nodeTypes={nodeTypes} onNodeClick={(_,node)=>onSelect(node.id)} nodesDraggable={false} nodesConnectable={false} elementsSelectable={false} zoomOnScroll zoomOnPinch panOnDrag panOnScroll={false} preventScrolling minZoom={MIN} maxZoom={MAX} defaultViewport={initial??{x:0,y:0,zoom:.9}} onMoveEnd={(_,v)=>{setZoom(v.zoom);try{sessionStorage.setItem(key,JSON.stringify(v));}catch{}}} onMove={(_,v)=>setZoom(v.zoom)} proOptions={{hideAttribution:false}} ariaLabelConfig={{'minimap.ariaLabel':'نقشهٔ کلی چارت؛ برای جابه‌جایی کلیک کنید'}}>
- <Background variant={BackgroundVariant.Dots} gap={22} size={1} color="#d3ded7"/><MiniMap<ItemNode> pannable zoomable nodeColor={n=>n.data.item.selected?'#b92737':n.data.onPath?'#568cae':'#769584'} maskColor="#f5f7f5c9" position="bottom-right"/></ReactFlow></div></section>;
+ <Panel position="bottom-left" className="chart-canvas-controls" data-tour="chart-zoom" aria-label="کنترل‌های نقشه چارت" role="group">
+ <CanvasTool label="بزرگ‌نمایی چارت" disabled={zoom>=MAX} onClick={()=>void flow.zoomIn({duration:120})}><ZoomIn size={17}/></CanvasTool>
+ <CanvasTool label="کوچک‌نمایی چارت" disabled={zoom<=MIN} onClick={()=>void flow.zoomOut({duration:120})}><ZoomOut size={17}/></CanvasTool>
+ <CanvasTool label={focusId?'نمایش همهٔ شاخه‌ها':'تمرکز روی شاخهٔ انتخاب‌شده'} disabled={!focusId&&!selectedId} pressed={Boolean(focusId)} onClick={()=>onFocus(focusId?null:selectedId)}>{focusId?<GitFork size={17}/>:<ScanLine size={17}/>}</CanvasTool>
+ <CanvasTool label="نمایش کل چارت" onClick={fit}><Maximize size={17}/></CanvasTool>
+ </Panel><Background variant={BackgroundVariant.Dots} gap={22} size={1} color="#d3ded7"/><MiniMap<ItemNode> pannable zoomable nodeColor={n=>n.data.item.selected?'#b92737':n.data.onPath?'#568cae':'#769584'} maskColor="#f5f7f5c9" position="bottom-right"/></ReactFlow></div></section>;
+}
+
+function CanvasTool({label,children,onClick,disabled,pressed}:{label:string;children:ReactNode;onClick:()=>void;disabled?:boolean;pressed?:boolean}){
+ const id=useId();return <div className="chart-canvas-tool"><button type="button" aria-label={label} aria-describedby={id} aria-pressed={pressed} title={label} disabled={disabled} onClick={onClick}>{children}</button><span id={id} role="tooltip" className="chart-control-tooltip">{label}</span></div>;
 }
