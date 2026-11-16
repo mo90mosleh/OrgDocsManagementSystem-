@@ -38,9 +38,11 @@ function findFacts(data: AnyRecord, question: string, entity: AnyRecord | null) 
   const links = Array.isArray(data.links) ? data.links : [];
   const kpiOrgLinks = Array.isArray(data.kpiOrgLinks) ? data.kpiOrgLinks : [];
   const positions = Array.isArray(data.positions) ? data.positions : [];
-  const selectedPosition = entity?.kind === "position" ? positions.find((x: AnyRecord) => x.id === entity.id) : null;
-  const selectedUnit = units.find((x:AnyRecord) => x.id === (selectedPosition?.org_unit_id ?? (entity?.kind === "unit" ? entity.id : null)));
-  const positionIds = selectedPosition ? positions.filter((p:AnyRecord) => p.org_unit_id === selectedPosition.org_unit_id && norm(p.title)===norm(selectedPosition.title)).map((p:AnyRecord)=>p.id) : [];
+  const positionRoleKey=(p:AnyRecord)=>'role:'+String(p.org_unit_id)+'|'+String(p.title??'').normalize('NFKC').replace(/ي/g,'ی').replace(/ك/g,'ک').replace(/\\s+/g,' ').trim();
+  const selectedPositionMembers=entity?.kind==='position'?positions.filter((p:AnyRecord)=>p.id===entity.id||positionRoleKey(p)===entity.id):[];
+  const selectedPosition=selectedPositionMembers[0]??null;
+  const selectedUnit=units.find((x:AnyRecord)=>x.id===(selectedPosition?.org_unit_id??(entity?.kind==='unit'?entity.id:null)));
+  const positionIds=selectedPositionMembers.map((p:AnyRecord)=>p.id);
   const relatedKpiIds = new Set(kpiOrgLinks.filter((l:AnyRecord)=>entity?.kind==='position'
     ?positionIds.includes(l.position_id)
     :entity?.kind==='unit'?(l.org_unit_id===selectedUnit?.id || positions.some((p:AnyRecord)=>p.org_unit_id===selectedUnit?.id && p.id===l.position_id))
