@@ -26,32 +26,19 @@ test('architecture, process map and profiles are three tabs inside one process w
  await expect(nav.getByRole('link',{name:'شناسنامه فرآیندها'})).toHaveClass(/active/);
 });
 
-test('map supports local demo relation creation, editing and linked process profiles',async({page})=>{
- const data=await backend(page);
- const linked=new Set((data.relations??[]).flatMap(r=>[r.source_process_id,r.target_process_id]));
- const origin=data.nodes.find(n=>n.kind==='PROCESS'&&!linked.has(n.id));
- const destination=data.nodes.find(n=>n.kind==='PROCESS'&&n.id!==origin.id);
- await page.goto('./#/process-map');
- await page.getByRole('combobox',{name:'فرآیند منتخب نقشه'}).selectOption(origin.id);
- await expect(page.locator('.process-map-side')).toContainText('هنوز ارتباط ثبت‌شده‌ای ندارد');
- await page.getByRole('button',{name:'تعریف ارتباط'}).click();
- const form=page.getByRole('dialog',{name:'تعریف ارتباط فرآیندها'});
- await form.getByRole('combobox',{name:'فرآیند مبدأ'}).selectOption(origin.id);
- await form.getByRole('combobox',{name:'فرآیند مقصد'}).selectOption(destination.id);
- await form.getByRole('combobox',{name:'نوع ارتباط'}).selectOption('PREREQUISITE');
- await form.getByRole('textbox',{name:'توضیح ارتباط'}).fill('وابستگی پیشنهادی برای بررسی');
- await form.getByRole('button',{name:'ذخیره ارتباط'}).click();
- await expect(form).toHaveCount(0);
- await expect(page.locator('.process-map-meta')).toContainText('۲۰ ارتباط ثبت‌شده');
- await expect(page.locator('.process-map-side')).toContainText(destination.name);
- await page.reload();
- await expect(page.locator('.process-map-meta')).toContainText('۲۰ ارتباط ثبت‌شده');
- await page.getByRole('combobox',{name:'فرآیند منتخب نقشه'}).selectOption(origin.id);
- await expect(page.locator('.process-map-side')).toContainText(destination.name);
- await page.getByRole('link',{name:'مشاهده شناسنامه'}).click();
+test('interactive map shows all processes and read-only viewers can explore relationships without view toggles',async({page})=>{
+ const data=await backend(page);await page.goto('./#/process-map');
+ await expect(page.locator('.pm-flow-card')).toHaveCount(44);
+ await expect(page.getByRole('group',{name:'نمای نقشه فرآیندها'})).toHaveCount(0);
+ await expect(page.getByRole('button',{name:'تعریف ارتباط',exact:true})).toHaveCount(0);
+ const origin=data.nodes.find(p=>p.id===data.relations[0].source_process_id);
+ await page.getByRole('textbox',{name:'جست‌وجوی فرآیند روی نقشه'}).fill(origin.name);
+ await page.locator('.pm-search-results').getByRole('button').filter({hasText:origin.name}).click();
+ await expect(page.locator('.pm-selected-profile h3')).toHaveText(origin.name);
+ await expect(page.locator('.pm-relations-list .process-map-neighbor')).not.toHaveCount(0);
+ await expect(page.getByRole('button',{name:/ویرایش ارتباط با|حذف ارتباط با/})).toHaveCount(0);
+ await page.getByRole('link',{name:'مشاهده شناسنامه',exact:true}).click();
  await expect(page).toHaveURL(new RegExp('#/processes/'+origin.id));
- await expect(page.getByRole('navigation',{name:'بخش‌های مدیریت فرآیندها'})).toBeVisible();
- await expect(page.getByText(destination.name)).toBeVisible();
 });
 test('dashboard has four concept cards and the fourth links to OKR; menu icon is a target pierced by an arrow',async({page})=>{
  await backend(page);await page.goto('./#/dashboard');
