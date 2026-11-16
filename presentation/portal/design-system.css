@@ -268,3 +268,16 @@ button.primary, a.primary, button.secondary, a.secondary {
 .chart-search { z-index: 80; }
 .icon-button, .namayar-header .icon-button { color: var(--text-secondary); }
 .organization-filters > .icon-button { width: var(--control-height); min-width: var(--control-height); height: var(--control-height); }
+
+/* Back and guidance are a single non-wrapping header action group. */
+.chart-header-actions { display:flex;align-items:center;gap:8px;flex:0 0 auto;margin-inline-start:auto; }
+.chart-header-actions .global-back { margin:0;min-height:40px;height:40px; }
+@media(min-width:761px) {
+ .chart-header { flex-wrap:nowrap;gap:10px; }
+ .chart-header h1 { flex:0 0 auto;white-space:nowrap; }
+ .chart-header-switches { flex:1 1 auto;min-width:0;gap:8px; }
+ .chart-header .segmented-control button { padding-inline:8px; }
+ .chart-header:has(.tabs) { flex-wrap:wrap; }
+ .chart-header>.tabs { flex-basis:100%; }
+}
+@media(max-width:760px) { .chart-header-actions { display:none; } }

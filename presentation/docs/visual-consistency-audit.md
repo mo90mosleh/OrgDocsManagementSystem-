@@ -38,3 +38,5 @@ The chart context/history/deep-link feature added concurrently on main was prese
 The integrated chart-history checks exposed a real layer-order bug: an open detail popover intercepted clicks on the next search result. The search control/menu now stacks above that popover, without changing graph layout or selection behavior.
 
 The integrated chart history test also exposed a floating detail panel blocking subsequent search results. The search control is now layered above that panel while its results are open; both chart history/deep-link cases passed after the correction. Native clear-filter controls follow the same field-height token as adjacent dropdowns.
+
+Chart-header follow-up: Back and tour now share a non-wrapping action group. Viewer header controls wrap internally when needed instead of sending tour to its own row. Verified alignment at 1280/1366/1440px, header height <=80px at 1366/1440px, no page overflow and working tour open/close. Mobile retains its existing header guidance location.
