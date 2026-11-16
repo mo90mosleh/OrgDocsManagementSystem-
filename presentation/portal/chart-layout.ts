@@ -1,5 +1,5 @@
 import dagre from '@dagrejs/dagre';
-export type ChartItem={id:string;parentId:string|null;label:string;subtitle?:string;kind:'unit'|'position';closed:boolean;childCount:number;selected:boolean;seatCount?:number;mixed?:boolean};
+export type ChartItem={id:string;parentId:string|null;label:string;subtitle?:string;kind:'unit'|'position';closed:boolean;childCount:number;selected:boolean;seatCount?:number;mixed?:boolean;unitId?:string;descendantCount?:number;previewChildren?:string[];analysisValue?:number;analysisLabel?:string;tone?:string};
 export type ChartDirection='horizontal'|'vertical';
 export function layoutChart(items:ChartItem[],admin=false,direction:ChartDirection='horizontal'){
  const graph=new dagre.graphlib.Graph().setGraph({rankdir:direction==='vertical'?'TB':'RL',nodesep:28,ranksep:100,marginx:50,marginy:50}).setDefaultEdgeLabel(()=>({}));
