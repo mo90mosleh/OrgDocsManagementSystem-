@@ -61,10 +61,10 @@ test('workspace renders time-based status in every OKR view and removes manual c
  const{readFile}=await import('node:fs/promises');
  const src=await readFile(new URL('../portal/okr/OkrWorkspace.tsx',import.meta.url),'utf8');
  assert.match(src,/objectivePace\(portfolio,g\.id,today\)/);
- assert.match(src,/expectedCycleProgress\(cycle,today\)/);
+ assert.doesNotMatch(src,/pace\([^)]*\)\.expected|pace\.expected|okr-pace-detail|okr-card-expected/);
  assert.match(src,/value=\{pace\(g\)\.status\}/);
  assert.match(src,/value=\{pace\(selected\)\.status\}/);
- assert.match(src,/مورد انتظار تا امروز/);
+ assert.doesNotMatch(src,/مورد انتظار تا امروز|انتظار تا امروز|انتظار:/);
  assert.doesNotMatch(src,/name="confidence"/);
  assert.match(src,/visibilitychange/);
 });
