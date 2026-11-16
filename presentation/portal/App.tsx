@@ -5,7 +5,7 @@ import{Shell}from'./Shell';
 import{Login}from'./Login';import{authClient,signOut}from'./auth';
 import{Documents,Requirements}from'./References';import{ProcessProfile}from'./ProcessDetail';
 import{lazy,Suspense,useEffect,useState,type FormEvent}from'react';import{LayoutDashboard,Network,Layers3,ClipboardList,ChartNoAxesCombined,Settings as SettingsIcon,ChevronLeft,ChevronDown,ArrowLeft,ArrowUpLeft,Building2,Files,UserRound,ShieldCheck,Save,LogIn,Menu,X}from'lucide-react';
-import{loadData,loadInitialSnapshot,mutate,config}from'./api';import type{Data,Process}from'./types';import{Heading,Empty,Link,go,currentPath,number,errorMessage}from'./ui';import logo from'./assets/rassan-en.png';import'./style.css';import'./mobile.css';import'./assistance-layout.css';import'./design-system.css';
+import{loadData,loadInitialSnapshot,mutate,config}from'./api';import type{Data,Process}from'./types';import{Heading,Empty,Link,go,currentPath,number,errorMessage}from'./ui';import logo from'./assets/rassan-en.png';import'./style.css';import'./mobile.css';import'./assistance-layout.css';import'./design-system.css';import'./chart-shell.css';
 
 const Chart=lazy(()=>import('./Chart').then(module=>({default:module.Chart})));
 const Architecture=lazy(()=>import('./Architecture').then(module=>({default:module.Architecture})));

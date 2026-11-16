@@ -1,0 +1,131 @@
+/* Canvas-shell layout for the organization chart.
+   Never override the shared SegmentedControl buttons or their ARIA states. */
+.app.chart-focus-mode:not(.chart-immersive) .topbar{
+ display:flex;position:sticky;top:0;z-index:45;
+ width:100%;height:60px;min-height:60px;padding:5px 20px;
+ background:var(--surface,#fff);border-bottom:1px solid var(--line,#dce3eb);
+}
+.app.chart-focus-mode .topbar .organization{gap:13px;min-width:0}
+.app.chart-focus-mode .chart-shell-entry{
+ display:flex;align-items:center;gap:11px;flex:0 0 auto;
+ padding-inline-end:14px;border-inline-end:1px solid var(--line,#dce3eb);
+}
+.app.chart-focus-mode .chart-shell-page-title{
+ margin:0;font-size:14px;line-height:1.5;font-weight:700;white-space:nowrap;
+ color:var(--ink,#243447);
+}
+.app.chart-focus-mode .chart-shell-page-label-short{display:none}
+.app.chart-focus-mode .mobile-nama-brand{display:none}
+.app.chart-focus-mode .topbar .chart-menu-toggle{
+ display:inline-flex;justify-content:center;align-items:center;min-height:40px;height:40px;
+ border-radius:var(--radius-control,10px);border-color:var(--line,#dce3eb);
+ background:var(--surface,#fff);color:var(--text-secondary,#526276);
+}
+.app.chart-focus-mode .topbar .chart-menu-toggle:hover{background:var(--surface-subtle,#f6f8fb)}
+.app.chart-focus-mode .topbar .company-logo{width:108px;max-width:15vw}
+.app.chart-focus-mode .topbar .org-text{min-width:0}
+.app.chart-focus-mode .topbar-actions{gap:8px}
+.app.chart-focus-mode .chart-focus-controls{
+ display:flex;align-items:center;gap:10px;
+ padding:8px 20px;min-height:60px;
+ background:var(--surface,#fff);border-bottom:1px solid var(--line,#dce3eb);
+ position:sticky;top:60px;z-index:35;
+}
+.app.chart-focus-mode .chart-header-switches{flex:1 1 auto;min-width:0;gap:9px}
+.app.chart-focus-mode .chart-header-actions{
+ display:flex;align-items:center;justify-content:flex-end;flex:0 0 auto;
+ gap:8px;margin-inline-start:auto;
+}
+.app.chart-focus-mode .chart-focus-toggle{
+ display:inline-flex;align-items:center;justify-content:center;gap:7px;
+ min-height:40px;height:40px;padding:7px 11px;
+ background:var(--surface,#fff);color:var(--text-secondary,#526276);
+ border:1px solid var(--line,#dce3eb);
+ border-radius:var(--radius-control,10px);font-size:11px;white-space:nowrap;
+}
+.app.chart-focus-mode .chart-focus-toggle:hover{background:var(--surface-subtle,#f6f8fb)}
+.app.chart-focus-mode .chart-content{
+ padding:10px 20px 18px;position:relative;
+}
+.app.chart-focus-mode .interactive-chart{height:calc(100dvh - 255px);min-height:400px}
+.app.chart-focus-mode .chart-header>.primary{flex:0 0 auto}
+.app.chart-focus-mode .chart-header>.tabs{flex-basis:100%}
+.app.chart-focus-mode .chart-header:has(.tabs){flex-wrap:wrap}
+@media(min-width:1120px){
+ /* Selection context floats over spare canvas space instead of reducing its height. */
+ .app.chart-focus-mode .chart-content>.chart-navigation-strip{
+  position:absolute;z-index:45;top:82px;right:20px;left:auto;
+  width:min(650px,calc(100% - 440px));margin:0;
+  box-shadow:var(--shadow-popover,0 12px 36px #172b4426);
+  background:var(--surface,#fff);
+ }
+}
+/* The optional immersive view hides chrome, not the canvas interaction controls. */
+.app.chart-focus-mode.chart-immersive .topbar{display:none!important}
+.app.chart-focus-mode.chart-immersive .chart-focus-controls{
+ position:sticky;top:0;min-height:54px;padding:7px 20px;
+ justify-content:flex-end;
+}
+.app.chart-focus-mode.chart-immersive .chart-header-switches,
+.app.chart-focus-mode.chart-immersive .chart-header>.primary,
+.app.chart-focus-mode.chart-immersive .chart-header>.tabs{display:none}
+.app.chart-focus-mode.chart-immersive .chart-header-actions{margin-inline-start:auto}
+.app.chart-focus-mode.chart-immersive .interactive-chart{height:calc(100dvh - 168px);min-height:460px}
+@media(max-width:1130px) and (min-width:761px){
+ .app.chart-focus-mode .topbar .org-text{display:none}
+ .app.chart-focus-mode .chart-focus-controls{flex-wrap:wrap}
+ .app.chart-focus-mode .chart-header-switches{flex:1 1 690px}
+ .app.chart-focus-mode .chart-header-actions{margin-inline-start:0}
+ .app.chart-focus-mode .interactive-chart{height:calc(100dvh - 295px)}
+}
+@media(max-width:760px){
+ .app.chart-focus-mode:not(.chart-immersive) .topbar{
+  display:flex;position:sticky;top:0;z-index:45;
+  height:var(--mobile-header-height,56px);min-height:var(--mobile-header-height,56px);
+  padding:5px 10px;
+ }
+ .app.chart-focus-mode .topbar .organization{gap:7px;min-width:0;flex:1 1 auto}
+ .app.chart-focus-mode .chart-shell-entry{gap:6px;padding-inline-end:8px}
+ .app.chart-focus-mode .chart-shell-page-label-full{display:none}
+ .app.chart-focus-mode .chart-shell-page-label-short{display:inline}
+ .app.chart-focus-mode .chart-shell-page-title{font-size:12px}
+ .app.chart-focus-mode .topbar .chart-menu-toggle{
+  width:42px;min-width:42px;height:42px;min-height:42px;padding:0 5px;gap:0;
+ }
+ .app.chart-focus-mode .topbar .chart-menu-toggle .nama-mark{width:28px}
+ .app.chart-focus-mode .topbar .chart-menu-toggle>svg{display:none}
+ .app.chart-focus-mode .topbar .company-logo{width:clamp(68px,22vw,90px);height:30px;max-width:none}
+ .app.chart-focus-mode .topbar-actions{gap:5px;margin-right:auto}
+ .app.chart-focus-mode .topbar-actions .global-back{min-width:40px;min-height:40px}
+ .app.chart-focus-mode .topbar-actions .mobile-menu-button{min-width:40px;min-height:40px}
+ .app.chart-focus-mode .chart-focus-controls{
+  position:relative;top:auto;display:flex;flex-wrap:wrap;gap:8px;
+  padding:9px 12px;
+ }
+ .app.chart-focus-mode .chart-header-switches{flex:1 1 100%;width:100%;gap:8px}
+ .app.chart-focus-mode .chart-header-actions{
+  display:flex;order:2;flex-basis:100%;justify-content:flex-end;
+  margin:0;
+ }
+ .app.chart-focus-mode .chart-focus-toggle{min-height:36px;height:36px;padding:6px 10px;font-size:10px}
+ .app.chart-focus-mode .chart-content{padding:8px 10px 14px}
+ .app.chart-focus-mode .chart-content>.chart-navigation-strip{position:static;width:auto;margin:0 0 9px;box-shadow:none}
+ .app.chart-focus-mode .interactive-chart{height:calc(100dvh - 400px);min-height:320px}
+ .app.chart-focus-mode.chart-immersive .chart-focus-controls{
+  position:relative;top:auto;min-height:44px;padding:5px 12px;
+ }
+ .app.chart-focus-mode.chart-immersive .chart-header-actions{flex-basis:100%;order:0}
+ .app.chart-focus-mode.chart-immersive .interactive-chart{height:calc(100dvh - 292px);min-height:360px}
+}
+@media(max-width:375px){
+ .app.chart-focus-mode .topbar .organization{gap:4px}
+ .app.chart-focus-mode .chart-shell-entry{padding-inline-end:5px;gap:4px}
+ .app.chart-focus-mode .topbar-actions{gap:3px}
+ .app.chart-focus-mode .topbar .company-logo{width:68px}
+}
+
+@media(max-width:760px){
+ .app.chart-focus-mode.chart-immersive .mobile-bottom-nav{display:none}
+ .app.chart-focus-mode.chart-immersive>.workspace{padding-bottom:0}
+ .app.chart-focus-mode.chart-immersive .interactive-chart{height:calc(100dvh - 222px);min-height:400px}
+}
