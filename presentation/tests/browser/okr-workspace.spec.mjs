@@ -70,16 +70,19 @@ test('top breadcrumbs are removed from the integrated process workspace, KPI and
 });
 
 
-test('automatically updates goal schedule status from quarter elapsed time, not manual check-in confidence',async({page})=>{
+test('keeps automatic schedule status without displaying expected percentages',async({page})=>{
  await page.clock.setFixedTime(new Date('2026-11-16T12:00:00Z'));
  await backend(page);await page.goto('./#/okr');
- await expect(page.locator('.okr-current-cycle')).toContainText('انتظار تا امروز:');
- await expect(page.locator('.okr-goal-card.is-company .okr-card-expected')).toContainText('مورد انتظار تا امروز:');
+ await expect(page.locator('.okr-goal-card.is-company .okr-status')).toHaveText('نیازمند توجه');
+ await expect(page.locator('.okr-current-cycle')).not.toContainText('انتظار');
+ await expect(page.locator('.okr-card-expected')).toHaveCount(0);
  await page.locator('.okr-goal-card.is-company').click();
  const details=page.getByRole('dialog',{name:'جزئیات هدف OKR'});
- await expect(details.locator('.okr-pace-detail')).toContainText('پیشرفت مورد انتظار تا امروز');
- await details.getByRole('button',{name:'ثبت Check-in'}).first().click();
- const checkin=page.getByRole('dialog',{name:'فرم مدیریت OKR'});
- await expect(checkin.locator('[name="confidence"]')).toHaveCount(0);
- await expect(checkin).toContainText('به‌صورت خودکار');
+ await expect(details.locator('.okr-pace-detail')).toHaveCount(0);
+ await expect(details.locator('.okr-detail-summary .okr-status')).toHaveText('نیازمند توجه');
+ await details.getByRole('button',{name:'بستن جزئیات'}).click();
+ for(const name of ['اهداف و نتایج کلیدی','پایش و عملکرد']){
+  await page.getByRole('navigation',{name:'بخش‌های مدیریت OKR'}).getByRole('button',{name,exact:true}).click();
+  await expect(page.locator('main')).not.toContainText('انتظار');
+ }
 });
