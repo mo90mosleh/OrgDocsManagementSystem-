@@ -13,13 +13,13 @@ const idleMessages = [
  'من این پایینم! کجای «نما» رو با هم ببینیم؟',
 ];
 
-type Message={id:number;role:'user'|'assistant';text?:string;reply?:Reply;context:string};
+type Message={id:number;role:'user'|'assistant';text?:string;reply?:Reply;context:string;streaming?:boolean};
 function QuotaRing({percent}:{percent:number}){const c=2*Math.PI*15;return <span className="namayar-quota-ring" role="img" aria-label={`سهمیه تخمینی مشترک باقی‌مانده: ${percent} درصد`} title="سهمیه تخمینی مشترک نمایار"><svg viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="15" stroke="#dfe6eb" strokeWidth="3.5" fill="none"/><circle cx="20" cy="20" r="15" stroke={percent>40?'#159e85':percent>15?'#e3a13a':'#d65a52'} strokeWidth="3.5" strokeLinecap="round" strokeDasharray={`${c*percent/100} ${c}`} transform="rotate(-90 20 20)" fill="none"/><text x="20" y="23" textAnchor="middle" fontSize="10" fontWeight="700" fill="#263b58">{percent}%</text></svg></span>}
 function AnswerLink({link,onGo}:{link:AssistantLink;onGo:(link:AssistantLink)=>void}){return link.external?<a href={link.href} target="_blank" rel="noopener noreferrer" className="namayar-result-link"><span dir="auto">{link.label}</span><ExternalLink size={14}/></a>:<span onClick={()=>onGo(link)}><Link to={link.href} className="namayar-result-link"><span dir="auto">{link.label}</span><ArrowUpLeft size={14}/></Link></span>;}
-export function Namayar(){const{data,context,requestSelection}=usePageContext(),[aiEnabled,setAiEnabled]=useState(true),[quotaPercent,setQuotaPercent]=useState<number|null>(null),[open,setOpen]=useState(false),[closing,setClosing]=useState(false),[callout,setCallout]=useState<string|null>(null),nextMessage=useRef(0),[tour,setTour]=useState(false),[messages,setMessages]=useState<Message[]>([]),[input,setInput]=useState(''),[thinking,setThinking]=useState(false),panel=useRef<HTMLElement>(null),textbox=useRef<HTMLTextAreaElement>(null),launcher=useRef<HTMLButtonElement>(null),end=useRef<HTMLDivElement>(null),counter=useRef(0),closeTimer=useRef<ReturnType<typeof setTimeout>|null>(null),ownTour=useRef(false),request=useRef<AbortController|null>(null),latest=useRef(context),conversation=useRef<ConversationState>({}),[reaction,setReaction]=useState<'idle'|'responding'|'success'>('idle');latest.current=context;
+export function Namayar(){const{data,context,requestSelection}=usePageContext(),[aiEnabled,setAiEnabled]=useState(true),[quotaPercent,setQuotaPercent]=useState<number|null>(null),[open,setOpen]=useState(false),[closing,setClosing]=useState(false),[callout,setCallout]=useState<string|null>(null),nextMessage=useRef(0),[tour,setTour]=useState(false),[messages,setMessages]=useState<Message[]>([]),[input,setInput]=useState(''),[thinking,setThinking]=useState(false),panel=useRef<HTMLElement>(null),textbox=useRef<HTMLTextAreaElement>(null),launcher=useRef<HTMLButtonElement>(null),end=useRef<HTMLDivElement>(null),conversationScroller=useRef<HTMLDivElement>(null),counter=useRef(0),closeTimer=useRef<ReturnType<typeof setTimeout>|null>(null),ownTour=useRef(false),request=useRef<AbortController|null>(null),latest=useRef(context),conversation=useRef<ConversationState>({}),[reaction,setReaction]=useState<'idle'|'responding'|'success'>('idle');latest.current=context;
  useEffect(()=>{const start=()=>{setTour(true);setClosing(false);setOpen(false);request.current?.abort();setThinking(false);},stop=()=>{setTour(false);if(ownTour.current){ownTour.current=false;requestAnimationFrame(()=>launcher.current?.focus({preventScroll:true}));}};window.addEventListener('nama:tour-start',start);window.addEventListener('nama:tour-end',stop);return()=>{request.current?.abort();if(closeTimer.current)clearTimeout(closeTimer.current);window.removeEventListener('nama:tour-start',start);window.removeEventListener('nama:tour-end',stop);};},[]);
  useEffect(()=>{if(!open||!aiEnabled){setQuotaPercent(null);return;}let active=true;const refresh=()=>{void fetchSharedQuota().then(v=>{if(active)setQuotaPercent(v);});};refresh();const timer=window.setInterval(refresh,30000);return()=>{active=false;window.clearInterval(timer);};},[open,aiEnabled]);
- useEffect(()=>{request.current?.abort();setThinking(false);},[context.path,context.entity?.kind,context.entity?.id]);
+ useEffect(()=>{request.current?.abort();setThinking(false);setMessages(old=>old.some(m=>m.streaming)?old.map(m=>m.streaming?{...m,streaming:false}:m):old);},[context.path,context.entity?.kind,context.entity?.id]);
  useEffect(()=>{
    setCallout(null);
    if(open || closing || tour || thinking)return;
@@ -43,25 +43,85 @@ export function Namayar(){const{data,context,requestSelection}=usePageContext(),
    return ()=>{stop();document.removeEventListener('visibilitychange',schedule);};
  },[open,closing,tour,thinking,context.path]);
  useEffect(()=>{if(open){if(closeTimer.current)clearTimeout(closeTimer.current);setClosing(false);requestAnimationFrame(()=>textbox.current?.focus({preventScroll:true}));}else if(panel.current?.contains(document.activeElement))launcher.current?.focus();},[open]);
- useEffect(()=>{if(open)end.current?.scrollIntoView({block:'nearest',behavior:'instant'});},[messages,thinking,open]);
+ // Do not follow the growing answer: preserve the user's reading position during streaming.
  function close(){setClosing(true);setOpen(false);if(closeTimer.current)clearTimeout(closeTimer.current);closeTimer.current=setTimeout(()=>setClosing(false),160);requestAnimationFrame(()=>launcher.current?.focus({preventScroll:true}));}
  useEffect(()=>{if(!open||tour)return;const escape=(event:KeyboardEvent)=>{if(event.key==='Escape'&&!document.querySelector('dialog[open],[data-tour-dialog]')){event.preventDefault();close();}};window.addEventListener('keydown',escape);return()=>window.removeEventListener('keydown',escape);},[open,tour]);
  function startTour(){ownTour.current=true;setOpen(false);window.dispatchEvent(new Event('nama:tour-request'));}
  function resetConversation(){request.current?.abort();setThinking(false);setMessages([]);conversation.current={};setInput('');}
  function toggleAi(){resetConversation();setAiEnabled(v=>!v);}
- async function send(value:string){const question=value.trim().slice(0,1200);if(!question||thinking||tour)return;setInput('');const origin=context,controller=new AbortController();request.current?.abort();request.current=controller;setMessages(old=>[...old.slice(-38),{id:++counter.current,role:'user',text:question,context:origin.title}]);setThinking(true);
- try{await Promise.resolve();if(controller.signal.aborted)return;const history:HistoryMessage[]=messages.slice(-12).flatMap((message):HistoryMessage[]=>message.role==='user'&&message.text?[{role:'user',content:message.text}]:message.role==='assistant'&&message.reply?[{role:'assistant',content:message.reply.paragraphs.join(' ').slice(0,650)}]:[]);
- const reply=!withinScope(data,origin,question)?refusalReply():aiEnabled?await llmAdapter.answer(question,origin,data,controller.signal,history):converse(data,origin,question,conversation.current);if(controller.signal.aborted)return;if(aiEnabled)void fetchSharedQuota().then(setQuotaPercent);setReaction('responding');setTimeout(()=>setReaction('idle'),650);setMessages(old=>[...old.slice(-39),{id:++counter.current,role:'assistant',reply,context:origin.title}]);if(reply.navigate&&latest.current.path===origin.path){if(reply.navigateEntity&&['unit','position','group'].includes(reply.navigateEntity.kind))requestSelection(reply.navigate,reply.navigateEntity);go(reply.navigate);if(innerWidth<=600)close();} }catch(error){if(!controller.signal.aborted){setMessages(old=>[...old,{id:++counter.current,role:'assistant',reply:{paragraphs:[error instanceof Error?error.message:'پاسخ‌گویی انجام نشد؛ دوباره تلاش کن.'],links:[],sources:[]},context:origin.title}]);}}finally{if(request.current===controller){request.current=null;setThinking(false);requestAnimationFrame(()=>{if(document.activeElement===document.body||panel.current?.contains(document.activeElement))textbox.current?.focus({preventScroll:true});});}}}
+ async function send(value:string){
+  const question=value.trim().slice(0,1200);
+  if(!question||thinking||tour)return;
+  setInput('');
+  const origin=context,controller=new AbortController();
+  request.current?.abort();request.current=controller;
+  const userId=++counter.current,assistantId=++counter.current;
+  const draft:Reply={paragraphs:[''],links:[],sources:[]};
+  setMessages(old=>[...old.slice(-38),{id:userId,role:'user',text:question,context:origin.title},{id:assistantId,role:'assistant',reply:draft,context:origin.title,streaming:true}]);
+  setThinking(true);
+  // One-time positioning at the start of a new answer; never auto-follow incoming tokens.
+  requestAnimationFrame(()=>{const scroller=conversationScroller.current;if(scroller)scroller.scrollTop=scroller.scrollHeight-scroller.clientHeight;});
+  let visible='';
+  const updateDraft=(value:string)=>{
+    if(controller.signal.aborted)return;
+    visible=value;
+    setMessages(old=>old.map(m=>m.id===assistantId?{...m,reply:{paragraphs:[value],links:[],sources:[]},streaming:true}:m));
+  };
+  const reveal=async(text:string)=>{
+    const characters=Array.from(text);
+    for(let i=0;i<characters.length;i+=30){
+      if(controller.signal.aborted)return;
+      updateDraft(characters.slice(0,i+30).join(''));
+      await new Promise<void>(resolve=>setTimeout(resolve,16));
+    }
+  };
+  try{
+    await Promise.resolve();
+    if(controller.signal.aborted)return;
+    const history:HistoryMessage[]=messages.slice(-12).flatMap((message):HistoryMessage[]=>
+      message.role==='user'&&message.text?[{role:'user',content:message.text}]:
+      message.role==='assistant'&&message.reply?[{role:'assistant',content:message.reply.paragraphs.join(' ').slice(0,650)}]:[]);
+    let receivedDelta=false;
+    const reply=!withinScope(data,origin,question)?refusalReply():
+      aiEnabled?await llmAdapter.answer(question,origin,data,controller.signal,history,(fragment)=>{
+        if(controller.signal.aborted)return;
+        receivedDelta=true;
+        updateDraft(visible+fragment);
+      }):converse(data,origin,question,conversation.current);
+    if(controller.signal.aborted)return;
+    if(!receivedDelta)await reveal(reply.paragraphs.join('\n\n'));
+    if(controller.signal.aborted)return;
+    if(aiEnabled)void fetchSharedQuota().then(v=>{if(!controller.signal.aborted)setQuotaPercent(v);});
+    setReaction('responding');setTimeout(()=>setReaction('idle'),650);
+    setMessages(old=>old.map(m=>m.id===assistantId?{...m,reply,streaming:false}:m));
+    if(reply.navigate&&latest.current.path===origin.path){
+      if(reply.navigateEntity&&['unit','position','group'].includes(reply.navigateEntity.kind))requestSelection(reply.navigate,reply.navigateEntity);
+      go(reply.navigate);if(innerWidth<=600)close();
+    }
+  }catch(error){
+    if(!controller.signal.aborted){
+      const message=error instanceof Error?error.message:'پاسخ‌گویی انجام نشد؛ دوباره تلاش کن.';
+      setMessages(old=>old.map(m=>m.id===assistantId?{...m,streaming:false,
+        reply:{paragraphs:visible?[visible,'پاسخ کامل نشد: '+message]:[message],links:[],sources:[]}}:m));
+    }
+  }finally{
+    if(request.current===controller){
+      request.current=null;setThinking(false);
+      // Keep the conversation viewport still; only return focus to input if needed.
+      requestAnimationFrame(()=>{if(document.activeElement===document.body)textbox.current?.focus({preventScroll:true});});
+    }
+  }
+ }
  function submit(e:FormEvent){e.preventDefault();void send(input);}
  const sidebar=callout&&!open&&!tour?document.getElementById("main-sidebar"):null;
  const avatarState = thinking ? 'thinking' : input ? 'listening' : reaction === 'idle' ? 'awake' : reaction;
  return createPortal(<div className={'namayar-root '+(tour?'tour-active':'')} data-feedback-ui="true" data-namayar-ui="true">
  {!tour&&<button ref={launcher} className={'namayar-launcher '+(open?'is-open':'')} aria-label={open?'بستن نمایار':'باز کردن نمایار'} title="نمایار — درباره نما، این صفحه یا موضوعات عمومی بپرسید" aria-expanded={open} aria-controls="namayar-panel" onClick={()=>open?close():setOpen(true)}><NamayarAvatar state={open ? avatarState : 'idle'}/><span className="namayar-launcher-label">نمایار</span></button>}
  {sidebar&&createPortal(<span className="namayar-idle-callout" aria-hidden="true">{callout}</span>,sidebar)}
- {(open||closing)&&!tour&&<section ref={panel} id="namayar-panel" className={'namayar-panel '+(closing?'is-closing':'')} inert={!open} role="dialog" aria-label="گفتگو با نمایار" aria-modal="false" onKeyDown={e=>{if(e.key==='Escape'){e.stopPropagation();close();}}}><header className="namayar-header"><NamayarAvatar small state={avatarState}/><div><h2>نمایار</h2><small>{aiEnabled?'گفت‌وگوی هوشمند فعال':'همراه و راهنمای شما'}</small></div>{thinking&&<span className="namayar-readiness" role="status">در حال بررسی…</span>}<button className="icon-button" aria-label="پاک کردن گفتگو" title="پاک کردن گفتگو" disabled={!messages.length&&!thinking} onClick={()=>{request.current?.abort();setThinking(false);setMessages([]);conversation.current={};setInput('');textbox.current?.focus();}}><BrushCleaning size={17}/></button><button type="button" className={'namayar-ai-toggle '+(aiEnabled?'is-active':'')} aria-pressed={Boolean(aiEnabled)} aria-label={aiEnabled?'خاموش کردن حالت هوشمند':'روشن کردن حالت هوشمند'} title={aiEnabled?'خاموش کردن حالت هوشمند':'فعال‌سازی حالت هوشمند'} onClick={toggleAi}><span>AI</span>{aiEnabled&&<Sparkles size={16} aria-hidden="true"/>}</button>{aiEnabled&&quotaPercent!==null&&<QuotaRing percent={quotaPercent}/>}<button className="icon-button" aria-label="بستن پنل نمایار" title="بستن" onClick={close}><X size={19}/></button></header>
+ {(open||closing)&&!tour&&<section ref={panel} id="namayar-panel" className={'namayar-panel '+(closing?'is-closing':'')} inert={!open} role="dialog" aria-label="گفتگو با نمایار" aria-modal="false" onKeyDown={e=>{if(e.key==='Escape'){e.stopPropagation();close();}}}><header className="namayar-header"><NamayarAvatar small state={avatarState}/><div><h2>نمایار</h2><small>{aiEnabled?'گفت‌وگوی هوشمند فعال':'همراه و راهنمای شما'}</small></div>{thinking&&<span className="namayar-readiness" role="status">{messages.at(-1)?.reply?.paragraphs[0]?'در حال نوشتن…':'در حال بررسی…'}</span>}<button className="icon-button" aria-label="پاک کردن گفتگو" title="پاک کردن گفتگو" disabled={!messages.length&&!thinking} onClick={()=>{request.current?.abort();setThinking(false);setMessages([]);conversation.current={};setInput('');textbox.current?.focus();}}><BrushCleaning size={17}/></button><button type="button" className={'namayar-ai-toggle '+(aiEnabled?'is-active':'')} aria-pressed={Boolean(aiEnabled)} aria-label={aiEnabled?'خاموش کردن حالت هوشمند':'روشن کردن حالت هوشمند'} title={aiEnabled?'خاموش کردن حالت هوشمند':'فعال‌سازی حالت هوشمند'} onClick={toggleAi}><span>AI</span>{aiEnabled&&<Sparkles size={16} aria-hidden="true"/>}</button>{aiEnabled&&quotaPercent!==null&&<QuotaRing percent={quotaPercent}/>}<button className="icon-button" aria-label="بستن پنل نمایار" title="بستن" onClick={close}><X size={19}/></button></header>
 
  <div className="namayar-context"><Route size={14}/><span dir="auto">{context.title}</span><small>{context.dataSource==='snapshot'?'نسخهٔ ذخیره‌شده':'راهنمای مبتنی بر داده'}</small></div>
- <div className="namayar-conversation" role="log" aria-label="پیام‌های نمایار" aria-live="polite" aria-relevant="additions text">{!messages.length&&<div className="namayar-welcome"><NamayarAvatar small state={avatarState}/><h3>سلام! دنبال چی می‌گردی؟</h3><p>برای پیدا کردن سند یا شناخت فرآیندها کمکت می‌کنم. {aiEnabled?'حالت هوشمند روشنه؛ سؤال‌های عمومی هم می‌تونی بپرسی.':'می‌تونی ازم درباره همین صفحه بپرسی. برای گفت‌وگوی آزادتر هم دکمه AI رو روشن کن.'}</p></div>}{messages.map(m=><article key={m.id} className={'namayar-message '+m.role} aria-label={m.role==='user'?'پیام شما':'پاسخ نمایار'}>{m.role==='user'?<p dir="auto">{m.text}</p>:<>{m.reply?.paragraphs.map((p,i)=><p dir="auto" key={i}>{p}</p>)}{Boolean(m.reply?.links.length)&&<p className="namayar-links">این هم لینک مرتبط: {m.reply!.links.map((link,i)=><AnswerLink key={link.href+':'+i} link={link} onGo={link=>{setReaction('success');setTimeout(()=>setReaction('idle'),650);if(link.entity&&(link.entity.kind==='unit'||link.entity.kind==='position'||link.entity.kind==='group'))requestSelection(link.href,link.entity);if(innerWidth<=600)close();}}/>)}</p>}{m.reply?.action==='tour'&&<button className="secondary namayar-tour-action" onClick={startTour}><BookOpen size={15}/>شروع تور این صفحه</button>}</>}</article>)}{thinking&&<div className="namayar-thinking" role="status"><NamayarAvatar small state="thinking"/><span>در حال بررسی اطلاعات ثبت‌شده…</span></div>}<div ref={end}/></div>
+ <div ref={conversationScroller} className="namayar-conversation" role="log" aria-label="پیام‌های نمایار" aria-live="polite" aria-relevant="additions text">{!messages.length&&<div className="namayar-welcome"><NamayarAvatar small state={avatarState}/><h3>سلام! دنبال چی می‌گردی؟</h3><p>برای پیدا کردن سند یا شناخت فرآیندها کمکت می‌کنم. {aiEnabled?'حالت هوشمند روشنه؛ سؤال‌های عمومی هم می‌تونی بپرسی.':'می‌تونی ازم درباره همین صفحه بپرسی. برای گفت‌وگوی آزادتر هم دکمه AI رو روشن کن.'}</p></div>}{messages.map(m=><article key={m.id} className={'namayar-message '+m.role} aria-label={m.role==='user'?'پیام شما':'پاسخ نمایار'}>{m.role==='user'?<p dir="auto">{m.text}</p>:<>{m.reply?.paragraphs.map((p,i)=><p dir="auto" key={i}>{p}{m.streaming&&i===m.reply!.paragraphs.length-1&&<span className="namayar-stream-caret" aria-hidden="true"/>}</p>)}{Boolean(m.reply?.links.length)&&<p className="namayar-links">این هم لینک مرتبط: {m.reply!.links.map((link,i)=><AnswerLink key={link.href+':'+i} link={link} onGo={link=>{setReaction('success');setTimeout(()=>setReaction('idle'),650);if(link.entity&&(link.entity.kind==='unit'||link.entity.kind==='position'||link.entity.kind==='group'))requestSelection(link.href,link.entity);if(innerWidth<=600)close();}}/>)}</p>}{m.reply?.action==='tour'&&<button className="secondary namayar-tour-action" onClick={startTour}><BookOpen size={15}/>شروع تور این صفحه</button>}</>}</article>)}{thinking&&!messages.at(-1)?.reply?.paragraphs[0]&&<div className="namayar-thinking" role="status"><NamayarAvatar small state="thinking"/><span>در حال بررسی اطلاعات ثبت‌شده…</span></div>}<div ref={end}/></div>
  <div className="namayar-suggestions" aria-label="سؤال‌های پیشنهادی این صفحه">{context.questions.map(q=><button key={q} disabled={thinking} onClick={()=>void send(q)}>{q}</button>)}</div><form className="namayar-input" onSubmit={submit}><label className="namayar-sr" htmlFor="namayar-question">سؤال از نمایار</label><textarea ref={textbox} id="namayar-question" placeholder="دربارهٔ نما یا هر موضوعی بپرسید…" value={input} maxLength={1200} rows={2} onChange={e=>setInput(e.target.value)} onKeyDown={e=>{if(e.key==='Enter'&&!e.shiftKey&&!e.nativeEvent.isComposing){e.preventDefault();void send(input);}}}/><button className="namayar-send" aria-label="ارسال سؤال" disabled={!input.trim()||thinking}><Send size={18}/></button></form><footer className="namayar-footer"><button onClick={startTour}><BookOpen size={13}/>تور صفحه</button></footer>
  </section>}</div>,document.body);
 }
