@@ -117,3 +117,18 @@
 .chart-insight-toggle button[aria-checked="true"]{background:#fff;color:var(--brand);border-color:#dce6e0;box-shadow:0 2px 5px #1a312315;font-weight:700}
 .chart-insight-toggle button:focus-visible{outline:2px solid #608b99;outline-offset:2px}
 .chart-insight-popover .chart-related{min-height:72px}
+
+
+/* RTL control priority: organization role, orientation, diagram first (right);
+   analysis coloring last on the left, independently wrapping on smaller screens. */
+.chart-header-switches{direction:rtl;justify-content:flex-start;gap:10px}
+.chart-header-switches .chart-view-switch{order:0!important;flex:0 0 auto}
+.chart-header-switches .chart-header-divider{order:1}
+.chart-header-switches .chart-direction-switch{order:2!important;flex:0 0 auto}
+.chart-header-switches .chart-format-switch{order:3!important;flex:0 0 auto}
+.chart-header-switches .chart-analysis-select{order:4!important;margin-inline-start:auto}
+@media(max-width:760px){
+ .chart-header-switches{align-items:center;justify-content:flex-start;row-gap:8px}
+ .chart-header-switches .chart-view-switch{flex:0 1 auto}
+ .chart-header-switches .chart-analysis-select{flex:0 1 auto;margin-inline-start:auto}
+}
