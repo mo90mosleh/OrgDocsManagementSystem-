@@ -2,6 +2,15 @@ import{test}from'node:test';import assert from'node:assert/strict';import{readFi
 const data=JSON.parse(await readFile(new URL('../data/rassan-presentation.json',import.meta.url),'utf8'));
 for(const direction of ['horizontal','vertical'])for(const mode of ['units','positions'])test(`interactive ${direction} ${mode} layout has no overlapping nodes and preserves every stored hierarchy edge`,()=>{
  const source=mode==='units'?data.units:groupPositions(data.positions);const items=source.map(n=>({id:n.id,parentId:n.parent_id??null,label:n.name??n.title,kind:mode==='units'?'unit':'position',closed:false,childCount:0,selected:false})),layout=layoutChart(items,false,direction),byId=new Map(layout.map(n=>[n.id,n]));assert.equal(layout.length,items.length);
- for(let i=0;i<layout.length;i++){const a=layout[i];assert.ok(Number.isFinite(a.x)&&Number.isFinite(a.y));for(const b of layout.slice(i+1))assert.ok(a.x+a.width<=b.x||b.x+b.width<=a.x||a.y+a.height<=b.y||b.y+b.height<=a.y,`${a.label} overlaps ${b.label}`);if(a.parentId){const parent=byId.get(a.parentId);assert.ok(parent,'source parent must exist');assert.ok(direction==='vertical'?parent.y+parent.height<a.y:parent.x>a.x+a.width,'reporting line must follow the selected layout direction');}}
+ for(let i=0;i<layout.length;i++){const a=layout[i];assert.ok(Number.isFinite(a.x)&&Number.isFinite(a.y));for(const b of layout.slice(i+1))assert.ok(a.x+a.width<=b.x||b.x+b.width<=a.x||a.y+a.height<=b.y||b.y+b.height<=a.y,`${a.label} overlaps ${b.label}`);if(a.parentId){const parent=byId.get(a.parentId);assert.ok(parent,'source parent must exist');if(mode==='units')assert.ok(direction==='vertical'?parent.y+parent.height<a.y:parent.x>a.x+a.width,'reporting line must follow the selected layout direction');}}
  const root=items.find(n=>!n.parentId),closed=visibleChartItems(items,new Set([root.id]),null);assert.ok(!closed.some(n=>n.parentId===root.id));const focused=visibleChartItems(items,new Set(),root.id);assert.ok(focused.some(n=>n.id===root.id));assert.ok(focused.every(n=>{let current=n;const seen=new Set();while(current&&!seen.has(current.id)){if(current.id===root.id)return true;seen.add(current.id);current=byId.get(current.parentId);}return false;}));
+});
+
+for(const direction of ['horizontal','vertical'])test(`direct reports align by position level in the ${direction} chart`,()=>{
+ const titles=['معاون بازاریابی و فروش','مدیر فروش تهران','مدیر بازاریابی','سرپرست صادرات','کارشناس فروش'];
+ const items=titles.map((label,index)=>({id:String(index),parentId:index?'0':null,label,kind:'position',closed:false,childCount:0,selected:false}));
+ const [vicePresident,manager,peer,supervisor,specialist]=layoutChart(items,false,direction);
+ assert.equal(manager.y,peer.y);
+ assert.ok(vicePresident.y<manager.y&&manager.y<supervisor.y&&supervisor.y<specialist.y);
+ assert.deepEqual([manager,peer,supervisor,specialist].map(item=>item.parentId),['0','0','0','0']);
 });
