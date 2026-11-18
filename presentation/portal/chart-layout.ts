@@ -8,7 +8,31 @@ export function layoutChart(items:ChartItem[],admin=false,direction:ChartDirecti
  for(const n of items)graph.setNode(n.id,{width,height:height+(n.people?.length?24:0)});
  for(const n of items)if(n.parentId&&ids.has(n.parentId))graph.setEdge(n.parentId,n.id);
  dagre.layout(graph);
- return items.map(n=>{const p=graph.node(n.id);return{...n,x:p.x-width/2,y:p.y-graph.node(n.id).height/2,width,height:graph.node(n.id).height};});
+ const placed=items.map(n=>{const p=graph.node(n.id);return{...n,x:p.x-width/2,y:p.y-graph.node(n.id).height/2,width,height:graph.node(n.id).height};});
+
+ if(!placed.length||placed.some(node=>node.kind!=='position'))return placed;
+
+ // Position titles determine the display row. Reporting links still use parentId.
+ const rowFor=(title:string)=>{
+  const normalized=title.replace(/ي/g,'ی').replace(/ك/g,'ک').trim();
+  if(/^(معاون|مدیر\s*عامل)(?:\s|$)/.test(normalized))return 0;
+  if(/^مدیر(?:\s|$)/.test(normalized))return 1;
+  if(/^(سرپرست|مسئول)(?:\s|$)/.test(normalized))return 2;
+  return 3;
+ };
+ const rowHeight=Math.max(...placed.map(node=>node.height))+100;
+ const firstRow=Math.min(...placed.map(node=>rowFor(node.label)));
+ for(const row of [0,1,2,3]){
+  const members=placed.filter(node=>rowFor(node.label)===row);
+  members.sort((a,b)=>a.x-b.x||a.y-b.y);
+  let nextX=-Infinity;
+  for(const node of members){
+   node.x=Math.max(node.x,nextX);
+   node.y=76+(row-firstRow)*rowHeight;
+   nextX=node.x+node.width+60;
+  }
+ }
+ return placed;
 }
 // Follow IDs only. No synthetic parents and no changes to stored reporting relationships.
 export function visibleChartItems(items:ChartItem[],closed:Set<string>,focusId:string|null){
