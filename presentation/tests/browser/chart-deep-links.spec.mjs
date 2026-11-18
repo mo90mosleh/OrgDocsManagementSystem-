@@ -2,7 +2,7 @@ import{test,expect}from'@playwright/test';
 import{backend}from'./pages-backend.mjs';
 test.skip(!process.env.PAGES_BASE_PATH,'Pages build only');
 async function visitSearch(page,title){
- await page.getByLabel('یافتن واحد یا سمت در چارت').fill(title);
+ await page.getByLabel('یافتن واحد، سمت یا شخص در چارت').fill(title);
  const results=page.getByRole('region',{name:'نتایج جست‌وجوی چارت'});
  await results.getByRole('button',{name:new RegExp(title)}).first().click();
  await expect(page.locator('.chart-insight-popover h2')).toContainText(title);

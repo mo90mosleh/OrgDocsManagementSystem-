@@ -5,7 +5,7 @@ async function setup(page){const d=await backend(page),position=d.positions.find
  d.assignments=d.persons.map(p=>({id:crypto.randomUUID(),person_id:p.id,position_id:position.id}));
  await page.goto('./#/login');await page.getByLabel('ایمیل',{exact:true}).fill('mo90mosleh@gmail.com');await page.getByLabel('رمز عبور',{exact:true}).fill('correct-password');await page.getByRole('button',{name:'ورود',exact:true}).click();
  await expect(page).toHaveURL(/#\/admin$/);await expect(page.getByRole('heading',{name:'پنل مدیریت',exact:true})).toBeVisible();
- await page.goto('./#/organization/chart');await page.getByLabel('یافتن واحد یا سمت در چارت').fill(position.title);await page.getByRole('region',{name:'نتایج جست‌وجوی چارت'}).getByRole('button',{name:position.title+' فروش تهران',exact:true}).click();
+ await page.goto('./#/organization/chart');await page.getByLabel('یافتن واحد، سمت یا شخص در چارت').fill(position.title);await page.getByRole('region',{name:'نتایج جست‌وجوی چارت'}).getByRole('button',{name:position.title+' فروش تهران',exact:true}).click();
  await page.getByRole('button',{name:'بستن اطلاعات مرتبط'}).click();return d;
 }
 test('multiple people, semantic zoom and desktop call links',async({page})=>{await setup(page);
@@ -29,4 +29,20 @@ test('mobile contact dialog omits extension and fits viewport',async({page})=>{a
  const card=page.getByRole('button',{name:'انتخاب سمت مدیر فروش تهران در فروش تهران',exact:true}).locator('..');await card.getByRole('button',{name:'اطلاعات همکار آزمون 0',exact:true}).click();
  const dialog=page.getByRole('dialog',{name:'اطلاعات همکار'});await expect(dialog.getByRole('link',{name:/تماس با موبایل/})).toBeVisible();await expect(dialog.getByRole('link',{name:/تماس با داخلی/})).toHaveCount(0);
  const box=await dialog.boundingBox();expect(box.x).toBeGreaterThanOrEqual(0);expect(box.x+box.width).toBeLessThanOrEqual(390);await page.screenshot({path:'/tmp/nama-person-mobile.png'});
+});
+
+test('chart search finds units, positions and people across both views',async({page})=>{
+ await setup(page);
+ const search=page.getByLabel('یافتن واحد، سمت یا شخص در چارت');
+ const results=page.getByRole('region',{name:'نتایج جست‌وجوی چارت'});
+ await search.fill('فروش تهران');
+ await results.getByRole('button',{name:'فروش تهران',exact:true}).click();
+ await expect(page.getByRole('radio',{name:'دپارتمان‌ها'})).toBeChecked();
+ await search.fill('مدیر فروش تهران');
+ await results.getByRole('button',{name:'مدیر فروش تهران فروش تهران',exact:true}).click();
+ await expect(page.getByRole('radio',{name:'سمت‌های سازمانی'})).toBeChecked();
+ await page.getByRole('radio',{name:'دپارتمان‌ها'}).click();
+ await search.fill('همکار آزمون 0');
+ await results.getByRole('button',{name:/همکار آزمون 0/}).click();
+ await expect(page.getByRole('dialog',{name:'اطلاعات همکار'})).toContainText('همکار آزمون 0');
 });

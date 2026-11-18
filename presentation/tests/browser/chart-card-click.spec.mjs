@@ -8,7 +8,7 @@ test(`card opens floating KPI-first tabs without reducing chart: ${type}, ${dire
  await page.getByRole('radio',{name:direction,exact:true}).click();
  const label=type==='سمت‌های سازمانی'?'مدیر فروش تهران':'فروش تهران';
  const canvas=page.locator('.interactive-chart');const initialWidth=await canvas.evaluate(e=>e.getBoundingClientRect().width);
- await page.getByLabel('یافتن واحد یا سمت در چارت').fill(label);
+ await page.getByLabel('یافتن واحد، سمت یا شخص در چارت').fill(label);
  await page.getByRole('region',{name:'نتایج جست‌وجوی چارت'}).getByRole('button',{name:label+(type==='سمت‌های سازمانی'?' فروش تهران':''),exact:true}).click();
  const dialog=page.getByRole('dialog',{name:'فرآیندها و شاخص‌های مرتبط با گره انتخاب‌شده'});
  await expect(dialog).toBeVisible();
