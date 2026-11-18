@@ -8,6 +8,28 @@
 .flow-org-node>.person-avatar-group>:not(:first-child){margin-inline-start:-15px}
 .flow-org-node>.person-avatar-group>.person-avatar-more{width:auto;min-width:42px;font-size:13px;padding:0 7px}
 .flow-org-node>.person-avatar-group>button:hover,.flow-org-node>.person-avatar-group>button:focus-visible{z-index:2}
+/* Give a single portrait the same visual prominence as the position title. */
+.flow-org-node.org-position-node:has(>.person-avatar-group>.person-avatar-button) .node-select {
+  justify-content: center;
+  text-align: center;
+}
+.flow-org-node.org-position-node:has(>.person-avatar-group>.person-avatar-button) .node-select>svg {
+  display: none;
+}
+.flow-org-node.org-position-node:has(>.person-avatar-group>.person-avatar-button:only-child) .node-select {
+  padding-top: 46px;
+}
+.flow-org-node.org-position-node>.person-avatar-group:has(>.person-avatar-button:only-child) {
+  top: -38px;
+}
+.flow-org-node.org-position-node>.person-avatar-group>.person-avatar-button:only-child {
+  width: 76px;
+  height: 76px;
+  font-size: 22px;
+}
+.flow-org-node.org-position-node>.person-avatar-group>.person-avatar-button {
+  box-shadow: 0 0 0 1px #829b8b, 0 3px 9px #203c3026;
+}
 .person-avatar-more{width:auto;min-width:34px;padding:0 7px;border-radius:18px;gap:3px}
 .mobile-chart-browser .person-avatar-group{padding:4px 14px 10px}.person-contact-dialog{direction:rtl;width:min(420px,calc(100vw - 24px));max-height:calc(100dvh - 32px);padding:22px;border:1px solid #d8e2da;border-radius:20px;box-shadow:0 18px 70px #142d2733;color:#203c30;background:#fff;overflow:auto;font:inherit}
 .person-contact-dialog::backdrop{background:#142d274d}.person-contact-dialog header{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:16px}.person-contact-dialog h2{font-size:18px;margin:0}.person-contact-heading{display:flex;align-items:center;gap:14px;margin:16px 0}.person-contact-heading>.person-avatar{width:64px;height:64px;flex-shrink:0;font-size:22px}.person-contact-heading h3{font-size:19px;margin:0 0 5px}.person-contact-heading p{margin:0;color:#66776e}.person-contact-positions{padding-inline-start:22px;font-size:14px;line-height:1.9}.person-contact-actions{display:grid;gap:10px}.person-contact-actions>div{display:flex;align-items:center;gap:6px}.person-contact-actions a{flex:1;justify-content:flex-start;text-decoration:none;min-height:52px}.person-contact-actions a span{display:grid;gap:3px}.person-contact-actions bdi{font-size:14px}.person-call-help{font-size:13px;line-height:1.9}.person-contact-email{overflow-wrap:anywhere;font-size:14px}.person-contact-list{list-style:none;padding:0;margin:0;display:grid;gap:6px}.person-contact-list button{display:flex;gap:12px;align-items:center;width:100%;padding:10px;border:1px solid #e4ebe6;background:#f8faf8;border-radius:12px;color:inherit;font:inherit;text-align:start;cursor:pointer}.person-contact-list .person-avatar{width:42px;height:42px;flex-shrink:0}.person-copy-status{font-size:13px;color:#357450;margin-bottom:0}.person-photo-field{display:grid;gap:10px}.person-photo-field img{width:72px;height:72px;object-fit:cover;border-radius:50%}
