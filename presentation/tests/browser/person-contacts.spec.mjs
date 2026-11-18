@@ -10,7 +10,13 @@ async function setup(page){const d=await backend(page),position=d.positions.find
 }
 test('multiple people, semantic zoom and desktop call links',async({page})=>{await setup(page);
  const card=page.getByRole('button',{name:'انتخاب سمت مدیر فروش تهران در فروش تهران',exact:true}).locator('..');
- await expect(card.locator('.person-avatar-button')).toHaveCount(3);await card.getByRole('button',{name:'اطلاعات همکار آزمون 0',exact:true}).click();
+ await expect(card.locator('.person-avatar-button')).toHaveCount(3);
+ const bounds=await card.evaluate(el=>{const card=el.getBoundingClientRect(),group=el.querySelector('.person-avatar-group').getBoundingClientRect(),avatar=el.querySelector('.person-avatar-button').getBoundingClientRect(),title=el.querySelector('strong').getBoundingClientRect();return{card:{x:card.x,y:card.y,width:card.width},group:{x:group.x,y:group.y,width:group.width,height:group.height},avatarWidth:avatar.width,titleTop:title.top};});
+ expect(Math.abs(bounds.group.x+bounds.group.width/2-(bounds.card.x+bounds.card.width/2))).toBeLessThan(2);
+ expect(bounds.group.y).toBeLessThan(bounds.card.y);expect(bounds.group.y+bounds.group.height).toBeGreaterThan(bounds.card.y);
+ expect(bounds.avatarWidth).toBeGreaterThanOrEqual(45);expect(bounds.titleTop).toBeGreaterThanOrEqual(bounds.group.y+bounds.group.height-2);
+ await page.screenshot({path:'/tmp/nama-avatars-top-desktop.png'});
+ await card.getByRole('button',{name:'اطلاعات همکار آزمون 0',exact:true}).click();
  const dialog=page.getByRole('dialog',{name:'اطلاعات همکار'});await expect(dialog).toBeVisible();
  await expect(dialog.getByRole('link',{name:'تماس با موبایل همکار آزمون 0'})).toHaveAttribute('href','tel:09121234560');await expect(dialog.getByRole('link',{name:'تماس با داخلی همکار آزمون 0'})).toHaveAttribute('href','sip:200');
  await dialog.getByRole('button',{name:'همه افراد این جایگاه'}).click();await expect(page.locator('.person-contact-list li')).toHaveCount(6);await page.keyboard.press('Escape');
